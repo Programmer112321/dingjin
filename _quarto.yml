@@ -2,12 +2,19 @@ project:
   type: website
 
 website:
-  title: "Dingjin_blog"
+  title: "Dingjin Chu"
   navbar:
     left:
       - href: index.qmd
         text: Home
-      - about.qmd
+      - href: about.qmd
+        text: About
+      - href: projects.qmd
+        text: Projects
+      - href: cv.qmd
+        text: CV
+      - href: notes.qmd
+        text: Notes
 
 format:
   html:
@@ -15,7 +22,4 @@ format:
       - cosmo
       - brand
     css: styles.css
-    toc: true
-
-editor: visual
-
+    toc: false

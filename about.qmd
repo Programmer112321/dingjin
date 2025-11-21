@@ -2,8 +2,15 @@
 title: "About"
 ---
 
-About this site
+# About Me
 
-```{r}
-1 + 1
-```
+I am a researcher specializing in **forest disturbance and geospatial analysis**, with experience in **remote sensing, R, Python, and Google Earth Engine**.  
+
+## Education
+- MSc/PhD in Environmental Science (Your University)
+- BSc in Forestry (Your University)
+
+## Interests
+- Forest monitoring
+- Climate and environmental data analysis
+- Geospatial visualization

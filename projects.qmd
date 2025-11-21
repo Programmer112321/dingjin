@@ -1,0 +1,14 @@
+---
+title: "Projects"
+---
+
+# Projects
+
+## Forest Loss Analysis
+Analyzing forest loss trends and drivers using satellite imagery and data modeling.
+
+## Geospatial Data Visualization
+Creating maps and visualizations for environmental data using **R** and **Python**.
+
+## Climate Impact Studies
+Investigating the relationship between climate variability and forest productivity.

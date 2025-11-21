@@ -1,7 +1,10 @@
-
 ---
 title: "Dingjin Chu"
-page-layout: article
 image: images/profile.png
 description: "Personal site—projects, CV, and notes."
 ---
+
+# Welcome
+
+Hi, I’m **Dingjin Chu**.  
+I work on **forest monitoring, geospatial data analysis, and environmental research**. 

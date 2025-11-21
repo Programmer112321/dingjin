@@ -1,0 +1,7 @@
+---
+title: "CV"
+---
+
+# Curriculum Vitae
+
+You can link your PDF CV here: [Download CV](files/DingjinChu_CV.pdf)
