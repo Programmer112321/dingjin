@@ -6,5 +6,13 @@ description: "Personal site—projects, CV, and notes."
 
 # Welcome
 
-Hi, I’m **Dingjin Chu**.  
-I work on **forest monitoring, geospatial data analysis, and environmental research**. 
+Hi, I’m **Dingjin Chu**.\
+I work on **forest monitoring, geospatial data analysis, and environmental research**.
+
+![Look at](profile.png){#fig-work width="400px"}
+
+Connect with me:\
+[![GitHub](https://img.shields.io/badge/GitHub-%2312100E.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.com/YourGitHub)|
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-%230077B5.svg?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/YourLinkedIn)|
+[![Twitter](https://img.shields.io/badge/Twitter-%231DA1F2.svg?style=for-the-badge&logo=twitter&logoColor=white)](https://twitter.com/YourTwitter)|
+[![ResearchGate](https://img.shields.io/badge/ResearchGate-%2300CCBB.svg?style=for-the-badge&logo=researchgate&logoColor=white)](https://www.researchgate.net/profile/YourResearchGate)
