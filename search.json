@@ -1,10 +1,73 @@
 [
   {
+    "objectID": "Thinking.html",
+    "href": "Thinking.html",
+    "title": "Notes",
+    "section": "",
+    "text": "Notes\nHere you can include research notes, code snippets, or publications."
+  },
+  {
+    "objectID": "notes.html",
+    "href": "notes.html",
+    "title": "Notes",
+    "section": "",
+    "text": "Notes\nHere you can include research notes, code snippets, or publications."
+  },
+  {
+    "objectID": "ML.html",
+    "href": "ML.html",
+    "title": "Notes",
+    "section": "",
+    "text": "Notes\nHere you can include research notes, code snippets, or publications."
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Home",
+    "section": "",
+    "text": "Welcome\nHi, I’m Dingjin Chu.\nI work on forest monitoring using remote sensing and modeling.\n\n\nBackground\nClimate change increases the risks to human life on Earth.\nIdentifying effective strategies to address these risks is the central focus of my research.\n# Research interest\n\n\n\n\n\n\nFigure 1\n\n\n\nEstimating forest above ground biomass using remote sensing.\nForest remote sensing Geospatial visualization Climate and environmental data analysis"
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About Me",
+    "section": "",
+    "text": "I specialize in forest disturbance and geospatial analysis, with experience in remote sensing, R, Python, and Google Earth Engine."
+  },
+  {
+    "objectID": "about.html#education",
+    "href": "about.html#education",
+    "title": "About Me",
+    "section": "Education",
+    "text": "Education\nPhD in Ecology (Oklahoma state university) MSc in Soil and water conservation (Beijing Forestry University) BSc in Soil and water conservation (Shenyang Agriculture University)"
+  },
+  {
+    "objectID": "about.html#interests",
+    "href": "about.html#interests",
+    "title": "About Me",
+    "section": "Interests",
+    "text": "Interests\nHiking Swimming"
+  },
+  {
+    "objectID": "Lidar.html",
+    "href": "Lidar.html",
+    "title": "Notes",
+    "section": "",
+    "text": "Notes\nHere you can include research notes, code snippets, or publications."
+  },
+  {
+    "objectID": "news.html",
+    "href": "news.html",
+    "title": "Recent News",
+    "section": "",
+    "text": "2025\n\n20 Dec 2025\n\n\nNew Paper Published in Certain Journal\n\n\nDingjin Chu and collaborators published a study on forest biomass estimation using LiDAR and optical data.\n\nRead Paper\n\n15–19 Dec 2025\n\n\nAGU Fall Meeting, New Orleans, USA\n\n\nDingjin presented recent research findings at the AGU Fall Meeting.\n\nVisit AGU\n\n\n2023\n\n16–17 Aug 2023\n\n\n\nPoster Presentation at the Conference “Actual Issues of Environmental Research for Sustainable Development in the Arid Zone” in Kyrgyzstan\n\n\nPoster about the impacts of future climate extremes on the interannual variability of terrestrial ecosystem productivity in Central Asia based on CMIP6."
+  },
+  {
     "objectID": "projects.html",
     "href": "projects.html",
     "title": "Projects",
     "section": "",
-    "text": "Analyzing forest loss trends and drivers using satellite imagery and data modeling.\n\n\n\nCreating maps and visualizations for environmental data using R and Python.\n\n\n\nInvestigating the relationship between climate variability and forest productivity."
+    "text": "Analyzing forest loss trends and drivers using satellite imagery and data modeling."
   },
   {
     "objectID": "projects.html#forest-loss-analysis",
@@ -14,59 +77,24 @@
     "text": "Analyzing forest loss trends and drivers using satellite imagery and data modeling."
   },
   {
-    "objectID": "projects.html#geospatial-data-visualization",
-    "href": "projects.html#geospatial-data-visualization",
+    "objectID": "projects.html#forest-agb-product-validation",
+    "href": "projects.html#forest-agb-product-validation",
     "title": "Projects",
-    "section": "",
-    "text": "Creating maps and visualizations for environmental data using R and Python."
+    "section": "Forest AGB product validation",
+    "text": "Forest AGB product validation\nUsing FIA data to validate"
   },
   {
-    "objectID": "projects.html#climate-impact-studies",
-    "href": "projects.html#climate-impact-studies",
+    "objectID": "projects.html#forest-agb-estimation",
+    "href": "projects.html#forest-agb-estimation",
     "title": "Projects",
-    "section": "",
-    "text": "Investigating the relationship between climate variability and forest productivity."
+    "section": "Forest AGB estimation",
+    "text": "Forest AGB estimation"
   },
   {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Dingjin Chu",
-    "section": "",
-    "text": "Welcome\nHi, I’m Dingjin Chu.\nI work on forest monitoring using remote sensing and modeling.\n\n\n\n\n\n\nFigure 1: Look at\n\n\n\nConnect with me:\n| | |"
-  },
-  {
-    "objectID": "about.html",
-    "href": "about.html",
-    "title": "About",
-    "section": "",
-    "text": "I am a researcher specializing in forest disturbance and geospatial analysis, with experience in remote sensing, R, Python, and Google Earth Engine.\n\n\n\nMSc/PhD in Environmental Science (Your University)\nBSc in Forestry (Your University)\n\n\n\n\n\nForest monitoring\nClimate and environmental data analysis\nGeospatial visualization"
-  },
-  {
-    "objectID": "about.html#education",
-    "href": "about.html#education",
-    "title": "About",
-    "section": "",
-    "text": "MSc/PhD in Environmental Science (Your University)\nBSc in Forestry (Your University)"
-  },
-  {
-    "objectID": "about.html#interests",
-    "href": "about.html#interests",
-    "title": "About",
-    "section": "",
-    "text": "Forest monitoring\nClimate and environmental data analysis\nGeospatial visualization"
-  },
-  {
-    "objectID": "cv.html",
-    "href": "cv.html",
-    "title": "CV",
-    "section": "",
-    "text": "Curriculum Vitae\nYou can link your PDF CV here: Download CV"
-  },
-  {
-    "objectID": "notes.html",
-    "href": "notes.html",
-    "title": "Notes",
-    "section": "",
-    "text": "Notes\nHere you can include research notes, code snippets, or publications."
+    "objectID": "projects.html#cooling-effect-of-urban-green-space",
+    "href": "projects.html#cooling-effect-of-urban-green-space",
+    "title": "Projects",
+    "section": "Cooling effect of urban green space",
+    "text": "Cooling effect of urban green space"
   }
 ]

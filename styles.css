@@ -7,7 +7,11 @@ h1, h2, h3 {
   color: #2c3e50;
 }
 
+/* Updated image styling */
 img {
-  border-radius: 50%;
-  max-width: 150px;
+  border-radius: 0; /* Remove circle crop */
+  max-width: 500px; /* Allow larger images */
+  height: auto; /* Maintain aspect ratio */
+  display: block; /* Prevent inline issues */
+  margin: 0 auto; /* Center the image */
 }
