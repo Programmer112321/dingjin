@@ -11,7 +11,7 @@ website:
         href: projects.qmd
       - text: Datasets
         href: datasets.qmd
-      - text: CV
+      - text: About Me
         href: cv.qmd
       - text: News
         href: news.qmd

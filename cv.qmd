@@ -1,50 +1,20 @@
 ---
-title: "CV"
+title: "About Me"
 ---
 
 # Curriculum Vitae
 
 [Download CV (PDF)](doc/DingjinChu_CV.pdf){.btn .btn-primary}
 
----
-
-## Education
-
-**MSc / PhD** — Environmental Science, *Your University* (Year–Present)
-
-**BSc** — Forestry, *Your University* (Year–Year)
+<iframe src="doc/DingjinChu_CV.pdf" width="100%" height="900px"
+        style="border: 1px solid #dee2e6; border-radius: 6px; margin-top: 1rem;">
+</iframe>
 
 ---
 
-## Research Experience
+# Personal Interest
 
-**Graduate Research Assistant** — *Your Lab / Department* (Year–Present)
-- Developed remote sensing workflows for forest disturbance detection using Google Earth Engine
-- Analyzed multi-decadal Landsat time series across boreal and temperate forest biomes
-- Contributed to peer-reviewed publications and conference presentations
-
----
-
-## Publications
-
-- *Your publication title.* Journal Name, Year. [DOI link]
-
----
-
-## Presentations
-
-- *Your talk title.* Conference Name, Location, Year.
-
----
-
-## Skills
-
-**Programming:** R, Python, Bash
-**Platforms:** Google Earth Engine, HPC/Linux
-**Data:** Landsat, MODIS, Sentinel, LiDAR
-**Writing:** LaTeX, R Markdown, Quarto
-
----
+Hiking, swimming, music, and movie.
 
 ## Photos
 
