@@ -32,7 +32,14 @@
     "href": "index.html",
     "title": "Dingjin Chu",
     "section": "",
-    "text": "Welcome\nHi, I’m Dingjin Chu — a researcher working at the intersection of forest ecology, remote sensing, and geospatial data analysis.\nI use satellite imagery, cloud computing platforms, and statistical modeling to study forest disturbance and landscape change.\n\n\nConnect with me:"
+    "text": "PhD Student · Forest Monitoring & Geospatial Analysis\nDepartment of Geography · Your University"
+  },
+  {
+    "objectID": "index.html#hello-this-is-dingjin.",
+    "href": "index.html#hello-this-is-dingjin.",
+    "title": "Dingjin Chu",
+    "section": "👋 Hello, this is Dingjin.",
+    "text": "👋 Hello, this is Dingjin.\nI am a PhD student studying forest disturbance and landscape change using satellite remote sensing and large-scale geospatial data. I work with time-series satellite imagery, Google Earth Engine, and statistical modeling to understand how forests respond to climate variability and human disturbance.\nI received my BSc in Forestry from Your University. My research interests sit at the intersection of forest ecology, remote sensing, and environmental data science."
   },
   {
     "objectID": "about.html",
