@@ -2,15 +2,7 @@
 title: "Projects"
 ---
 
-![](photo/Background.jpg){width="100%" style="border-radius: 8px; margin-bottom: 1.5rem;"}
-
-# Projects
-
-A selection of research and data projects. Source code and write-ups are linked where available.
-
----
-
-## Forest Loss Analysis
+# Forest Loss Analysis
 
 ![](photo/tree_mortality.jpg){width="100%" style="border-radius: 6px; margin-bottom: 0.75rem;"}
 
@@ -20,19 +12,20 @@ Quantifying forest loss trends and drivers across large spatial extents using ti
 
 ---
 
-## Geospatial Data Visualization
+# Forest above ground biomass estimation 
 
-Interactive and static maps for communicating spatial patterns in environmental datasets. Projects include animated time-series maps of vegetation indices and choropleth visualizations of disturbance rates by ecoregion.
+LiDAR-based modeling of forest above-ground biomass (AGB) using USGS 3DEP and NEON airborne point clouds, integrated with GEDI spaceborne LiDAR footprints and ESA CCI Biomass products for cross-scale validation. Built a large-scale processing pipeline that derives canopy structure metrics (height percentiles, density, rumple index) and predicts plot-level AGB with Random Forest, XGBoost, LightGBM, and stacked ensemble models, evaluated with grouped cross-validation and SHAP-based interpretation.
 
-**Tools:** R (ggplot2, tmap, Leaflet), Python (Matplotlib, Folium)
+**Tools:** R (lidR, lasR, terra, sf), Python (scikit-learn, XGBoost, LightGBM, SHAP)
 
 ---
 
-## Climate–Forest Productivity Analysis
+# Urban green space of cooling effect 
 
-Investigating how interannual climate variability (temperature, precipitation, drought indices) drives fluctuations in forest productivity as measured by MODIS NDVI and GPP products.
+Quantifying how the structure and composition of urban green spaces moderate land surface temperature across cities. Integrates USGS 3DEP airborne LiDAR-derived canopy metrics (height, cover, vertical complexity) with land cover and satellite-derived LST to model cooling magnitude as a function of canopy structure, patch geometry, and surrounding impervious context.
 
-**Tools:** Python, R, netCDF4, xarray
+
+**Tools:** R (lidR, terra, sf, lme4), Python (xarray, rasterio, scikit-learn)
 
 ---
 

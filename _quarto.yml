@@ -9,8 +9,6 @@ website:
         href: about.qmd
       - text: Projects
         href: projects.qmd
-      - text: News
-        href: news.qmd
       - text: CV
         href: cv.qmd
       - text: Datasets
@@ -19,12 +17,14 @@ website:
         menu:
           - text: Overview
             href: notes.qmd
-          - text: Lidar
-            href: Lidar.qmd
           - text: Machine Learning
             href: ML.qmd
           - text: Thinking
             href: Thinking.qmd
+      - text: News
+        href: news.qmd
+      - text: Contact
+        href: "mailto:dingjinchu@gmail.com"
     right:
       - icon: github
         href: https://github.com/YourGitHub

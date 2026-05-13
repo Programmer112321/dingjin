@@ -61,29 +61,26 @@ bbox_utm <- st_sfc(
 )
 bbox_wgs <- st_transform(bbox_utm, 4326)
 bb  <- st_bbox(bbox_wgs)
-cx  <- (bb["xmin"] + bb["xmax"]) / 2
-cy  <- (bb["ymin"] + bb["ymax"]) / 2
+cx  <- as.numeric((bb["xmin"] + bb["xmax"]) / 2)
+cy  <- as.numeric((bb["ymin"] + bb["ymax"]) / 2)
 
 map_cp <- leaflet() |>
   addProviderTiles("Esri.WorldImagery",
-                   options = providerTileOptions(maxZoom = 20)) |>
+                   options = providerTileOptions(maxZoom = 19)) |>
   addProviderTiles("CartoDB.PositronOnlyLabels",
-                   options = providerTileOptions(maxZoom = 20, opacity = 0.7)) |>
+                   options = providerTileOptions(maxZoom = 19, opacity = 0.8)) |>
   setView(lng = cx, lat = cy, zoom = 14) |>
   addPolygons(
     data        = bbox_wgs,
     color       = "#F03B20", weight = 2,
     fillColor   = "#F03B20", fillOpacity = 0.15,
-    label       = "USGS 3DEP LiDAR tile",
-    labelOptions = labelOptions(permanent = FALSE, textsize = "13px")
+    popup       = "USGS 3DEP LiDAR tile (~2 km² near Central Park)"
   ) |>
-  addScaleBar(position = "bottomleft") |>
-  addMiniMap(tiles = "CartoDB.Positron", toggleDisplay = TRUE,
-             minimized = FALSE)
+  addScaleBar(position = "bottomleft")
 
 cat("Saving central_park_map.html...\n")
 saveWidget(map_cp, file.path(out_dir, "central_park_map.html"),
-           selfcontained = TRUE, title = "Central Park — Location Map")
+           selfcontained = TRUE, title = "Central Park Location Map")
 cat("Done.\n")
 
 
