@@ -358,16 +358,19 @@ ul.task-list li input[type="checkbox"] {
 <hr>
 <section id="urban-forest-near-central-park-new-york-city" class="level2">
 <h2 class="anchored" data-anchor-id="urban-forest-near-central-park-new-york-city">Urban Forest — Near Central Park, New York City</h2>
-<p><strong>Source:</strong> USGS 3DEP · NAD83(2011) / UTM Zone 18N <strong>Area:</strong> ~2.04 km² · <strong>Points:</strong> 2.21 million · <strong>Density:</strong> ~1.08 pts/m² <strong>Classifications:</strong> Ground · Unclassified · Water · Rail · Bridge Deck · Noise</p>
-<p>This tile covers a section of Manhattan adjacent to Central Park. The vertical range (−10 to +385 m) captures both below-grade infrastructure and the surrounding high-rise skyline. Points are colored by LiDAR classification — rotate and zoom to explore the urban 3D structure.</p>
-<iframe src="widgets/central_park_3d.html" width="100%" height="600px" style="border: 1px solid #dee2e6; border-radius: 6px;" frameborder="0">
+<p><strong>Source:</strong> USGS 3DEP · NAD83(2011) / UTM Zone 18N <strong>Area:</strong> ~2.04 km² · <strong>Points:</strong> 2.21 million · <strong>Density:</strong> ~1.08 pts/m² <strong>Elevation range:</strong> −10 m to +385 m (ground to building rooftops)</p>
+<p>This tile covers a section of Manhattan adjacent to Central Park. The map below shows the exact footprint of the dataset on a satellite basemap — toggle the minimap in the bottom-right corner for broader context.</p>
+<iframe src="widgets/central_park_map.html" width="100%" height="420px" style="border: 1px solid #dee2e6; border-radius: 6px; margin-bottom: 1rem;" frameborder="0">
+</iframe>
+<p>The 3D viewer below renders the point cloud colored by elevation. Rotate with left-click, pan with right-click, and scroll to zoom. The tall peaks (orange–red) are Manhattan skyscrapers; the flat ground surface and below-grade infrastructure appear in purple–blue.</p>
+<iframe src="widgets/central_park_3d.html" width="100%" height="580px" style="border: 1px solid #dee2e6; border-radius: 6px;" frameborder="0">
 </iframe>
 <hr>
 </section>
 <section id="small-tree-plot" class="level2">
 <h2 class="anchored" data-anchor-id="small-tree-plot">Small Tree Plot</h2>
-<p><strong>Source:</strong> USGS 3DEP · WGS 84 / UTM Zone 6N <strong>Area:</strong> ~399 m² · <strong>Points:</strong> 10.4 thousand · <strong>Density:</strong> ~26 pts/m² <strong>Classifications:</strong> Ground · Vegetation · Unclassified</p>
-<p>A high-density scan of a small tree stand (~20 m × 20 m). At 26 pts/m² this tile resolves individual tree crowns and branching structure in detail. Points reach up to 17 m above ground. All points are shown — no subsampling.</p>
+<p><strong>Source:</strong> USGS 3DEP · WGS 84 / UTM Zone 6N <strong>Area:</strong> ~399 m² · <strong>Points:</strong> 10.4 thousand · <strong>Density:</strong> ~26 pts/m² <strong>Elevation range:</strong> 0 m to 17.3 m (ground to crown top)</p>
+<p>A high-density scan (~20 m × 20 m) of a small tree stand. At 26 pts/m² the scan resolves individual tree crowns and branching structure in detail. All points are shown — no subsampling. Colors show elevation from ground (dark green) to canopy top (yellow).</p>
 <iframe src="widgets/tree_3d.html" width="100%" height="550px" style="border: 1px solid #dee2e6; border-radius: 6px;" frameborder="0">
 </iframe>
 <hr>
@@ -381,7 +384,7 @@ Note
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>All data are from the <a href="https://www.usgs.gov/3d-elevation-program">USGS 3D Elevation Program (3DEP)</a> and are in the public domain. Visualizations use <code>lidR</code> and <code>plotly</code> in R.</p>
+<p>All data are from the <a href="https://www.usgs.gov/3d-elevation-program">USGS 3D Elevation Program (3DEP)</a> and are in the public domain. Visualizations produced with <code>lidR</code>, <code>plotly</code>, and <code>leaflet</code> in R.</p>
 </div>
 </div>
 
