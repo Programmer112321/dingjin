@@ -1,56 +1,70 @@
-/* Typography */
+/* ── Typography ─────────────────────────────────────────── */
 body {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  line-height: 1.7;
-  color: #2c3e50;
+  line-height: 1.75;
 }
 
 h1, h2, h3 {
-  color: #1a252f;
   font-weight: 600;
   margin-top: 1.6rem;
 }
 
-h1 {
-  font-size: 2rem;
-  border-bottom: 2px solid #e8ecef;
-  padding-bottom: 0.4rem;
-  margin-bottom: 1rem;
-}
-
 h2 {
-  font-size: 1.35rem;
-  color: #2c3e50;
+  font-size: 1.25rem;
 }
 
-/* Profile image on home page */
-.profile-img {
-  display: block;
-  width: 150px;
-  height: 150px;
+/* ── About / Home page (jolla template) ─────────────────── */
+.quarto-about-jolla .about-image {
+  width: 160px !important;
+  height: 160px !important;
+  border-radius: 50% !important;
   object-fit: cover;
-  border-radius: 50%;
-  margin: 1.5rem 0;
   border: 3px solid #dee2e6;
 }
 
-/* Nav */
+/* subtitle line under name */
+.quarto-about-jolla .about-entity {
+  text-align: center;
+}
+
+/* affiliation text below the name */
+.quarto-about-jolla p:first-of-type {
+  font-size: 1rem;
+  color: #555;
+  margin-bottom: 0.25rem;
+}
+
+/* ── Navbar ──────────────────────────────────────────────── */
 .navbar {
-  border-bottom: 1px solid #e8ecef;
+  border-bottom: 1px solid rgba(0,0,0,.08);
 }
 
-/* Content width */
-.quarto-content {
-  max-width: 760px;
+.navbar-nav .nav-link {
+  font-size: 0.9rem;
 }
 
-/* Social badges */
-img[src*="shields.io"] {
-  margin: 0 4px 6px 0;
-  vertical-align: middle;
+/* social icon links in navbar */
+.navbar-nav .nav-link .bi {
+  font-size: 1.05rem;
 }
 
-/* Tables */
+/* ── Content ─────────────────────────────────────────────── */
+.quarto-content,
+#quarto-content {
+  max-width: 780px;
+  margin: 0 auto;
+}
+
+/* ── Links ───────────────────────────────────────────────── */
+a {
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* ── Tables ──────────────────────────────────────────────── */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -59,49 +73,39 @@ table {
 }
 
 th {
-  background-color: #f1f3f5;
   font-weight: 600;
   padding: 0.5rem 0.75rem;
   text-align: left;
   border-bottom: 2px solid #dee2e6;
+  background-color: rgba(0,0,0,.03);
 }
 
 td {
   padding: 0.45rem 0.75rem;
-  border-bottom: 1px solid #e8ecef;
+  border-bottom: 1px solid rgba(0,0,0,.07);
 }
 
-/* Horizontal rule */
+/* ── Horizontal rule ─────────────────────────────────────── */
 hr {
   border: none;
-  border-top: 1px solid #e8ecef;
-  margin: 2rem 0;
+  border-top: 1px solid rgba(0,0,0,.1);
+  margin: 1.5rem 0;
 }
 
-/* Callout tweaks */
+/* ── Callouts ────────────────────────────────────────────── */
 .callout {
   margin: 1.5rem 0;
 }
 
-/* Links */
-a {
-  color: #2980b9;
-  text-decoration: none;
-}
-
-a:hover {
-  text-decoration: underline;
-}
-
-/* Button */
+/* ── CV button ───────────────────────────────────────────── */
 .btn-primary {
-  background-color: #2980b9;
-  border-color: #2980b9;
   font-size: 0.9rem;
   padding: 0.4rem 1rem;
 }
 
-.btn-primary:hover {
-  background-color: #1a6fa0;
-  border-color: #1a6fa0;
+/* ── Footer ──────────────────────────────────────────────── */
+.nav-footer {
+  border-top: 1px solid rgba(0,0,0,.08);
+  font-size: 0.85rem;
+  color: #888;
 }

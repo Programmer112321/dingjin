@@ -1,21 +1,31 @@
 ---
 title: "Dingjin Chu"
-image: profile.png
-description: "Personal site — projects, CV, and notes."
+about:
+  template: jolla
+  image: profile.png
+  links:
+    - icon: github
+      text: GitHub
+      href: https://github.com/YourGitHub
+    - icon: linkedin
+      text: LinkedIn
+      href: https://www.linkedin.com/in/YourLinkedIn
+    - icon: mortarboard-fill
+      text: ResearchGate
+      href: https://www.researchgate.net/profile/YourResearchGate
+    - icon: envelope
+      text: Email
+      href: mailto:your.email@university.edu
 ---
 
-# Welcome
+**PhD Student** · Forest Monitoring & Geospatial Analysis
 
-Hi, I'm **Dingjin Chu** — a researcher working at the intersection of **forest ecology, remote sensing, and geospatial data analysis**.
-
-I use satellite imagery, cloud computing platforms, and statistical modeling to study forest disturbance and landscape change.
-
-![](profile.png){.profile-img}
+[Department of Geography](link) · [Your University](link)
 
 ---
 
-Connect with me:
+## 👋 Hello, this is Dingjin.
 
-[![GitHub](https://img.shields.io/badge/GitHub-%2312100E.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.com/YourGitHub)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-%230077B5.svg?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/YourLinkedIn)
-[![ResearchGate](https://img.shields.io/badge/ResearchGate-%2300CCBB.svg?style=for-the-badge&logo=researchgate&logoColor=white)](https://www.researchgate.net/profile/YourResearchGate)
+I am a PhD student studying **forest disturbance and landscape change** using satellite remote sensing and large-scale geospatial data. I work with time-series satellite imagery, Google Earth Engine, and statistical modeling to understand how forests respond to climate variability and human disturbance.
+
+I received my BSc in Forestry from *Your University*. My research interests sit at the intersection of forest ecology, remote sensing, and environmental data science.

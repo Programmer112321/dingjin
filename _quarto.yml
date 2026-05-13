@@ -5,14 +5,14 @@ website:
   title: "Dingjin Chu"
   navbar:
     left:
-      - text: Home
-        href: index.qmd
       - text: About
         href: about.qmd
       - text: Projects
         href: projects.qmd
       - text: News
-        href: news.qmd        
+        href: news.qmd
+      - text: CV
+        href: cv.qmd
       - text: Notes
         menu:
           - text: Overview
@@ -23,11 +23,23 @@ website:
             href: ML.qmd
           - text: Thinking
             href: Thinking.qmd
+    right:
+      - icon: github
+        href: https://github.com/YourGitHub
+        aria-label: GitHub
+      - icon: linkedin
+        href: https://www.linkedin.com/in/YourLinkedIn
+        aria-label: LinkedIn
+      - icon: twitter
+        href: https://twitter.com/YourTwitter
+        aria-label: Twitter
+  page-footer:
+    center: "© 2026 Dingjin Chu"
 
 format:
   html:
     theme:
-      - cosmo
-      - brand
+      light: cosmo
+      dark: darkly
     css: styles.css
     toc: false
