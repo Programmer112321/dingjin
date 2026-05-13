@@ -5,16 +5,24 @@ website:
   title: "Dingjin Chu"
   navbar:
     left:
-      - href: index.qmd
-        text: Home
-      - href: about.qmd
-        text: About
-      - href: projects.qmd
-        text: Projects
-      - href: cv.qmd
-        text: CV
-      - href: notes.qmd
-        text: Notes
+      - text: Home
+        href: index.qmd
+      - text: About
+        href: about.qmd
+      - text: Projects
+        href: projects.qmd
+      - text: News
+        href: news.qmd        
+      - text: Notes
+        menu:
+          - text: Overview
+            href: notes.qmd
+          - text: Lidar
+            href: Lidar.qmd
+          - text: Machine Learning
+            href: ML.qmd
+          - text: Thinking
+            href: Thinking.qmd
 
 format:
   html:

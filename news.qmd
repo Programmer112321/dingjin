@@ -1,0 +1,27 @@
+---
+title: "Recent News"
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+---
+
+# 2025
+
+<div class="text-muted mt-4">20 Dec 2025</div>
+<h5><strong>New Paper Published in <em>Certain Journal</em></strong></h5>
+<p>Dingjin Chu and collaborators published a study on forest biomass estimation using LiDAR and optical data.</p>
+<a href="https://doi.org/YOUR-DOI" class="btn btn-primary" target="_blank">Read Paper</a>
+
+<div class="text-muted mt-4">15–19 Dec 2025</div>
+<h5><strong>AGU Fall Meeting, New Orleans, USA</strong></h5>
+<p>Dingjin presented recent research findings at the AGU Fall Meeting.</p>
+<a href="https://www.agu.org" class="btn btn-primary" target="_blank">Visit AGU</a>
+
+# 2023
+
+<div class="text-muted mt-4">16–17 Aug 2023</div>
+<div class="card mb-3 p-3">
+  <h5><strong>Poster Presentation at the Conference “Actual Issues of Environmental Research for Sustainable Development in the Arid Zone” in Kyrgyzstan</strong></h5>
+  <p>Poster about the impacts of future climate extremes on the interannual variability of terrestrial ecosystem productivity in Central Asia based on CMIP6.</p>
+</div>

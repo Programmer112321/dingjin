@@ -1,0 +1,7 @@
+---
+title: "Notes"
+---
+
+# Notes
+
+Here you can include **research notes, code snippets, or publications**.

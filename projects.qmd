@@ -4,11 +4,34 @@ title: "Projects"
 
 # Projects
 
+A selection of research and data projects. Source code and write-ups are linked where available.
+
+---
+
 ## Forest Loss Analysis
-Analyzing forest loss trends and drivers using satellite imagery and data modeling.
+
+Quantifying forest loss trends and drivers across large spatial extents using time-series satellite imagery. The workflow integrates Hansen Global Forest Change data with climate and topographic covariates to attribute disturbance to fire, harvest, and insect outbreak.
+
+**Tools:** R, Google Earth Engine, tidyverse
+
+---
 
 ## Geospatial Data Visualization
-Creating maps and visualizations for environmental data using **R** and **Python**.
 
-## Climate Impact Studies
-Investigating the relationship between climate variability and forest productivity.
+Interactive and static maps for communicating spatial patterns in environmental datasets. Projects include animated time-series maps of vegetation indices and choropleth visualizations of disturbance rates by ecoregion.
+
+**Tools:** R (ggplot2, tmap, Leaflet), Python (Matplotlib, Folium)
+
+---
+
+## Climate–Forest Productivity Analysis
+
+Investigating how interannual climate variability (temperature, precipitation, drought indices) drives fluctuations in forest productivity as measured by MODIS NDVI and GPP products.
+
+**Tools:** Python, R, netCDF4, xarray
+
+---
+
+::: {.callout-note}
+More projects and reproducible notebooks will be added here over time.
+:::

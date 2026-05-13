@@ -4,4 +4,42 @@ title: "CV"
 
 # Curriculum Vitae
 
-You can link your PDF CV here: [Download CV](files/DingjinChu_CV.pdf)
+[Download CV (PDF)](files/DingjinChu_CV.pdf){.btn .btn-primary}
+
+---
+
+## Education
+
+**MSc / PhD** — Environmental Science, *Your University* (Year–Present)
+
+**BSc** — Forestry, *Your University* (Year–Year)
+
+---
+
+## Research Experience
+
+**Graduate Research Assistant** — *Your Lab / Department* (Year–Present)
+- Developed remote sensing workflows for forest disturbance detection using Google Earth Engine
+- Analyzed multi-decadal Landsat time series across boreal and temperate forest biomes
+- Contributed to peer-reviewed publications and conference presentations
+
+---
+
+## Publications
+
+- *Your publication title.* Journal Name, Year. [DOI link]
+
+---
+
+## Presentations
+
+- *Your talk title.* Conference Name, Location, Year.
+
+---
+
+## Skills
+
+**Programming:** R, Python, Bash
+**Platforms:** Google Earth Engine, HPC/Linux
+**Data:** Landsat, MODIS, Sentinel, LiDAR
+**Writing:** LaTeX, R Markdown, Quarto
