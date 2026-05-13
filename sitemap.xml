@@ -1,43 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://Programmer112321.github.io/dingjin/Thinking.html</loc>
-    <lastmod>2025-11-21T02:06:02.899Z</lastmod>
-  </url>
-  <url>
-    <loc>https://Programmer112321.github.io/dingjin/notes.html</loc>
-    <lastmod>2026-05-13T15:19:06.575Z</lastmod>
-  </url>
-  <url>
-    <loc>https://Programmer112321.github.io/dingjin/ML.html</loc>
-    <lastmod>2025-11-21T02:06:02.899Z</lastmod>
-  </url>
-  <url>
-    <loc>https://Programmer112321.github.io/dingjin/index.html</loc>
-    <lastmod>2026-05-13T16:15:10.006Z</lastmod>
-  </url>
-  <url>
-    <loc>https://Programmer112321.github.io/dingjin/cv.html</loc>
-    <lastmod>2026-05-13T15:18:59.053Z</lastmod>
-  </url>
-  <url>
-    <loc>https://Programmer112321.github.io/dingjin/about.html</loc>
-    <lastmod>2026-05-13T16:27:48.503Z</lastmod>
-  </url>
-  <url>
-    <loc>https://Programmer112321.github.io/dingjin/datasets.html</loc>
-    <lastmod>2026-05-13T17:52:55.935Z</lastmod>
+    <loc>https://Programmer112321.github.io/dingjin/projects.html</loc>
+    <lastmod>2026-05-13T18:29:28.994Z</lastmod>
   </url>
   <url>
     <loc>https://Programmer112321.github.io/dingjin/Lidar.html</loc>
     <lastmod>2026-05-13T15:58:39.882Z</lastmod>
   </url>
   <url>
-    <loc>https://Programmer112321.github.io/dingjin/news.html</loc>
-    <lastmod>2025-11-21T16:18:01.086Z</lastmod>
+    <loc>https://Programmer112321.github.io/dingjin/datasets.html</loc>
+    <lastmod>2026-05-13T17:59:27.987Z</lastmod>
   </url>
   <url>
-    <loc>https://Programmer112321.github.io/dingjin/projects.html</loc>
-    <lastmod>2026-05-13T17:45:49.508Z</lastmod>
+    <loc>https://Programmer112321.github.io/dingjin/about.html</loc>
+    <lastmod>2026-05-13T16:27:48.503Z</lastmod>
+  </url>
+  <url>
+    <loc>https://Programmer112321.github.io/dingjin/cv.html</loc>
+    <lastmod>2026-05-13T15:18:59.053Z</lastmod>
+  </url>
+  <url>
+    <loc>https://Programmer112321.github.io/dingjin/index.html</loc>
+    <lastmod>2026-05-13T16:15:10.006Z</lastmod>
+  </url>
+  <url>
+    <loc>https://Programmer112321.github.io/dingjin/news.html</loc>
+    <lastmod>2025-11-21T16:18:01.086Z</lastmod>
   </url>
 </urlset>

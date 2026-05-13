@@ -265,12 +265,12 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">Projects</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./cv.html"> 
-<span class="menu-text">CV</span></a>
-  </li>  
-  <li class="nav-item">
     <a class="nav-link" href="./datasets.html"> 
 <span class="menu-text">Datasets</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./cv.html"> 
+<span class="menu-text">CV</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="./news.html"> 
@@ -343,12 +343,14 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="forest-above-ground-biomass-estimation" class="level1">
 <h1>Forest above ground biomass estimation</h1>
+<p><img src="photo/AGB_estimation.png" class="img-fluid" style="border-radius: 6px; margin-bottom: 0.75rem;;width:100.0%"></p>
 <p>LiDAR-based modeling of forest above-ground biomass (AGB) using USGS 3DEP and NEON airborne point clouds, integrated with GEDI spaceborne LiDAR footprints and ESA CCI Biomass products for cross-scale validation. Built a large-scale processing pipeline that derives canopy structure metrics (height percentiles, density, rumple index) and predicts plot-level AGB with Random Forest, XGBoost, LightGBM, and stacked ensemble models, evaluated with grouped cross-validation and SHAP-based interpretation.</p>
 <p><strong>Tools:</strong> R (lidR, lasR, terra, sf), Python (scikit-learn, XGBoost, LightGBM, SHAP)</p>
 <hr>
 </section>
 <section id="urban-green-space-of-cooling-effect" class="level1">
 <h1>Urban green space of cooling effect</h1>
+<p><img src="photo/urban_green_space_cooling_effect.png" class="img-fluid" style="border-radius: 6px; margin-bottom: 0.75rem;;width:100.0%"></p>
 <p>Quantifying how the structure and composition of urban green spaces moderate land surface temperature across cities. Integrates USGS 3DEP airborne LiDAR-derived canopy metrics (height, cover, vertical complexity) with land cover and satellite-derived LST to model cooling magnitude as a function of canopy structure, patch geometry, and surrounding impervious context.</p>
 <p><strong>Tools:</strong> R (lidR, terra, sf, lme4), Python (xarray, rasterio, scikit-learn)</p>
 <hr>

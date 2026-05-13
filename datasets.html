@@ -265,12 +265,12 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">Projects</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./cv.html"> 
-<span class="menu-text">CV</span></a>
-  </li>  
-  <li class="nav-item">
     <a class="nav-link active" href="./datasets.html" aria-current="page"> 
 <span class="menu-text">Datasets</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./cv.html"> 
+<span class="menu-text">CV</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="./news.html"> 
@@ -334,8 +334,8 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<section id="lidar" class="level1">
-<h1>LiDAR</h1>
+<section id="gedi" class="level1">
+<h1>GEDI</h1>
 <p>Notes on LiDAR data processing, analysis, and applications in forest monitoring.</p>
 <div class="quarto-figure quarto-figure-center" style="border-radius: 6px; margin: 1rem 0;">
 <figure class="figure">
@@ -349,12 +349,9 @@ ul.task-list li input[type="checkbox"] {
 <hr>
 </section>
 </section>
-<section id="datasets" class="level1">
-<h1>Datasets</h1>
+<section id="usgs-3dep-urban-forest-near-central-park-new-york-city" class="level1">
+<h1>USGS 3DEP — Urban Forest Near Central Park, New York City</h1>
 <p>The datasets shown here are airborne LiDAR point clouds from two open-access programs: the <strong>USGS 3D Elevation Program (3DEP)</strong>, a nationwide topographic mapping initiative, and the <strong>NEON Airborne Observation Platform (AOP)</strong>, which collects high-density ecological LiDAR across NEON field sites. Both programs provide data freely to the public.</p>
-<hr>
-<section id="usgs-3dep-urban-forest-near-central-park-new-york-city" class="level2">
-<h2 class="anchored" data-anchor-id="usgs-3dep-urban-forest-near-central-park-new-york-city">USGS 3DEP — Urban Forest Near Central Park, New York City</h2>
 <p><strong>Source:</strong> USGS 3DEP · NAD83(2011) / UTM Zone 18N <strong>Area:</strong> ~2.04 km² · <strong>Points:</strong> 2.21 million · <strong>Density:</strong> ~1.08 pts/m² <strong>Elevation range:</strong> −10 m to +385 m (ground to building rooftops)</p>
 <p>This tile covers a section of Manhattan adjacent to Central Park. The map below shows the exact footprint of the dataset on a satellite basemap.</p>
 <iframe src="widgets/central_park_map.html" width="100%" height="420px" style="border: 1px solid #dee2e6; border-radius: 6px; margin-bottom: 1rem;" frameborder="0">
@@ -364,8 +361,8 @@ ul.task-list li input[type="checkbox"] {
 </iframe>
 <hr>
 </section>
-<section id="neon-aop-small-tree-plot" class="level2">
-<h2 class="anchored" data-anchor-id="neon-aop-small-tree-plot">NEON AOP — Small Tree Plot</h2>
+<section id="neon-aop-small-tree-plot" class="level1">
+<h1>NEON AOP — Small Tree Plot</h1>
 <p><strong>Source:</strong> NEON Airborne Observation Platform · WGS 84 / UTM Zone 6N <strong>Area:</strong> ~399 m² · <strong>Points:</strong> 10.4 thousand · <strong>Density:</strong> ~26 pts/m² <strong>Elevation range:</strong> 0 m to 17.3 m (ground to crown top)</p>
 <p>A high-density NEON AOP scan (~20 m × 20 m) of a small tree stand. At 26 pts/m² the scan resolves individual tree crowns and branching structure in detail. All points are shown — no subsampling. Colors show elevation from ground (dark green) to canopy top (yellow).</p>
 <iframe src="widgets/tree_3d.html" width="100%" height="550px" style="border: 1px solid #dee2e6; border-radius: 6px;" frameborder="0">
@@ -386,7 +383,6 @@ Note
 </div>
 
 
-</section>
 </section>
 
 </main> <!-- /main -->
