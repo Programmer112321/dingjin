@@ -2,6 +2,8 @@
 title: "About"
 ---
 
+![](photo/remote_Sensing.jpg){width="100%" style="border-radius: 8px; margin-bottom: 1.5rem;"}
+
 # About Me
 
 I am a researcher specializing in **forest disturbance and geospatial analysis**. My work combines remote sensing, statistical modeling, and large-scale environmental data to understand how forests respond to natural and human-driven disturbances.
@@ -14,6 +16,8 @@ I am comfortable working across the full analysis pipeline — from raw satellit
 - **BSc** in Forestry — *Your University*
 
 ## Research Interests
+
+![](photo/Research_interest1.webp){width="100%" style="border-radius: 6px; margin: 0.5rem 0 1rem;"}
 
 - Forest disturbance monitoring and change detection
 - Remote sensing and land-cover analysis

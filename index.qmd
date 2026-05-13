@@ -2,7 +2,7 @@
 title: "Dingjin Chu"
 about:
   template: jolla
-  image: profile.png
+  image: photo/personal_profile.JPG
   links:
     - icon: github
       text: GitHub
@@ -29,3 +29,7 @@ about:
 I am a PhD student studying **forest disturbance and landscape change** using satellite remote sensing and large-scale geospatial data. I work with time-series satellite imagery, Google Earth Engine, and statistical modeling to understand how forests respond to climate variability and human disturbance.
 
 I received my BSc in Forestry from *Your University*. My research interests sit at the intersection of forest ecology, remote sensing, and environmental data science.
+
+---
+
+![*Image generated from [Your Name in Landsat](https://science.nasa.gov/specials/your-name-in-landsat/) — NASA.*](photo/Bottom_photo_created_by_yourname_landsat.png){width="100%"}

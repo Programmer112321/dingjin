@@ -2,6 +2,8 @@
 title: "Projects"
 ---
 
+![](photo/Background.jpg){width="100%" style="border-radius: 8px; margin-bottom: 1.5rem;"}
+
 # Projects
 
 A selection of research and data projects. Source code and write-ups are linked where available.
@@ -9,6 +11,8 @@ A selection of research and data projects. Source code and write-ups are linked 
 ---
 
 ## Forest Loss Analysis
+
+![](photo/tree_mortality.jpg){width="100%" style="border-radius: 6px; margin-bottom: 0.75rem;"}
 
 Quantifying forest loss trends and drivers across large spatial extents using time-series satellite imagery. The workflow integrates Hansen Global Forest Change data with climate and topographic covariates to attribute disturbance to fire, harvest, and insect outbreak.
 
