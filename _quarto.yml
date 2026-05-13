@@ -3,11 +3,11 @@ project:
 
 website:
   title: "Dingjin Chu"
+  favicon: "photo/favicon_satellite.svg"
   navbar:
+    title: "<i class='bi bi-broadcast-pin'></i> Dingjin Chu"
     left:
-      - text: About
-        href: about.qmd
-      - text: Projects
+      - text: Research
         href: projects.qmd
       - text: Datasets
         href: datasets.qmd
