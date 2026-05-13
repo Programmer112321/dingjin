@@ -272,32 +272,14 @@ ul.task-list li input[type="checkbox"] {
     <a class="nav-link active" href="./datasets.html" aria-current="page"> 
 <span class="menu-text">Datasets</span></a>
   </li>  
-  <li class="nav-item dropdown ">
-    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-notes" role="link" data-bs-toggle="dropdown" aria-expanded="false">
- <span class="menu-text">Notes</span>
-    </a>
-    <ul class="dropdown-menu" aria-labelledby="nav-menu-notes">    
-        <li>
-    <a class="dropdown-item" href="./notes.html">
- <span class="dropdown-text">Overview</span></a>
-  </li>  
-        <li>
-    <a class="dropdown-item" href="./ML.html">
- <span class="dropdown-text">Machine Learning</span></a>
-  </li>  
-        <li>
-    <a class="dropdown-item" href="./Thinking.html">
- <span class="dropdown-text">Thinking</span></a>
-  </li>  
-    </ul>
-  </li>
   <li class="nav-item">
     <a class="nav-link" href="./news.html"> 
 <span class="menu-text">News</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="mailto:dingjinchu@gmail.com"> 
-<span class="menu-text">Contact</span></a>
+    <span class="nav-link">
+<span class="menu-text">dingjinchu@gmail.com</span>
+    </span>
   </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
@@ -369,12 +351,12 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="datasets" class="level1">
 <h1>Datasets</h1>
-<p>The datasets shown here are airborne LiDAR point clouds sourced from the <strong>USGS 3D Elevation Program (3DEP)</strong> — a nationwide initiative to collect high-quality topographic data across the United States. Data are freely available through the <a href="https://www.usgs.gov/3d-elevation-program">USGS National Map</a>.</p>
+<p>The datasets shown here are airborne LiDAR point clouds from two open-access programs: the <strong>USGS 3D Elevation Program (3DEP)</strong>, a nationwide topographic mapping initiative, and the <strong>NEON Airborne Observation Platform (AOP)</strong>, which collects high-density ecological LiDAR across NEON field sites. Both programs provide data freely to the public.</p>
 <hr>
-<section id="urban-forest-near-central-park-new-york-city" class="level2">
-<h2 class="anchored" data-anchor-id="urban-forest-near-central-park-new-york-city">Urban Forest — Near Central Park, New York City</h2>
+<section id="usgs-3dep-urban-forest-near-central-park-new-york-city" class="level2">
+<h2 class="anchored" data-anchor-id="usgs-3dep-urban-forest-near-central-park-new-york-city">USGS 3DEP — Urban Forest Near Central Park, New York City</h2>
 <p><strong>Source:</strong> USGS 3DEP · NAD83(2011) / UTM Zone 18N <strong>Area:</strong> ~2.04 km² · <strong>Points:</strong> 2.21 million · <strong>Density:</strong> ~1.08 pts/m² <strong>Elevation range:</strong> −10 m to +385 m (ground to building rooftops)</p>
-<p>This tile covers a section of Manhattan adjacent to Central Park. The map below shows the exact footprint of the dataset on a satellite basemap — toggle the minimap in the bottom-right corner for broader context.</p>
+<p>This tile covers a section of Manhattan adjacent to Central Park. The map below shows the exact footprint of the dataset on a satellite basemap.</p>
 <iframe src="widgets/central_park_map.html" width="100%" height="420px" style="border: 1px solid #dee2e6; border-radius: 6px; margin-bottom: 1rem;" frameborder="0">
 </iframe>
 <p>The 3D viewer below renders the point cloud colored by elevation. Rotate with left-click, pan with right-click, and scroll to zoom. The tall peaks (orange–red) are Manhattan skyscrapers; the flat ground surface and below-grade infrastructure appear in purple–blue.</p>
@@ -382,10 +364,10 @@ ul.task-list li input[type="checkbox"] {
 </iframe>
 <hr>
 </section>
-<section id="small-tree-plot" class="level2">
-<h2 class="anchored" data-anchor-id="small-tree-plot">Small Tree Plot</h2>
-<p><strong>Source:</strong> USGS 3DEP · WGS 84 / UTM Zone 6N <strong>Area:</strong> ~399 m² · <strong>Points:</strong> 10.4 thousand · <strong>Density:</strong> ~26 pts/m² <strong>Elevation range:</strong> 0 m to 17.3 m (ground to crown top)</p>
-<p>A high-density scan (~20 m × 20 m) of a small tree stand. At 26 pts/m² the scan resolves individual tree crowns and branching structure in detail. All points are shown — no subsampling. Colors show elevation from ground (dark green) to canopy top (yellow).</p>
+<section id="neon-aop-small-tree-plot" class="level2">
+<h2 class="anchored" data-anchor-id="neon-aop-small-tree-plot">NEON AOP — Small Tree Plot</h2>
+<p><strong>Source:</strong> NEON Airborne Observation Platform · WGS 84 / UTM Zone 6N <strong>Area:</strong> ~399 m² · <strong>Points:</strong> 10.4 thousand · <strong>Density:</strong> ~26 pts/m² <strong>Elevation range:</strong> 0 m to 17.3 m (ground to crown top)</p>
+<p>A high-density NEON AOP scan (~20 m × 20 m) of a small tree stand. At 26 pts/m² the scan resolves individual tree crowns and branching structure in detail. All points are shown — no subsampling. Colors show elevation from ground (dark green) to canopy top (yellow).</p>
 <iframe src="widgets/tree_3d.html" width="100%" height="550px" style="border: 1px solid #dee2e6; border-radius: 6px;" frameborder="0">
 </iframe>
 <hr>
@@ -399,7 +381,7 @@ Note
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>All data are from the <a href="https://www.usgs.gov/3d-elevation-program">USGS 3D Elevation Program (3DEP)</a> and are in the public domain. Visualizations produced with <code>lidR</code>, <code>plotly</code>, and <code>leaflet</code> in R.</p>
+<p>USGS 3DEP data are available via the <a href="https://www.usgs.gov/3d-elevation-program">USGS National Map</a>. NEON AOP data are available via the <a href="https://data.neonscience.org">NEON Data Portal</a>. Visualizations produced with <code>lidR</code>, <code>plotly</code>, and <code>leaflet</code> in R.</p>
 </div>
 </div>
 

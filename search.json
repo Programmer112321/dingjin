@@ -126,18 +126,18 @@
     "text": "GEDI is a full-waveform LiDAR instrument mounted on the International Space Station. It provides high-resolution measurements of forest vertical structure, canopy height, and above-ground biomass at global scale."
   },
   {
-    "objectID": "datasets.html#urban-forest-near-central-park-new-york-city",
-    "href": "datasets.html#urban-forest-near-central-park-new-york-city",
+    "objectID": "datasets.html#usgs-3dep-urban-forest-near-central-park-new-york-city",
+    "href": "datasets.html#usgs-3dep-urban-forest-near-central-park-new-york-city",
     "title": "Datasets",
-    "section": "Urban Forest — Near Central Park, New York City",
-    "text": "Urban Forest — Near Central Park, New York City\nSource: USGS 3DEP · NAD83(2011) / UTM Zone 18N Area: ~2.04 km² · Points: 2.21 million · Density: ~1.08 pts/m² Elevation range: −10 m to +385 m (ground to building rooftops)\nThis tile covers a section of Manhattan adjacent to Central Park. The map below shows the exact footprint of the dataset on a satellite basemap — toggle the minimap in the bottom-right corner for broader context.\n\n\nThe 3D viewer below renders the point cloud colored by elevation. Rotate with left-click, pan with right-click, and scroll to zoom. The tall peaks (orange–red) are Manhattan skyscrapers; the flat ground surface and below-grade infrastructure appear in purple–blue."
+    "section": "USGS 3DEP — Urban Forest Near Central Park, New York City",
+    "text": "USGS 3DEP — Urban Forest Near Central Park, New York City\nSource: USGS 3DEP · NAD83(2011) / UTM Zone 18N Area: ~2.04 km² · Points: 2.21 million · Density: ~1.08 pts/m² Elevation range: −10 m to +385 m (ground to building rooftops)\nThis tile covers a section of Manhattan adjacent to Central Park. The map below shows the exact footprint of the dataset on a satellite basemap.\n\n\nThe 3D viewer below renders the point cloud colored by elevation. Rotate with left-click, pan with right-click, and scroll to zoom. The tall peaks (orange–red) are Manhattan skyscrapers; the flat ground surface and below-grade infrastructure appear in purple–blue."
   },
   {
-    "objectID": "datasets.html#small-tree-plot",
-    "href": "datasets.html#small-tree-plot",
+    "objectID": "datasets.html#neon-aop-small-tree-plot",
+    "href": "datasets.html#neon-aop-small-tree-plot",
     "title": "Datasets",
-    "section": "Small Tree Plot",
-    "text": "Small Tree Plot\nSource: USGS 3DEP · WGS 84 / UTM Zone 6N Area: ~399 m² · Points: 10.4 thousand · Density: ~26 pts/m² Elevation range: 0 m to 17.3 m (ground to crown top)\nA high-density scan (~20 m × 20 m) of a small tree stand. At 26 pts/m² the scan resolves individual tree crowns and branching structure in detail. All points are shown — no subsampling. Colors show elevation from ground (dark green) to canopy top (yellow).\n\n\n\n\n\n\n\n\n\nNote\n\n\n\nAll data are from the USGS 3D Elevation Program (3DEP) and are in the public domain. Visualizations produced with lidR, plotly, and leaflet in R."
+    "section": "NEON AOP — Small Tree Plot",
+    "text": "NEON AOP — Small Tree Plot\nSource: NEON Airborne Observation Platform · WGS 84 / UTM Zone 6N Area: ~399 m² · Points: 10.4 thousand · Density: ~26 pts/m² Elevation range: 0 m to 17.3 m (ground to crown top)\nA high-density NEON AOP scan (~20 m × 20 m) of a small tree stand. At 26 pts/m² the scan resolves individual tree crowns and branching structure in detail. All points are shown — no subsampling. Colors show elevation from ground (dark green) to canopy top (yellow).\n\n\n\n\n\n\n\n\n\nNote\n\n\n\nUSGS 3DEP data are available via the USGS National Map. NEON AOP data are available via the NEON Data Portal. Visualizations produced with lidR, plotly, and leaflet in R."
   },
   {
     "objectID": "Lidar.html",
