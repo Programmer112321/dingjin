@@ -4,7 +4,7 @@
     "href": "projects.html",
     "title": "Research",
     "section": "",
-    "text": "Forest Loss Analysis\n\nQuantifying forest loss trends and drivers across large spatial extents using time-series satellite imagery. The workflow integrates Hansen Global Forest Change data with climate and topographic covariates to attribute disturbance to fire, harvest, and insect outbreak.\nTools: R, Google Earth Engine, tidyverse\n\n\n\nForest above ground biomass estimation\n\nLiDAR-based modeling of forest above-ground biomass (AGB) using USGS 3DEP and NEON airborne point clouds, integrated with GEDI spaceborne LiDAR footprints and ESA CCI Biomass products for cross-scale validation. Built a large-scale processing pipeline that derives canopy structure metrics (height percentiles, density, rumple index) and predicts plot-level AGB with Random Forest, XGBoost, LightGBM, and stacked ensemble models, evaluated with grouped cross-validation and SHAP-based interpretation.\nTools: R (lidR, lasR, terra, sf), Python (scikit-learn, XGBoost, LightGBM, SHAP)\n\n\n\nUrban green space of cooling effect\n\nQuantifying how the structure and composition of urban green spaces moderate land surface temperature across cities. Integrates USGS 3DEP airborne LiDAR-derived canopy metrics (height, cover, vertical complexity) with land cover and satellite-derived LST to model cooling magnitude as a function of canopy structure, patch geometry, and surrounding impervious context.\nTools: R (lidR, terra, sf, lme4), Python (xarray, rasterio, scikit-learn)\n\n\n\n\n\n\n\nNote\n\n\n\nMore projects and reproducible notebooks will be added here over time."
+    "text": "Forest Loss Analysis\n\nQuantifying forest loss trends and drivers across large spatial extents using time-series satellite imagery. The workflow integrates Hansen Global Forest Change data with climate and topographic covariates to attribute disturbance to fire, harvest, and insect outbreak.\nTools: R, Google Earth Engine, tidyverse\n\n\n\nForest above ground biomass estimation\n\nLiDAR-based modeling of forest above-ground biomass (AGB) using USGS 3DEP and NEON airborne point clouds, integrated with GEDI spaceborne LiDAR footprints and ESA CCI Biomass products for cross-scale validation. Built a large-scale processing pipeline that derives canopy structure metrics (height percentiles, density, rumple index) and predicts plot-level AGB with Random Forest, XGBoost, LightGBM, and stacked ensemble models, evaluated with grouped cross-validation and SHAP-based interpretation.\nTools: R (lidR, lasR, terra, sf), Python (scikit-learn, XGBoost, LightGBM, SHAP)\n\n\n\nCooling effect of urban green space\n\nQuantifying how the structure and composition of urban green spaces moderate land surface temperature across cities. Integrates USGS 3DEP airborne LiDAR-derived canopy metrics (height, cover, vertical complexity) with land cover and satellite-derived LST to model cooling magnitude as a function of canopy structure, patch geometry, and surrounding impervious context.\nTools: R (lidR, terra, sf, lme4), Python (xarray, rasterio, scikit-learn)\n\n\n\n\n\n\n\nNote\n\n\n\nMore projects and reproducible notebooks will be added here over time."
   },
   {
     "objectID": "Lidar.html",
@@ -33,34 +33,6 @@
     "title": "Datasets",
     "section": "",
     "text": "GEDI is a full-waveform LiDAR instrument mounted on the International Space Station. It provides high-resolution measurements of forest vertical structure, canopy height, and above-ground biomass at global scale."
-  },
-  {
-    "objectID": "about.html",
-    "href": "about.html",
-    "title": "About",
-    "section": "",
-    "text": "I am a PhD researcher at Oklahoma State University specializing in forest remote sensing and geospatial ANALYSISI. My research uses LiDAR to characterize three-dimensional forest structure and link it to above-ground biomass (AGB) estimation and the cooling effects of urban green spaces, integrating USGS 3DEP and NEON airborne point clouds with GEDI spaceborne LiDAR, satellite-derived land surface temperature, and machine learning to model canopy structure, carbon stocks, and urban climate across scales.\nI work across the full analysis pipeline — from raw LiDAR point clouds and satellite imagery to statistical modeling, machine learning (Random Forest, XGBoost, LightGBM, stacked ensembles), and visualization in R and Python.\n\n\n\nPhD in Natural Resource Ecology & Management — Oklahoma State University\n\n\n\n\n\n\nCooling effect of Urban green space\nForest above ground biomass estimation\nForest disturbance monitoring and change detection\nRemote sensing and land-cover analysis\nClimate–vegetation interactions\nGeospatial data visualization and communication\n\n\n\n\n\n\n\nDomain\nTools\n\n\n\n\nRemote sensing\nGoogle Earth Engine, GDAL, ENVI\n\n\nProgramming\nR, Python, Bash\n\n\nVisualization\nggplot2, Matplotlib, Leaflet\n\n\nPlatforms\nLinux"
-  },
-  {
-    "objectID": "about.html#education",
-    "href": "about.html#education",
-    "title": "About",
-    "section": "",
-    "text": "PhD in Natural Resource Ecology & Management — Oklahoma State University"
-  },
-  {
-    "objectID": "about.html#research-interests",
-    "href": "about.html#research-interests",
-    "title": "About",
-    "section": "",
-    "text": "Cooling effect of Urban green space\nForest above ground biomass estimation\nForest disturbance monitoring and change detection\nRemote sensing and land-cover analysis\nClimate–vegetation interactions\nGeospatial data visualization and communication"
-  },
-  {
-    "objectID": "about.html#tools-skills",
-    "href": "about.html#tools-skills",
-    "title": "About",
-    "section": "",
-    "text": "Domain\nTools\n\n\n\n\nRemote sensing\nGoogle Earth Engine, GDAL, ENVI\n\n\nProgramming\nR, Python, Bash\n\n\nVisualization\nggplot2, Matplotlib, Leaflet\n\n\nPlatforms\nLinux"
   },
   {
     "objectID": "cv.html",
