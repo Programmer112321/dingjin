@@ -1,0 +1,45 @@
+---
+title: "Datasets"
+---
+
+# Datasets
+
+The datasets shown here are airborne LiDAR point clouds sourced from the **USGS 3D Elevation Program (3DEP)** — a nationwide initiative to collect high-quality topographic data across the United States. Data are freely available through the [USGS National Map](https://www.usgs.gov/3d-elevation-program).
+
+---
+
+## Urban Forest — Near Central Park, New York City
+
+**Source:** USGS 3DEP · NAD83(2011) / UTM Zone 18N
+**Area:** ~2.04 km² · **Points:** 2.21 million · **Density:** ~1.08 pts/m²
+**Classifications:** Ground · Unclassified · Water · Rail · Bridge Deck · Noise
+
+This tile covers a section of Manhattan adjacent to Central Park. The vertical range (−10 to +385 m) captures both below-grade infrastructure and the surrounding high-rise skyline. Points are colored by LiDAR classification — rotate and zoom to explore the urban 3D structure.
+
+<iframe src="widgets/central_park_3d.html"
+        width="100%" height="600px"
+        style="border: 1px solid #dee2e6; border-radius: 6px;"
+        frameborder="0">
+</iframe>
+
+---
+
+## Small Tree Plot
+
+**Source:** USGS 3DEP · WGS 84 / UTM Zone 6N
+**Area:** ~399 m² · **Points:** 10.4 thousand · **Density:** ~26 pts/m²
+**Classifications:** Ground · Vegetation · Unclassified
+
+A high-density scan of a small tree stand (~20 m × 20 m). At 26 pts/m² this tile resolves individual tree crowns and branching structure in detail. Points reach up to 17 m above ground. All points are shown — no subsampling.
+
+<iframe src="widgets/tree_3d.html"
+        width="100%" height="550px"
+        style="border: 1px solid #dee2e6; border-radius: 6px;"
+        frameborder="0">
+</iframe>
+
+---
+
+::: {.callout-note}
+All data are from the [USGS 3D Elevation Program (3DEP)](https://www.usgs.gov/3d-elevation-program) and are in the public domain. Visualizations use `lidR` and `plotly` in R.
+:::

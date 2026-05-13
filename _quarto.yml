@@ -13,6 +13,8 @@ website:
         href: news.qmd
       - text: CV
         href: cv.qmd
+      - text: Datasets
+        href: datasets.qmd
       - text: Notes
         menu:
           - text: Overview
