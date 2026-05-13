@@ -4,13 +4,27 @@ title: "About"
 
 # About Me
 
-I am a researcher specializing in **forest disturbance and geospatial analysis**, with experience in **remote sensing, R, Python, and Google Earth Engine**.  
+I am a researcher specializing in **forest disturbance and geospatial analysis**. My work combines remote sensing, statistical modeling, and large-scale environmental data to understand how forests respond to natural and human-driven disturbances.
+
+I am comfortable working across the full analysis pipeline — from raw satellite imagery and cloud-based processing in **Google Earth Engine**, to statistical modeling and visualization in **R** and **Python**.
 
 ## Education
-- MSc/PhD in Environmental Science (Your University)
-- BSc in Forestry (Your University)
 
-## Interests
-- Forest monitoring
-- Climate and environmental data analysis
-- Geospatial visualization
+- **MSc / PhD** in Environmental Science — *Your University*
+- **BSc** in Forestry — *Your University*
+
+## Research Interests
+
+- Forest disturbance monitoring and change detection
+- Remote sensing and land-cover analysis
+- Climate–vegetation interactions
+- Geospatial data visualization and communication
+
+## Tools & Skills
+
+| Domain | Tools |
+|---|---|
+| Remote sensing | Google Earth Engine, GDAL, ENVI |
+| Programming | R, Python, Bash |
+| Visualization | ggplot2, Matplotlib, Leaflet |
+| Platforms | Linux, HPC clusters |

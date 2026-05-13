@@ -1,13 +1,107 @@
+/* Typography */
 body {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  line-height: 1.6;
-}
-
-h1, h2, h3 {
+  line-height: 1.7;
   color: #2c3e50;
 }
 
-img {
+h1, h2, h3 {
+  color: #1a252f;
+  font-weight: 600;
+  margin-top: 1.6rem;
+}
+
+h1 {
+  font-size: 2rem;
+  border-bottom: 2px solid #e8ecef;
+  padding-bottom: 0.4rem;
+  margin-bottom: 1rem;
+}
+
+h2 {
+  font-size: 1.35rem;
+  color: #2c3e50;
+}
+
+/* Profile image on home page */
+.profile-img {
+  display: block;
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
   border-radius: 50%;
-  max-width: 150px;
+  margin: 1.5rem 0;
+  border: 3px solid #dee2e6;
+}
+
+/* Nav */
+.navbar {
+  border-bottom: 1px solid #e8ecef;
+}
+
+/* Content width */
+.quarto-content {
+  max-width: 760px;
+}
+
+/* Social badges */
+img[src*="shields.io"] {
+  margin: 0 4px 6px 0;
+  vertical-align: middle;
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.95rem;
+}
+
+th {
+  background-color: #f1f3f5;
+  font-weight: 600;
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  border-bottom: 2px solid #dee2e6;
+}
+
+td {
+  padding: 0.45rem 0.75rem;
+  border-bottom: 1px solid #e8ecef;
+}
+
+/* Horizontal rule */
+hr {
+  border: none;
+  border-top: 1px solid #e8ecef;
+  margin: 2rem 0;
+}
+
+/* Callout tweaks */
+.callout {
+  margin: 1.5rem 0;
+}
+
+/* Links */
+a {
+  color: #2980b9;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Button */
+.btn-primary {
+  background-color: #2980b9;
+  border-color: #2980b9;
+  font-size: 0.9rem;
+  padding: 0.4rem 1rem;
+}
+
+.btn-primary:hover {
+  background-color: #1a6fa0;
+  border-color: #1a6fa0;
 }

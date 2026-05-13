@@ -4,4 +4,17 @@ title: "Notes"
 
 # Notes
 
-Here you can include **research notes, code snippets, or publications**.
+Short write-ups, code snippets, and technical notes from my research workflow. These are informal posts meant to document things I find useful or want to remember.
+
+---
+
+::: {.callout-note}
+Notes will be added here over time. Check back soon.
+:::
+
+## Topics I plan to cover
+
+- Working with large raster datasets in R (`terra`, `stars`)
+- Efficient Google Earth Engine workflows for time-series analysis
+- Visualizing spatial data with `ggplot2` and `tmap`
+- Reproducible research practices with Quarto and `renv`
