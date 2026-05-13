@@ -16,6 +16,7 @@ format:
 <div class="text-muted mt-4">15–19 Dec 2025</div>
 <h5><strong>AGU Fall Meeting, New Orleans, USA</strong></h5>
 <p>Dingjin presented recent research findings at the AGU Fall Meeting.</p>
+<img src="photo/AGU_poster.jpg" style="width:100%; border-radius:6px; margin: 0.75rem 0;" alt="AGU poster">
 <a href="https://www.agu.org" class="btn btn-primary" target="_blank">Visit AGU</a>
 
 # 2023

@@ -4,7 +4,7 @@ title: "CV"
 
 # Curriculum Vitae
 
-[Download CV (PDF)](files/DingjinChu_CV.pdf){.btn .btn-primary}
+[Download CV (PDF)](doc/DingjinChu_CV.pdf){.btn .btn-primary}
 
 ---
 
@@ -43,3 +43,17 @@ title: "CV"
 **Platforms:** Google Earth Engine, HPC/Linux
 **Data:** Landsat, MODIS, Sentinel, LiDAR
 **Writing:** LaTeX, R Markdown, Quarto
+
+---
+
+## Photos
+
+::: {layout-ncol=2}
+![](photo/Personal/FACE.jpg){style="border-radius: 6px; width: 100%;"}
+
+![](photo/Personal/IMG_6266.JPG){style="border-radius: 6px; width: 100%;"}
+
+![](photo/Personal/IMG_8220.jpg){style="border-radius: 6px; width: 100%;"}
+
+![](photo/Personal/IMG_8628.jpg){style="border-radius: 6px; width: 100%;"}
+:::
