@@ -11,7 +11,14 @@
     "href": "notes.html",
     "title": "Notes",
     "section": "",
-    "text": "Notes\nHere you can include research notes, code snippets, or publications."
+    "text": "Short write-ups, code snippets, and technical notes from my research workflow. These are informal posts meant to document things I find useful or want to remember.\n\n\n\n\n\n\n\nNote\n\n\n\nNotes will be added here over time. Check back soon.\n\n\n\n\n\nWorking with large raster datasets in R (terra, stars)\nEfficient Google Earth Engine workflows for time-series analysis\nVisualizing spatial data with ggplot2 and tmap\nReproducible research practices with Quarto and renv"
+  },
+  {
+    "objectID": "notes.html#topics-i-plan-to-cover",
+    "href": "notes.html#topics-i-plan-to-cover",
+    "title": "Notes",
+    "section": "",
+    "text": "Working with large raster datasets in R (terra, stars)\nEfficient Google Earth Engine workflows for time-series analysis\nVisualizing spatial data with ggplot2 and tmap\nReproducible research practices with Quarto and renv"
   },
   {
     "objectID": "ML.html",
@@ -23,30 +30,79 @@
   {
     "objectID": "index.html",
     "href": "index.html",
-    "title": "Home",
+    "title": "Dingjin Chu",
     "section": "",
-    "text": "Welcome\nHi, I’m Dingjin Chu.\nI work on forest monitoring using remote sensing and modeling.\n\n\nBackground\nClimate change increases the risks to human life on Earth.\nIdentifying effective strategies to address these risks is the central focus of my research.\n# Research interest\n\n\n\n\n\n\nFigure 1\n\n\n\nEstimating forest above ground biomass using remote sensing.\nForest remote sensing Geospatial visualization Climate and environmental data analysis"
+    "text": "Welcome\nHi, I’m Dingjin Chu — a researcher working at the intersection of forest ecology, remote sensing, and geospatial data analysis.\nI use satellite imagery, cloud computing platforms, and statistical modeling to study forest disturbance and landscape change.\n\n\nConnect with me:"
   },
   {
     "objectID": "about.html",
     "href": "about.html",
-    "title": "About Me",
+    "title": "About",
     "section": "",
-    "text": "I specialize in forest disturbance and geospatial analysis, with experience in remote sensing, R, Python, and Google Earth Engine."
+    "text": "I am a researcher specializing in forest disturbance and geospatial analysis. My work combines remote sensing, statistical modeling, and large-scale environmental data to understand how forests respond to natural and human-driven disturbances.\nI am comfortable working across the full analysis pipeline — from raw satellite imagery and cloud-based processing in Google Earth Engine, to statistical modeling and visualization in R and Python.\n\n\n\nMSc / PhD in Environmental Science — Your University\nBSc in Forestry — Your University\n\n\n\n\n\nForest disturbance monitoring and change detection\nRemote sensing and land-cover analysis\nClimate–vegetation interactions\nGeospatial data visualization and communication\n\n\n\n\n\n\n\nDomain\nTools\n\n\n\n\nRemote sensing\nGoogle Earth Engine, GDAL, ENVI\n\n\nProgramming\nR, Python, Bash\n\n\nVisualization\nggplot2, Matplotlib, Leaflet\n\n\nPlatforms\nLinux, HPC clusters"
   },
   {
     "objectID": "about.html#education",
     "href": "about.html#education",
-    "title": "About Me",
-    "section": "Education",
-    "text": "Education\nPhD in Ecology (Oklahoma state university) MSc in Soil and water conservation (Beijing Forestry University) BSc in Soil and water conservation (Shenyang Agriculture University)"
+    "title": "About",
+    "section": "",
+    "text": "MSc / PhD in Environmental Science — Your University\nBSc in Forestry — Your University"
   },
   {
-    "objectID": "about.html#interests",
-    "href": "about.html#interests",
-    "title": "About Me",
-    "section": "Interests",
-    "text": "Interests\nHiking Swimming"
+    "objectID": "about.html#research-interests",
+    "href": "about.html#research-interests",
+    "title": "About",
+    "section": "",
+    "text": "Forest disturbance monitoring and change detection\nRemote sensing and land-cover analysis\nClimate–vegetation interactions\nGeospatial data visualization and communication"
+  },
+  {
+    "objectID": "about.html#tools-skills",
+    "href": "about.html#tools-skills",
+    "title": "About",
+    "section": "",
+    "text": "Domain\nTools\n\n\n\n\nRemote sensing\nGoogle Earth Engine, GDAL, ENVI\n\n\nProgramming\nR, Python, Bash\n\n\nVisualization\nggplot2, Matplotlib, Leaflet\n\n\nPlatforms\nLinux, HPC clusters"
+  },
+  {
+    "objectID": "cv.html",
+    "href": "cv.html",
+    "title": "CV",
+    "section": "",
+    "text": "Download CV (PDF)\n\n\n\nMSc / PhD — Environmental Science, Your University (Year–Present)\nBSc — Forestry, Your University (Year–Year)\n\n\n\n\nGraduate Research Assistant — Your Lab / Department (Year–Present) - Developed remote sensing workflows for forest disturbance detection using Google Earth Engine - Analyzed multi-decadal Landsat time series across boreal and temperate forest biomes - Contributed to peer-reviewed publications and conference presentations\n\n\n\n\n\nYour publication title. Journal Name, Year. [DOI link]\n\n\n\n\n\n\nYour talk title. Conference Name, Location, Year.\n\n\n\n\n\nProgramming: R, Python, Bash Platforms: Google Earth Engine, HPC/Linux Data: Landsat, MODIS, Sentinel, LiDAR Writing: LaTeX, R Markdown, Quarto"
+  },
+  {
+    "objectID": "cv.html#education",
+    "href": "cv.html#education",
+    "title": "CV",
+    "section": "",
+    "text": "MSc / PhD — Environmental Science, Your University (Year–Present)\nBSc — Forestry, Your University (Year–Year)"
+  },
+  {
+    "objectID": "cv.html#research-experience",
+    "href": "cv.html#research-experience",
+    "title": "CV",
+    "section": "",
+    "text": "Graduate Research Assistant — Your Lab / Department (Year–Present) - Developed remote sensing workflows for forest disturbance detection using Google Earth Engine - Analyzed multi-decadal Landsat time series across boreal and temperate forest biomes - Contributed to peer-reviewed publications and conference presentations"
+  },
+  {
+    "objectID": "cv.html#publications",
+    "href": "cv.html#publications",
+    "title": "CV",
+    "section": "",
+    "text": "Your publication title. Journal Name, Year. [DOI link]"
+  },
+  {
+    "objectID": "cv.html#presentations",
+    "href": "cv.html#presentations",
+    "title": "CV",
+    "section": "",
+    "text": "Your talk title. Conference Name, Location, Year."
+  },
+  {
+    "objectID": "cv.html#skills",
+    "href": "cv.html#skills",
+    "title": "CV",
+    "section": "",
+    "text": "Programming: R, Python, Bash Platforms: Google Earth Engine, HPC/Linux Data: Landsat, MODIS, Sentinel, LiDAR Writing: LaTeX, R Markdown, Quarto"
   },
   {
     "objectID": "Lidar.html",
@@ -67,34 +123,27 @@
     "href": "projects.html",
     "title": "Projects",
     "section": "",
-    "text": "Analyzing forest loss trends and drivers using satellite imagery and data modeling."
+    "text": "A selection of research and data projects. Source code and write-ups are linked where available.\n\n\n\nQuantifying forest loss trends and drivers across large spatial extents using time-series satellite imagery. The workflow integrates Hansen Global Forest Change data with climate and topographic covariates to attribute disturbance to fire, harvest, and insect outbreak.\nTools: R, Google Earth Engine, tidyverse\n\n\n\n\nInteractive and static maps for communicating spatial patterns in environmental datasets. Projects include animated time-series maps of vegetation indices and choropleth visualizations of disturbance rates by ecoregion.\nTools: R (ggplot2, tmap, Leaflet), Python (Matplotlib, Folium)\n\n\n\n\nInvestigating how interannual climate variability (temperature, precipitation, drought indices) drives fluctuations in forest productivity as measured by MODIS NDVI and GPP products.\nTools: Python, R, netCDF4, xarray\n\n\n\n\n\n\n\nNote\n\n\n\nMore projects and reproducible notebooks will be added here over time."
   },
   {
     "objectID": "projects.html#forest-loss-analysis",
     "href": "projects.html#forest-loss-analysis",
     "title": "Projects",
     "section": "",
-    "text": "Analyzing forest loss trends and drivers using satellite imagery and data modeling."
+    "text": "Quantifying forest loss trends and drivers across large spatial extents using time-series satellite imagery. The workflow integrates Hansen Global Forest Change data with climate and topographic covariates to attribute disturbance to fire, harvest, and insect outbreak.\nTools: R, Google Earth Engine, tidyverse"
   },
   {
-    "objectID": "projects.html#forest-agb-product-validation",
-    "href": "projects.html#forest-agb-product-validation",
+    "objectID": "projects.html#geospatial-data-visualization",
+    "href": "projects.html#geospatial-data-visualization",
     "title": "Projects",
-    "section": "Forest AGB product validation",
-    "text": "Forest AGB product validation\nUsing FIA data to validate"
+    "section": "",
+    "text": "Interactive and static maps for communicating spatial patterns in environmental datasets. Projects include animated time-series maps of vegetation indices and choropleth visualizations of disturbance rates by ecoregion.\nTools: R (ggplot2, tmap, Leaflet), Python (Matplotlib, Folium)"
   },
   {
-    "objectID": "projects.html#forest-agb-estimation",
-    "href": "projects.html#forest-agb-estimation",
+    "objectID": "projects.html#climateforest-productivity-analysis",
+    "href": "projects.html#climateforest-productivity-analysis",
     "title": "Projects",
-    "section": "Forest AGB estimation",
-    "text": "Forest AGB estimation"
-  },
-  {
-    "objectID": "projects.html#cooling-effect-of-urban-green-space",
-    "href": "projects.html#cooling-effect-of-urban-green-space",
-    "title": "Projects",
-    "section": "Cooling effect of urban green space",
-    "text": "Cooling effect of urban green space"
+    "section": "",
+    "text": "Investigating how interannual climate variability (temperature, precipitation, drought indices) drives fluctuations in forest productivity as measured by MODIS NDVI and GPP products.\nTools: Python, R, netCDF4, xarray\n\n\n\n\n\n\n\nNote\n\n\n\nMore projects and reproducible notebooks will be added here over time."
   }
 ]
