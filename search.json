@@ -25,14 +25,14 @@
     "href": "datasets.html",
     "title": "Datasets",
     "section": "",
-    "text": "Notes on LiDAR data processing, analysis, and applications in forest monitoring.\n\n\n\nGEDI (Global Ecosystem Dynamics Investigation) — NASA LiDAR instrument aboard the ISS for measuring forest structure and biomass.\n\n\n\n\nGEDI is a full-waveform LiDAR instrument mounted on the International Space Station. It provides high-resolution measurements of forest vertical structure, canopy height, and above-ground biomass at global scale."
+    "text": "The datasets shown here are airborne LiDAR point clouds from two open-access programs: the USGS 3D Elevation Program (3DEP), a nationwide topographic mapping initiative, and the NEON Airborne Observation Platform (AOP), which collects high-density ecological LiDAR across NEON field sites. Both programs provide data freely to the public.\nSource: USGS 3DEP · NAD83(2011) / UTM Zone 18N Area: ~2.04 km² · Points: 2.21 million · Density: ~1.08 pts/m² Elevation range: −10 m to +385 m (ground to building rooftops)\nThis tile covers a section of Manhattan adjacent to Central Park. The map below shows the exact footprint of the dataset on a satellite basemap.\n\n\nThe 3D viewer below renders the point cloud colored by elevation. Rotate with left-click, pan with right-click, and scroll to zoom. The tall peaks (orange–red) are Manhattan skyscrapers; the flat ground surface and below-grade infrastructure appear in purple–blue."
   },
   {
     "objectID": "datasets.html#what-is-gedi",
     "href": "datasets.html#what-is-gedi",
     "title": "Datasets",
-    "section": "",
-    "text": "GEDI is a full-waveform LiDAR instrument mounted on the International Space Station. It provides high-resolution measurements of forest vertical structure, canopy height, and above-ground biomass at global scale."
+    "section": "What is GEDI?",
+    "text": "What is GEDI?\nGEDI is a full-waveform LiDAR instrument mounted on the International Space Station. It provides high-resolution measurements of forest vertical structure, canopy height, and above-ground biomass at global scale.\n\n\n\n\n\n\n\nNote\n\n\n\nUSGS 3DEP data are available via the USGS National Map. NEON AOP data are available via the NEON Data Portal. Visualizations produced with lidR, plotly, and leaflet in R."
   },
   {
     "objectID": "cv.html",
