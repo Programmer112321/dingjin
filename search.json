@@ -39,35 +39,28 @@
     "href": "index.html#hello-this-is-dingjin.",
     "title": "Dingjin Chu",
     "section": "👋 Hello, this is Dingjin.",
-    "text": "👋 Hello, this is Dingjin.\nI am a PhD student studying forest disturbance and landscape change using satellite remote sensing and large-scale geospatial data. I work with time-series satellite imagery, Google Earth Engine, and statistical modeling to understand how forests respond to climate variability and human disturbance.\nI received my BSc in Forestry from Your University. My research interests sit at the intersection of forest ecology, remote sensing, and environmental data science."
-  },
-  {
-    "objectID": "about.html",
-    "href": "about.html",
-    "title": "About",
-    "section": "",
-    "text": "I am a researcher specializing in forest disturbance and geospatial analysis. My work combines remote sensing, statistical modeling, and large-scale environmental data to understand how forests respond to natural and human-driven disturbances.\nI am comfortable working across the full analysis pipeline — from raw satellite imagery and cloud-based processing in Google Earth Engine, to statistical modeling and visualization in R and Python.\n\n\n\nMSc / PhD in Environmental Science — Your University\nBSc in Forestry — Your University\n\n\n\n\n\nForest disturbance monitoring and change detection\nRemote sensing and land-cover analysis\nClimate–vegetation interactions\nGeospatial data visualization and communication\n\n\n\n\n\n\n\nDomain\nTools\n\n\n\n\nRemote sensing\nGoogle Earth Engine, GDAL, ENVI\n\n\nProgramming\nR, Python, Bash\n\n\nVisualization\nggplot2, Matplotlib, Leaflet\n\n\nPlatforms\nLinux, HPC clusters"
+    "text": "👋 Hello, this is Dingjin.\nI am a PhD student studying forest disturbance and landscape change using satellite remote sensing and large-scale geospatial data. I work with time-series satellite imagery, Google Earth Engine, and statistical modeling to understand how forests respond to climate variability and human disturbance.\nI received my BSc in Forestry from Your University. My research interests sit at the intersection of forest ecology, remote sensing, and environmental data science.\n\n\n\n\nImage generated from Your Name in Landsat — NASA."
   },
   {
     "objectID": "about.html#education",
     "href": "about.html#education",
     "title": "About",
-    "section": "",
-    "text": "MSc / PhD in Environmental Science — Your University\nBSc in Forestry — Your University"
+    "section": "Education",
+    "text": "Education\n\nMSc / PhD in Environmental Science — Your University\nBSc in Forestry — Your University"
   },
   {
     "objectID": "about.html#research-interests",
     "href": "about.html#research-interests",
     "title": "About",
-    "section": "",
-    "text": "Forest disturbance monitoring and change detection\nRemote sensing and land-cover analysis\nClimate–vegetation interactions\nGeospatial data visualization and communication"
+    "section": "Research Interests",
+    "text": "Research Interests\n\n\nForest disturbance monitoring and change detection\nRemote sensing and land-cover analysis\nClimate–vegetation interactions\nGeospatial data visualization and communication"
   },
   {
     "objectID": "about.html#tools-skills",
     "href": "about.html#tools-skills",
     "title": "About",
-    "section": "",
-    "text": "Domain\nTools\n\n\n\n\nRemote sensing\nGoogle Earth Engine, GDAL, ENVI\n\n\nProgramming\nR, Python, Bash\n\n\nVisualization\nggplot2, Matplotlib, Leaflet\n\n\nPlatforms\nLinux, HPC clusters"
+    "section": "Tools & Skills",
+    "text": "Tools & Skills\n\n\n\nDomain\nTools\n\n\n\n\nRemote sensing\nGoogle Earth Engine, GDAL, ENVI\n\n\nProgramming\nR, Python, Bash\n\n\nVisualization\nggplot2, Matplotlib, Leaflet\n\n\nPlatforms\nLinux, HPC clusters"
   },
   {
     "objectID": "cv.html",
@@ -114,9 +107,16 @@
   {
     "objectID": "Lidar.html",
     "href": "Lidar.html",
-    "title": "Notes",
+    "title": "LiDAR Notes",
     "section": "",
-    "text": "Notes\nHere you can include research notes, code snippets, or publications."
+    "text": "Notes on LiDAR data processing, analysis, and applications in forest monitoring.\n\n\n\nGEDI (Global Ecosystem Dynamics Investigation) — NASA LiDAR instrument aboard the ISS for measuring forest structure and biomass.\n\n\n\n\nGEDI is a full-waveform LiDAR instrument mounted on the International Space Station. It provides high-resolution measurements of forest vertical structure, canopy height, and above-ground biomass at global scale.\n\n\n\n\n\n\n\nNote\n\n\n\nNotes and code snippets will be added here over time."
+  },
+  {
+    "objectID": "Lidar.html#what-is-gedi",
+    "href": "Lidar.html#what-is-gedi",
+    "title": "LiDAR Notes",
+    "section": "",
+    "text": "GEDI is a full-waveform LiDAR instrument mounted on the International Space Station. It provides high-resolution measurements of forest vertical structure, canopy height, and above-ground biomass at global scale.\n\n\n\n\n\n\n\nNote\n\n\n\nNotes and code snippets will be added here over time."
   },
   {
     "objectID": "news.html",
@@ -126,31 +126,24 @@
     "text": "2025\n\n20 Dec 2025\n\n\nNew Paper Published in Certain Journal\n\n\nDingjin Chu and collaborators published a study on forest biomass estimation using LiDAR and optical data.\n\nRead Paper\n\n15–19 Dec 2025\n\n\nAGU Fall Meeting, New Orleans, USA\n\n\nDingjin presented recent research findings at the AGU Fall Meeting.\n\nVisit AGU\n\n\n2023\n\n16–17 Aug 2023\n\n\n\nPoster Presentation at the Conference “Actual Issues of Environmental Research for Sustainable Development in the Arid Zone” in Kyrgyzstan\n\n\nPoster about the impacts of future climate extremes on the interannual variability of terrestrial ecosystem productivity in Central Asia based on CMIP6."
   },
   {
-    "objectID": "projects.html",
-    "href": "projects.html",
-    "title": "Projects",
-    "section": "",
-    "text": "A selection of research and data projects. Source code and write-ups are linked where available.\n\n\n\nQuantifying forest loss trends and drivers across large spatial extents using time-series satellite imagery. The workflow integrates Hansen Global Forest Change data with climate and topographic covariates to attribute disturbance to fire, harvest, and insect outbreak.\nTools: R, Google Earth Engine, tidyverse\n\n\n\n\nInteractive and static maps for communicating spatial patterns in environmental datasets. Projects include animated time-series maps of vegetation indices and choropleth visualizations of disturbance rates by ecoregion.\nTools: R (ggplot2, tmap, Leaflet), Python (Matplotlib, Folium)\n\n\n\n\nInvestigating how interannual climate variability (temperature, precipitation, drought indices) drives fluctuations in forest productivity as measured by MODIS NDVI and GPP products.\nTools: Python, R, netCDF4, xarray\n\n\n\n\n\n\n\nNote\n\n\n\nMore projects and reproducible notebooks will be added here over time."
-  },
-  {
     "objectID": "projects.html#forest-loss-analysis",
     "href": "projects.html#forest-loss-analysis",
     "title": "Projects",
-    "section": "",
-    "text": "Quantifying forest loss trends and drivers across large spatial extents using time-series satellite imagery. The workflow integrates Hansen Global Forest Change data with climate and topographic covariates to attribute disturbance to fire, harvest, and insect outbreak.\nTools: R, Google Earth Engine, tidyverse"
+    "section": "Forest Loss Analysis",
+    "text": "Forest Loss Analysis\n\nQuantifying forest loss trends and drivers across large spatial extents using time-series satellite imagery. The workflow integrates Hansen Global Forest Change data with climate and topographic covariates to attribute disturbance to fire, harvest, and insect outbreak.\nTools: R, Google Earth Engine, tidyverse"
   },
   {
     "objectID": "projects.html#geospatial-data-visualization",
     "href": "projects.html#geospatial-data-visualization",
     "title": "Projects",
-    "section": "",
-    "text": "Interactive and static maps for communicating spatial patterns in environmental datasets. Projects include animated time-series maps of vegetation indices and choropleth visualizations of disturbance rates by ecoregion.\nTools: R (ggplot2, tmap, Leaflet), Python (Matplotlib, Folium)"
+    "section": "Geospatial Data Visualization",
+    "text": "Geospatial Data Visualization\nInteractive and static maps for communicating spatial patterns in environmental datasets. Projects include animated time-series maps of vegetation indices and choropleth visualizations of disturbance rates by ecoregion.\nTools: R (ggplot2, tmap, Leaflet), Python (Matplotlib, Folium)"
   },
   {
     "objectID": "projects.html#climateforest-productivity-analysis",
     "href": "projects.html#climateforest-productivity-analysis",
     "title": "Projects",
-    "section": "",
-    "text": "Investigating how interannual climate variability (temperature, precipitation, drought indices) drives fluctuations in forest productivity as measured by MODIS NDVI and GPP products.\nTools: Python, R, netCDF4, xarray\n\n\n\n\n\n\n\nNote\n\n\n\nMore projects and reproducible notebooks will be added here over time."
+    "section": "Climate–Forest Productivity Analysis",
+    "text": "Climate–Forest Productivity Analysis\nInvestigating how interannual climate variability (temperature, precipitation, drought indices) drives fluctuations in forest productivity as measured by MODIS NDVI and GPP products.\nTools: Python, R, netCDF4, xarray\n\n\n\n\n\n\n\nNote\n\n\n\nMore projects and reproducible notebooks will be added here over time."
   }
 ]
