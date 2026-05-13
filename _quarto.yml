@@ -9,10 +9,10 @@ website:
         href: about.qmd
       - text: Projects
         href: projects.qmd
-      - text: CV
-        href: cv.qmd
       - text: Datasets
         href: datasets.qmd
+      - text: CV
+        href: cv.qmd
       - text: News
         href: news.qmd
       - text: "dingjinchu@gmail.com"
