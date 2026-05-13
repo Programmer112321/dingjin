@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>CV – Dingjin Chu</title>
+<title>Datasets – Dingjin Chu</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -269,11 +269,11 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">News</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="./cv.html" aria-current="page"> 
+    <a class="nav-link" href="./cv.html"> 
 <span class="menu-text">CV</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./datasets.html"> 
+    <a class="nav-link active" href="./datasets.html" aria-current="page"> 
 <span class="menu-text">Datasets</span></a>
   </li>  
   <li class="nav-item dropdown ">
@@ -335,7 +335,7 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">CV</h1>
+<h1 class="title">Datasets</h1>
 </div>
 
 
@@ -352,38 +352,38 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<section id="curriculum-vitae" class="level1">
-<h1>Curriculum Vitae</h1>
-<p><a href="files/DingjinChu_CV.pdf" class="btn btn-primary">Download CV (PDF)</a></p>
+<section id="datasets" class="level1">
+<h1>Datasets</h1>
+<p>The datasets shown here are airborne LiDAR point clouds sourced from the <strong>USGS 3D Elevation Program (3DEP)</strong> — a nationwide initiative to collect high-quality topographic data across the United States. Data are freely available through the <a href="https://www.usgs.gov/3d-elevation-program">USGS National Map</a>.</p>
 <hr>
-<section id="education" class="level2">
-<h2 class="anchored" data-anchor-id="education">Education</h2>
-<p><strong>MSc / PhD</strong> — Environmental Science, <em>Your University</em> (Year–Present)</p>
-<p><strong>BSc</strong> — Forestry, <em>Your University</em> (Year–Year)</p>
-<hr>
-</section>
-<section id="research-experience" class="level2">
-<h2 class="anchored" data-anchor-id="research-experience">Research Experience</h2>
-<p><strong>Graduate Research Assistant</strong> — <em>Your Lab / Department</em> (Year–Present) - Developed remote sensing workflows for forest disturbance detection using Google Earth Engine - Analyzed multi-decadal Landsat time series across boreal and temperate forest biomes - Contributed to peer-reviewed publications and conference presentations</p>
+<section id="urban-forest-near-central-park-new-york-city" class="level2">
+<h2 class="anchored" data-anchor-id="urban-forest-near-central-park-new-york-city">Urban Forest — Near Central Park, New York City</h2>
+<p><strong>Source:</strong> USGS 3DEP · NAD83(2011) / UTM Zone 18N <strong>Area:</strong> ~2.04 km² · <strong>Points:</strong> 2.21 million · <strong>Density:</strong> ~1.08 pts/m² <strong>Classifications:</strong> Ground · Unclassified · Water · Rail · Bridge Deck · Noise</p>
+<p>This tile covers a section of Manhattan adjacent to Central Park. The vertical range (−10 to +385 m) captures both below-grade infrastructure and the surrounding high-rise skyline. Points are colored by LiDAR classification — rotate and zoom to explore the urban 3D structure.</p>
+<iframe src="widgets/central_park_3d.html" width="100%" height="600px" style="border: 1px solid #dee2e6; border-radius: 6px;" frameborder="0">
+</iframe>
 <hr>
 </section>
-<section id="publications" class="level2">
-<h2 class="anchored" data-anchor-id="publications">Publications</h2>
-<ul>
-<li><em>Your publication title.</em> Journal Name, Year. [DOI link]</li>
-</ul>
+<section id="small-tree-plot" class="level2">
+<h2 class="anchored" data-anchor-id="small-tree-plot">Small Tree Plot</h2>
+<p><strong>Source:</strong> USGS 3DEP · WGS 84 / UTM Zone 6N <strong>Area:</strong> ~399 m² · <strong>Points:</strong> 10.4 thousand · <strong>Density:</strong> ~26 pts/m² <strong>Classifications:</strong> Ground · Vegetation · Unclassified</p>
+<p>A high-density scan of a small tree stand (~20 m × 20 m). At 26 pts/m² this tile resolves individual tree crowns and branching structure in detail. Points reach up to 17 m above ground. All points are shown — no subsampling.</p>
+<iframe src="widgets/tree_3d.html" width="100%" height="550px" style="border: 1px solid #dee2e6; border-radius: 6px;" frameborder="0">
+</iframe>
 <hr>
-</section>
-<section id="presentations" class="level2">
-<h2 class="anchored" data-anchor-id="presentations">Presentations</h2>
-<ul>
-<li><em>Your talk title.</em> Conference Name, Location, Year.</li>
-</ul>
-<hr>
-</section>
-<section id="skills" class="level2">
-<h2 class="anchored" data-anchor-id="skills">Skills</h2>
-<p><strong>Programming:</strong> R, Python, Bash <strong>Platforms:</strong> Google Earth Engine, HPC/Linux <strong>Data:</strong> Landsat, MODIS, Sentinel, LiDAR <strong>Writing:</strong> LaTeX, R Markdown, Quarto</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>All data are from the <a href="https://www.usgs.gov/3d-elevation-program">USGS 3D Elevation Program (3DEP)</a> and are in the public domain. Visualizations use <code>lidR</code> and <code>plotly</code> in R.</p>
+</div>
+</div>
 
 
 </section>

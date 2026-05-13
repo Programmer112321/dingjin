@@ -272,6 +272,10 @@ ul.task-list li input[type="checkbox"] {
     <a class="nav-link" href="./cv.html"> 
 <span class="menu-text">CV</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./datasets.html"> 
+<span class="menu-text">Datasets</span></a>
+  </li>  
   <li class="nav-item dropdown ">
     <a class="nav-link dropdown-toggle" href="#" id="nav-menu-notes" role="link" data-bs-toggle="dropdown" aria-expanded="false">
  <span class="menu-text">Notes</span>
@@ -348,28 +352,25 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p><img src="photo/Background.jpg" class="img-fluid" style="border-radius: 8px; margin-bottom: 1.5rem;;width:100.0%"></p>
-<section id="projects" class="level1">
-<h1>Projects</h1>
-<p>A selection of research and data projects. Source code and write-ups are linked where available.</p>
+<p><img src="photo/remote_Sensing.jpg" class="img-fluid" style="border-radius: 8px; margin-bottom: 1.5rem;;width:100.0%"></p>
 <hr>
-<section id="forest-loss-analysis" class="level2">
-<h2 class="anchored" data-anchor-id="forest-loss-analysis">Forest Loss Analysis</h2>
+<section id="forest-loss-analysis" class="level1">
+<h1>Forest Loss Analysis</h1>
 <p><img src="photo/tree_mortality.jpg" class="img-fluid" style="border-radius: 6px; margin-bottom: 0.75rem;;width:100.0%"></p>
 <p>Quantifying forest loss trends and drivers across large spatial extents using time-series satellite imagery. The workflow integrates Hansen Global Forest Change data with climate and topographic covariates to attribute disturbance to fire, harvest, and insect outbreak.</p>
 <p><strong>Tools:</strong> R, Google Earth Engine, tidyverse</p>
 <hr>
 </section>
-<section id="geospatial-data-visualization" class="level2">
-<h2 class="anchored" data-anchor-id="geospatial-data-visualization">Geospatial Data Visualization</h2>
-<p>Interactive and static maps for communicating spatial patterns in environmental datasets. Projects include animated time-series maps of vegetation indices and choropleth visualizations of disturbance rates by ecoregion.</p>
-<p><strong>Tools:</strong> R (ggplot2, tmap, Leaflet), Python (Matplotlib, Folium)</p>
+<section id="forest-above-ground-biomass-estimation" class="level1">
+<h1>Forest above ground biomass estimation</h1>
+<p>LiDAR-based modeling of forest above-ground biomass (AGB) using USGS 3DEP and NEON airborne point clouds, integrated with GEDI spaceborne LiDAR footprints and ESA CCI Biomass products for cross-scale validation. Built a large-scale processing pipeline that derives canopy structure metrics (height percentiles, density, rumple index) and predicts plot-level AGB with Random Forest, XGBoost, LightGBM, and stacked ensemble models, evaluated with grouped cross-validation and SHAP-based interpretation.</p>
+<p><strong>Tools:</strong> R (lidR, lasR, terra, sf), Python (scikit-learn, XGBoost, LightGBM, SHAP)</p>
 <hr>
 </section>
-<section id="climateforest-productivity-analysis" class="level2">
-<h2 class="anchored" data-anchor-id="climateforest-productivity-analysis">Climate–Forest Productivity Analysis</h2>
-<p>Investigating how interannual climate variability (temperature, precipitation, drought indices) drives fluctuations in forest productivity as measured by MODIS NDVI and GPP products.</p>
-<p><strong>Tools:</strong> Python, R, netCDF4, xarray</p>
+<section id="urban-green-space-of-cooling-effect" class="level1">
+<h1>Urban green space of cooling effect</h1>
+<p>Quantifying how the structure and composition of urban green spaces moderate land surface temperature across cities. Integrates USGS 3DEP airborne LiDAR-derived canopy metrics (height, cover, vertical complexity) with land cover and satellite-derived LST to model cooling magnitude as a function of canopy structure, patch geometry, and surrounding impervious context.</p>
+<p><strong>Tools:</strong> R (lidR, terra, sf, lme4), Python (xarray, rasterio, scikit-learn)</p>
 <hr>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -386,7 +387,6 @@ Note
 </div>
 
 
-</section>
 </section>
 
 </main> <!-- /main -->

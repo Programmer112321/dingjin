@@ -32,35 +32,14 @@
     "href": "index.html",
     "title": "Dingjin Chu",
     "section": "",
-    "text": "PhD Student · Forest Monitoring & Geospatial Analysis\nDepartment of Geography · Your University"
+    "text": "PhD Student · Forest Monitoring & Geospatial Analysis\nDepartment of Natural Resource Ecology& Management · Oklahoma State University"
   },
   {
     "objectID": "index.html#hello-this-is-dingjin.",
     "href": "index.html#hello-this-is-dingjin.",
     "title": "Dingjin Chu",
     "section": "👋 Hello, this is Dingjin.",
-    "text": "👋 Hello, this is Dingjin.\nI am a PhD student studying forest disturbance and landscape change using satellite remote sensing and large-scale geospatial data. I work with time-series satellite imagery, Google Earth Engine, and statistical modeling to understand how forests respond to climate variability and human disturbance.\nI received my BSc in Forestry from Your University. My research interests sit at the intersection of forest ecology, remote sensing, and environmental data science.\n\n\n\n\nImage generated from Your Name in Landsat — NASA."
-  },
-  {
-    "objectID": "about.html#education",
-    "href": "about.html#education",
-    "title": "About",
-    "section": "Education",
-    "text": "Education\n\nMSc / PhD in Environmental Science — Your University\nBSc in Forestry — Your University"
-  },
-  {
-    "objectID": "about.html#research-interests",
-    "href": "about.html#research-interests",
-    "title": "About",
-    "section": "Research Interests",
-    "text": "Research Interests\n\n\nForest disturbance monitoring and change detection\nRemote sensing and land-cover analysis\nClimate–vegetation interactions\nGeospatial data visualization and communication"
-  },
-  {
-    "objectID": "about.html#tools-skills",
-    "href": "about.html#tools-skills",
-    "title": "About",
-    "section": "Tools & Skills",
-    "text": "Tools & Skills\n\n\n\nDomain\nTools\n\n\n\n\nRemote sensing\nGoogle Earth Engine, GDAL, ENVI\n\n\nProgramming\nR, Python, Bash\n\n\nVisualization\nggplot2, Matplotlib, Leaflet\n\n\nPlatforms\nLinux, HPC clusters"
+    "text": "👋 Hello, this is Dingjin.\nI am a PhD student studying Above ground biomass estimation, cooling effect of Urban green space, and forest disturbance using satellite remote sensing and large-scale geospatial data. I work with time-series satellite imagery, Google Earth Engine, and statistical modeling to understand how forests respond to climate variability and human disturbance.\nMy research interests sit at the intersection of forest ecology, remote sensing, and environmental data science.\n\n\n\n\nImage generated from Your Name in Landsat — NASA."
   },
   {
     "objectID": "cv.html",
@@ -105,6 +84,55 @@
     "text": "Programming: R, Python, Bash Platforms: Google Earth Engine, HPC/Linux Data: Landsat, MODIS, Sentinel, LiDAR Writing: LaTeX, R Markdown, Quarto"
   },
   {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "I am a PhD researcher at Oklahoma State University specializing in forest remote sensing and geospatial ANALYSISI. My research uses LiDAR to characterize three-dimensional forest structure and link it to above-ground biomass (AGB) estimation and the cooling effects of urban green spaces, integrating USGS 3DEP and NEON airborne point clouds with GEDI spaceborne LiDAR, satellite-derived land surface temperature, and machine learning to model canopy structure, carbon stocks, and urban climate across scales.\nI work across the full analysis pipeline — from raw LiDAR point clouds and satellite imagery to statistical modeling, machine learning (Random Forest, XGBoost, LightGBM, stacked ensembles), and visualization in R and Python.\n\n\n\nPhD in Natural Resource Ecology & Management — Oklahoma State University\n\n\n\n\n\n\nCooling effect of Urban green space\nForest above ground biomass estimation\nForest disturbance monitoring and change detection\nRemote sensing and land-cover analysis\nClimate–vegetation interactions\nGeospatial data visualization and communication\n\n\n\n\n\n\n\nDomain\nTools\n\n\n\n\nRemote sensing\nGoogle Earth Engine, GDAL, ENVI\n\n\nProgramming\nR, Python, Bash\n\n\nVisualization\nggplot2, Matplotlib, Leaflet\n\n\nPlatforms\nLinux"
+  },
+  {
+    "objectID": "about.html#education",
+    "href": "about.html#education",
+    "title": "About",
+    "section": "",
+    "text": "PhD in Natural Resource Ecology & Management — Oklahoma State University"
+  },
+  {
+    "objectID": "about.html#research-interests",
+    "href": "about.html#research-interests",
+    "title": "About",
+    "section": "",
+    "text": "Cooling effect of Urban green space\nForest above ground biomass estimation\nForest disturbance monitoring and change detection\nRemote sensing and land-cover analysis\nClimate–vegetation interactions\nGeospatial data visualization and communication"
+  },
+  {
+    "objectID": "about.html#tools-skills",
+    "href": "about.html#tools-skills",
+    "title": "About",
+    "section": "",
+    "text": "Domain\nTools\n\n\n\n\nRemote sensing\nGoogle Earth Engine, GDAL, ENVI\n\n\nProgramming\nR, Python, Bash\n\n\nVisualization\nggplot2, Matplotlib, Leaflet\n\n\nPlatforms\nLinux"
+  },
+  {
+    "objectID": "datasets.html",
+    "href": "datasets.html",
+    "title": "Datasets",
+    "section": "",
+    "text": "The datasets shown here are airborne LiDAR point clouds sourced from the USGS 3D Elevation Program (3DEP) — a nationwide initiative to collect high-quality topographic data across the United States. Data are freely available through the USGS National Map.\n\n\n\nSource: USGS 3DEP · NAD83(2011) / UTM Zone 18N Area: ~2.04 km² · Points: 2.21 million · Density: ~1.08 pts/m² Classifications: Ground · Unclassified · Water · Rail · Bridge Deck · Noise\nThis tile covers a section of Manhattan adjacent to Central Park. The vertical range (−10 to +385 m) captures both below-grade infrastructure and the surrounding high-rise skyline. Points are colored by LiDAR classification — rotate and zoom to explore the urban 3D structure.\n\n\n\n\n\n\nSource: USGS 3DEP · WGS 84 / UTM Zone 6N Area: ~399 m² · Points: 10.4 thousand · Density: ~26 pts/m² Classifications: Ground · Vegetation · Unclassified\nA high-density scan of a small tree stand (~20 m × 20 m). At 26 pts/m² this tile resolves individual tree crowns and branching structure in detail. Points reach up to 17 m above ground. All points are shown — no subsampling.\n\n\n\n\n\n\n\n\n\nNote\n\n\n\nAll data are from the USGS 3D Elevation Program (3DEP) and are in the public domain. Visualizations use lidR and plotly in R."
+  },
+  {
+    "objectID": "datasets.html#urban-forest-near-central-park-new-york-city",
+    "href": "datasets.html#urban-forest-near-central-park-new-york-city",
+    "title": "Datasets",
+    "section": "",
+    "text": "Source: USGS 3DEP · NAD83(2011) / UTM Zone 18N Area: ~2.04 km² · Points: 2.21 million · Density: ~1.08 pts/m² Classifications: Ground · Unclassified · Water · Rail · Bridge Deck · Noise\nThis tile covers a section of Manhattan adjacent to Central Park. The vertical range (−10 to +385 m) captures both below-grade infrastructure and the surrounding high-rise skyline. Points are colored by LiDAR classification — rotate and zoom to explore the urban 3D structure."
+  },
+  {
+    "objectID": "datasets.html#small-tree-plot",
+    "href": "datasets.html#small-tree-plot",
+    "title": "Datasets",
+    "section": "",
+    "text": "Source: USGS 3DEP · WGS 84 / UTM Zone 6N Area: ~399 m² · Points: 10.4 thousand · Density: ~26 pts/m² Classifications: Ground · Vegetation · Unclassified\nA high-density scan of a small tree stand (~20 m × 20 m). At 26 pts/m² this tile resolves individual tree crowns and branching structure in detail. Points reach up to 17 m above ground. All points are shown — no subsampling.\n\n\n\n\n\n\n\n\n\nNote\n\n\n\nAll data are from the USGS 3D Elevation Program (3DEP) and are in the public domain. Visualizations use lidR and plotly in R."
+  },
+  {
     "objectID": "Lidar.html",
     "href": "Lidar.html",
     "title": "LiDAR Notes",
@@ -126,24 +154,10 @@
     "text": "2025\n\n20 Dec 2025\n\n\nNew Paper Published in Certain Journal\n\n\nDingjin Chu and collaborators published a study on forest biomass estimation using LiDAR and optical data.\n\nRead Paper\n\n15–19 Dec 2025\n\n\nAGU Fall Meeting, New Orleans, USA\n\n\nDingjin presented recent research findings at the AGU Fall Meeting.\n\nVisit AGU\n\n\n2023\n\n16–17 Aug 2023\n\n\n\nPoster Presentation at the Conference “Actual Issues of Environmental Research for Sustainable Development in the Arid Zone” in Kyrgyzstan\n\n\nPoster about the impacts of future climate extremes on the interannual variability of terrestrial ecosystem productivity in Central Asia based on CMIP6."
   },
   {
-    "objectID": "projects.html#forest-loss-analysis",
-    "href": "projects.html#forest-loss-analysis",
+    "objectID": "projects.html",
+    "href": "projects.html",
     "title": "Projects",
-    "section": "Forest Loss Analysis",
-    "text": "Forest Loss Analysis\n\nQuantifying forest loss trends and drivers across large spatial extents using time-series satellite imagery. The workflow integrates Hansen Global Forest Change data with climate and topographic covariates to attribute disturbance to fire, harvest, and insect outbreak.\nTools: R, Google Earth Engine, tidyverse"
-  },
-  {
-    "objectID": "projects.html#geospatial-data-visualization",
-    "href": "projects.html#geospatial-data-visualization",
-    "title": "Projects",
-    "section": "Geospatial Data Visualization",
-    "text": "Geospatial Data Visualization\nInteractive and static maps for communicating spatial patterns in environmental datasets. Projects include animated time-series maps of vegetation indices and choropleth visualizations of disturbance rates by ecoregion.\nTools: R (ggplot2, tmap, Leaflet), Python (Matplotlib, Folium)"
-  },
-  {
-    "objectID": "projects.html#climateforest-productivity-analysis",
-    "href": "projects.html#climateforest-productivity-analysis",
-    "title": "Projects",
-    "section": "Climate–Forest Productivity Analysis",
-    "text": "Climate–Forest Productivity Analysis\nInvestigating how interannual climate variability (temperature, precipitation, drought indices) drives fluctuations in forest productivity as measured by MODIS NDVI and GPP products.\nTools: Python, R, netCDF4, xarray\n\n\n\n\n\n\n\nNote\n\n\n\nMore projects and reproducible notebooks will be added here over time."
+    "section": "",
+    "text": "Forest Loss Analysis\n\nQuantifying forest loss trends and drivers across large spatial extents using time-series satellite imagery. The workflow integrates Hansen Global Forest Change data with climate and topographic covariates to attribute disturbance to fire, harvest, and insect outbreak.\nTools: R, Google Earth Engine, tidyverse\n\n\n\nForest above ground biomass estimation\nLiDAR-based modeling of forest above-ground biomass (AGB) using USGS 3DEP and NEON airborne point clouds, integrated with GEDI spaceborne LiDAR footprints and ESA CCI Biomass products for cross-scale validation. Built a large-scale processing pipeline that derives canopy structure metrics (height percentiles, density, rumple index) and predicts plot-level AGB with Random Forest, XGBoost, LightGBM, and stacked ensemble models, evaluated with grouped cross-validation and SHAP-based interpretation.\nTools: R (lidR, lasR, terra, sf), Python (scikit-learn, XGBoost, LightGBM, SHAP)\n\n\n\nUrban green space of cooling effect\nQuantifying how the structure and composition of urban green spaces moderate land surface temperature across cities. Integrates USGS 3DEP airborne LiDAR-derived canopy metrics (height, cover, vertical complexity) with land cover and satellite-derived LST to model cooling magnitude as a function of canopy structure, patch geometry, and surrounding impervious context.\nTools: R (lidR, terra, sf, lme4), Python (xarray, rasterio, scikit-learn)\n\n\n\n\n\n\n\nNote\n\n\n\nMore projects and reproducible notebooks will be added here over time."
   }
 ]
