@@ -37,44 +37,16 @@
   {
     "objectID": "cv.html",
     "href": "cv.html",
-    "title": "CV",
+    "title": "About Me",
     "section": "",
-    "text": "Download CV (PDF)\n\n\n\nMSc / PhD — Environmental Science, Your University (Year–Present)\nBSc — Forestry, Your University (Year–Year)\n\n\n\n\nGraduate Research Assistant — Your Lab / Department (Year–Present) - Developed remote sensing workflows for forest disturbance detection using Google Earth Engine - Analyzed multi-decadal Landsat time series across boreal and temperate forest biomes - Contributed to peer-reviewed publications and conference presentations\n\n\n\n\n\nYour publication title. Journal Name, Year. [DOI link]\n\n\n\n\n\n\nYour talk title. Conference Name, Location, Year.\n\n\n\n\n\nProgramming: R, Python, Bash Platforms: Google Earth Engine, HPC/Linux Data: Landsat, MODIS, Sentinel, LiDAR Writing: LaTeX, R Markdown, Quarto"
+    "text": "Download CV (PDF)"
   },
   {
-    "objectID": "cv.html#education",
-    "href": "cv.html#education",
-    "title": "CV",
-    "section": "",
-    "text": "MSc / PhD — Environmental Science, Your University (Year–Present)\nBSc — Forestry, Your University (Year–Year)"
-  },
-  {
-    "objectID": "cv.html#research-experience",
-    "href": "cv.html#research-experience",
-    "title": "CV",
-    "section": "",
-    "text": "Graduate Research Assistant — Your Lab / Department (Year–Present) - Developed remote sensing workflows for forest disturbance detection using Google Earth Engine - Analyzed multi-decadal Landsat time series across boreal and temperate forest biomes - Contributed to peer-reviewed publications and conference presentations"
-  },
-  {
-    "objectID": "cv.html#publications",
-    "href": "cv.html#publications",
-    "title": "CV",
-    "section": "",
-    "text": "Your publication title. Journal Name, Year. [DOI link]"
-  },
-  {
-    "objectID": "cv.html#presentations",
-    "href": "cv.html#presentations",
-    "title": "CV",
-    "section": "",
-    "text": "Your talk title. Conference Name, Location, Year."
-  },
-  {
-    "objectID": "cv.html#skills",
-    "href": "cv.html#skills",
-    "title": "CV",
-    "section": "",
-    "text": "Programming: R, Python, Bash Platforms: Google Earth Engine, HPC/Linux Data: Landsat, MODIS, Sentinel, LiDAR Writing: LaTeX, R Markdown, Quarto"
+    "objectID": "cv.html#photos",
+    "href": "cv.html#photos",
+    "title": "About Me",
+    "section": "Photos",
+    "text": "Photos"
   },
   {
     "objectID": "index.html",
