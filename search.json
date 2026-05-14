@@ -42,6 +42,27 @@
     "text": "Photos"
   },
   {
+    "objectID": "contact.html",
+    "href": "contact.html",
+    "title": "Contact Me",
+    "section": "",
+    "text": "Feel free to reach out for research collaboration, questions, or just to connect.\nEmail: dingjinchu@gmail.com"
+  },
+  {
+    "objectID": "contact.html#get-in-touch",
+    "href": "contact.html#get-in-touch",
+    "title": "Contact Me",
+    "section": "",
+    "text": "Feel free to reach out for research collaboration, questions, or just to connect.\nEmail: dingjinchu@gmail.com"
+  },
+  {
+    "objectID": "contact.html#where-to-find-me",
+    "href": "contact.html#where-to-find-me",
+    "title": "Contact Me",
+    "section": "Where to Find Me",
+    "text": "Where to Find Me\nAgricultural Hall, Oklahoma State University Stillwater, Oklahoma, USA\n\n\nView larger map"
+  },
+  {
     "objectID": "datasets.html",
     "href": "datasets.html",
     "title": "Datasets",
