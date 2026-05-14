@@ -12,6 +12,1172 @@
 <generator>quarto-1.8.26</generator>
 <lastBuildDate>Thu, 14 May 2026 05:00:00 GMT</lastBuildDate>
 <item>
+  <title>Downloading and Analyzing GEDI L2A Relative Height Metrics</title>
+  <dc:creator>Dingjin Chu</dc:creator>
+  <link>https://Programmer112321.github.io/dingjin/posts/gedi-l2a/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<section id="overview" class="level2">
+<h2 class="anchored" data-anchor-id="overview">Overview</h2>
+<p><strong>GEDI L2A</strong> (Global Ecosystem Dynamics Investigation, Level 2A) provides footprint-level <strong>relative height (RH) metrics</strong> derived from full-waveform LiDAR. Unlike L4A which estimates above-ground biomass density, L2A reports the vertical distribution of returned energy — directly measuring canopy height structure.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Metric</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>RH25</strong></td>
+<td>Height below which 25% of waveform energy is returned</td>
+</tr>
+<tr class="even">
+<td><strong>RH50</strong></td>
+<td>Median canopy height</td>
+</tr>
+<tr class="odd">
+<td><strong>RH75</strong></td>
+<td>Height below which 75% of energy is returned</td>
+</tr>
+<tr class="even">
+<td><strong>RH95</strong></td>
+<td>Upper canopy height (~95th percentile) — most used as canopy height estimate</td>
+</tr>
+<tr class="odd">
+<td><strong>RH98</strong></td>
+<td>Near-maximum canopy height</td>
+</tr>
+<tr class="even">
+<td><strong>RH100</strong></td>
+<td>Maximum height of any return</td>
+</tr>
+</tbody>
+</table>
+<p>This tutorial applies the same workflow as GEDI L4A to two contrasting landscapes:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Region</th>
+<th>Site</th>
+<th>Land Cover</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Region 1</strong></td>
+<td>NEON SCBI — Front Royal, Virginia</td>
+<td>Temperate deciduous forest</td>
+</tr>
+<tr class="even">
+<td><strong>Region 2</strong></td>
+<td>Central Park &amp; surroundings — New York City</td>
+<td>Urban green space</td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+<section id="setup" class="level2">
+<h2 class="anchored" data-anchor-id="setup">Setup</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">install.packages</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"rGEDI"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"hdf5r"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"sf"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"terra"</span>,</span>
+<span id="cb1-2">                   <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"ggplot2"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"dplyr"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"tidyr"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"leaflet"</span>,</span>
+<span id="cb1-3">                   <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"viridis"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"patchwork"</span>))</span></code></pre></div></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(hdf5r); <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(sf);      <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(terra)</span>
+<span id="cb2-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(ggplot2); <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(dplyr); <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(tidyr)</span>
+<span id="cb2-3"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(leaflet); <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(viridis); <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(patchwork); <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(scales)</span></code></pre></div></div>
+</div>
+<hr>
+</section>
+<section id="step-1-define-two-study-areas" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="step-1-define-two-study-areas">Step 1 — Define Two Study Areas</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1">scbi <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(</span>
+<span id="cb3-2">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">name    =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"NEON SCBI — Front Royal, VA"</span>,</span>
+<span id="cb3-3">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">lon_min =</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">78.20</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">lat_min =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">38.85</span>,</span>
+<span id="cb3-4">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">lon_max =</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">78.10</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">lat_max =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">38.95</span></span>
+<span id="cb3-5">)</span>
+<span id="cb3-6"></span>
+<span id="cb3-7">nyc <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(</span>
+<span id="cb3-8">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">name    =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Central Park &amp; surroundings — New York City"</span>,</span>
+<span id="cb3-9">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">lon_min =</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">74.05</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">lat_min =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">40.70</span>,</span>
+<span id="cb3-10">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">lon_max =</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">73.85</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">lat_max =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">40.85</span></span>
+<span id="cb3-11">)</span>
+<span id="cb3-12"></span>
+<span id="cb3-13">region_to_sf <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">function</span>(r) {</span>
+<span id="cb3-14">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_bbox</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">xmin =</span> r<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>lon_min, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">ymin =</span> r<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>lat_min,</span>
+<span id="cb3-15">            <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">xmax =</span> r<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>lon_max, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">ymax =</span> r<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>lat_max),</span>
+<span id="cb3-16">          <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">crs =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4326</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_as_sfc</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_as_sf</span>()</span>
+<span id="cb3-17">}</span></code></pre></div></div>
+</div>
+<p>The map below shows GEDI orbital track coverage (green lines) and both study areas (red bounding boxes). Ascending (SW→NE) and descending (NW→SE) passes cross due to the ISS orbital inclination of ~51.6°.</p>
+<div class="column-page">
+<iframe src="fig_track_map.html" width="100%" height="500px" style="border: 1px solid #dee2e6; border-radius: 6px; margin: 0.5rem 0;" frameborder="0">
+</iframe>
+</div>
+<hr>
+</section>
+<section id="step-2-find-gedi-l2a-granules" class="level2">
+<h2 class="anchored" data-anchor-id="step-2-find-gedi-l2a-granules">Step 2 — Find GEDI L2A Granules</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(httr); <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(jsonlite)</span>
+<span id="cb4-2"></span>
+<span id="cb4-3">gedi_finder <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">function</span>(r, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">product =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"GEDI02_A"</span>) {</span>
+<span id="cb4-4">  url  <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">paste0</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"https://lpdaacsvc.cr.usgs.gov/services/gedifinder"</span>,</span>
+<span id="cb4-5">                 <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"?product="</span>, product, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"&amp;version=002"</span>,</span>
+<span id="cb4-6">                 <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"&amp;bbox="</span>, r<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>lon_min, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">","</span>, r<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>lat_min,</span>
+<span id="cb4-7">                 <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">","</span>,      r<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>lon_max, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">","</span>, r<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>lat_max)</span>
+<span id="cb4-8">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">fromJSON</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">content</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">GET</span>(url), <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"text"</span>))<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>data</span>
+<span id="cb4-9">}</span>
+<span id="cb4-10"></span>
+<span id="cb4-11">scbi_granules <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">gedi_finder</span>(scbi)</span>
+<span id="cb4-12">nyc_granules  <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">gedi_finder</span>(nyc)</span>
+<span id="cb4-13"></span>
+<span id="cb4-14"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">cat</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"SCBI granules:"</span>, <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">length</span>(scbi_granules), <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">\n</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span>)</span>
+<span id="cb4-15"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">cat</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"NYC  granules:"</span>, <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">length</span>(nyc_granules),  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">\n</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span>)</span></code></pre></div></div>
+</div>
+<hr>
+</section>
+<section id="step-3-download-granules" class="level2">
+<h2 class="anchored" data-anchor-id="step-3-download-granules">Step 3 — Download Granules</h2>
+<p>Requires a free <strong>NASA EarthData</strong> account (<a href="https://urs.earthdata.nasa.gov">urs.earthdata.nasa.gov</a>).</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(rGEDI)</span>
+<span id="cb5-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">gediDownload</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">filepath =</span> scbi_granules, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">outdir =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"data/gedi_l2a_scbi"</span>)</span>
+<span id="cb5-3"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">gediDownload</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">filepath =</span> nyc_granules,  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">outdir =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"data/gedi_l2a_nyc"</span>)</span></code></pre></div></div>
+</div>
+<blockquote class="blockquote">
+<p>Each L2A granule is ~300 MB–1 GB. For a small bounding box, 1–3 granules typically suffice.</p>
+</blockquote>
+<hr>
+</section>
+<section id="step-4-read-and-extract-rh-metrics-from-hdf5" class="level2">
+<h2 class="anchored" data-anchor-id="step-4-read-and-extract-rh-metrics-from-hdf5">Step 4 — Read and Extract RH Metrics from HDF5</h2>
+<p>GEDI L2A stores RH metrics as a 101-element array (<code>rh[0]</code>…<code>rh[100]</code>) per shot. Index 95 = RH95, index 50 = RH50, etc.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1">extract_gedi_l2a <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">function</span>(h5_path, region) {</span>
+<span id="cb6-2">  h5    <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> H5File<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">new</span>(h5_path, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">mode =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"r"</span>)</span>
+<span id="cb6-3">  beams <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"BEAM0000"</span>,<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"BEAM0001"</span>,<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"BEAM0010"</span>,<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"BEAM0011"</span>,</span>
+<span id="cb6-4">             <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"BEAM0101"</span>,<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"BEAM0110"</span>,<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"BEAM1000"</span>,<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"BEAM1011"</span>)</span>
+<span id="cb6-5"></span>
+<span id="cb6-6">  results <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">lapply</span>(beams, <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">function</span>(beam) {</span>
+<span id="cb6-7">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> (<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">!</span>beam <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%in%</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">names</span>(h5)) <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">return</span>(<span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">NULL</span>)</span>
+<span id="cb6-8">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tryCatch</span>({</span>
+<span id="cb6-9">      b  <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> h5[[beam]]</span>
+<span id="cb6-10">      rh <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> b[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"rh"</span>]][]        <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># matrix: shots × 101</span></span>
+<span id="cb6-11"></span>
+<span id="cb6-12">      <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">data.frame</span>(</span>
+<span id="cb6-13">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">lon          =</span> b[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"lon_lowestmode"</span>]][],</span>
+<span id="cb6-14">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">lat          =</span> b[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"lat_lowestmode"</span>]][],</span>
+<span id="cb6-15">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">elev_ground  =</span> b[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"elev_lowestmode"</span>]][],</span>
+<span id="cb6-16">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">rh25         =</span> rh[, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">26</span>],   <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># 0-indexed: col 26 = RH25</span></span>
+<span id="cb6-17">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">rh50         =</span> rh[, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">51</span>],</span>
+<span id="cb6-18">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">rh75         =</span> rh[, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">76</span>],</span>
+<span id="cb6-19">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">rh95         =</span> rh[, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">96</span>],</span>
+<span id="cb6-20">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">rh98         =</span> rh[, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">99</span>],</span>
+<span id="cb6-21">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">rh100        =</span> rh[, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">101</span>],</span>
+<span id="cb6-22">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">quality_flag =</span> b[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"quality_flag"</span>]][],</span>
+<span id="cb6-23">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">degrade_flag =</span> b[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"degrade_flag"</span>]][],</span>
+<span id="cb6-24">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">beam         =</span> beam</span>
+<span id="cb6-25">      )</span>
+<span id="cb6-26">    }, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">error =</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">function</span>(e) <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">NULL</span>)</span>
+<span id="cb6-27">  })</span>
+<span id="cb6-28"></span>
+<span id="cb6-29">  h5<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">close_all</span>()</span>
+<span id="cb6-30"></span>
+<span id="cb6-31">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">bind_rows</span>(results) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb6-32">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">filter</span>(lon <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&gt;=</span> region<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>lon_min, lon <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&lt;=</span> region<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>lon_max,</span>
+<span id="cb6-33">           lat <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&gt;=</span> region<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>lat_min, lat <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&lt;=</span> region<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>lat_max)</span>
+<span id="cb6-34">}</span>
+<span id="cb6-35"></span>
+<span id="cb6-36">scbi_raw <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list.files</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"data/gedi_l2a_scbi"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">\\</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">.h5$"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">full.names =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb6-37">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">lapply</span>(extract_gedi_l2a, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">region =</span> scbi) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">bind_rows</span>()</span>
+<span id="cb6-38"></span>
+<span id="cb6-39">nyc_raw  <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list.files</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"data/gedi_l2a_nyc"</span>,  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">\\</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">.h5$"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">full.names =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb6-40">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">lapply</span>(extract_gedi_l2a, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">region =</span> nyc)  <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">bind_rows</span>()</span></code></pre></div></div>
+</div>
+<hr>
+</section>
+<section id="step-5-quality-filtering" class="level2">
+<h2 class="anchored" data-anchor-id="step-5-quality-filtering">Step 5 — Quality Filtering</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1">quality_filter <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">function</span>(df) {</span>
+<span id="cb7-2">  df <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">filter</span>(quality_flag <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, degrade_flag <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>,</span>
+<span id="cb7-3">               rh95 <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&gt;=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, rh95 <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&lt;</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>)</span>
+<span id="cb7-4">}</span>
+<span id="cb7-5"></span>
+<span id="cb7-6">scbi_clean <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">quality_filter</span>(scbi_raw)</span>
+<span id="cb7-7">nyc_clean  <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">quality_filter</span>(nyc_raw)</span></code></pre></div></div>
+</div>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Flag</th>
+<th>Keep value</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>quality_flag</code></td>
+<td><code>1</code></td>
+<td>Valid waveform decomposition</td>
+</tr>
+<tr class="even">
+<td><code>degrade_flag</code></td>
+<td><code>0</code></td>
+<td>Nominal acquisition</td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+<section id="results" class="level2">
+<h2 class="anchored" data-anchor-id="results">Results</h2>
+<section id="spatial-distribution-of-rh95" class="level3">
+<h3 class="anchored" data-anchor-id="spatial-distribution-of-rh95">Spatial Distribution of RH95</h3>
+<img src="https://Programmer112321.github.io/dingjin/posts/gedi-l2a/fig_spatial_rh95.png" style="width:100%; border-radius:6px; margin:0.5rem 0;">
+<blockquote class="blockquote">
+<p>SCBI shows uniformly tall canopy (RH95 20–40 m) consistent with mature temperate forest. NYC reveals a sharp spatial contrast: the Central Park core reaches 15–25 m, while surrounding urban pixels drop to near zero where impervious surfaces dominate.</p>
+</blockquote>
+<hr>
+</section>
+<section id="rh95-frequency-distribution" class="level3">
+<h3 class="anchored" data-anchor-id="rh95-frequency-distribution">RH95 Frequency Distribution</h3>
+<img src="https://Programmer112321.github.io/dingjin/posts/gedi-l2a/fig_rh95_histogram.png" style="width:100%; border-radius:6px; margin:0.5rem 0;">
+<blockquote class="blockquote">
+<p>SCBI follows a near-normal distribution centred around 28 m. NYC shows a strongly bimodal pattern — a large mode below 5 m (streets, rooftops) and a secondary peak around 15–25 m (park trees).</p>
+</blockquote>
+<hr>
+</section>
+<section id="relative-height-profile-rh25-to-rh98" class="level3">
+<h3 class="anchored" data-anchor-id="relative-height-profile-rh25-to-rh98">Relative Height Profile — RH25 to RH98</h3>
+<img src="https://Programmer112321.github.io/dingjin/posts/gedi-l2a/fig_rh_profile.png" style="width:90%; border-radius:6px; margin:0.5rem auto; display:block;">
+<blockquote class="blockquote">
+<p>The RH profile reveals canopy vertical structure. SCBI’s wide spread from RH25 to RH95 indicates a multi-layered forest with understory. NYC’s RH values remain low across all percentiles outside the park, reflecting sparse or absent canopy.</p>
+</blockquote>
+<hr>
+</section>
+<section id="nyc-detail-central-park-vs-urban-surroundings" class="level3">
+<h3 class="anchored" data-anchor-id="nyc-detail-central-park-vs-urban-surroundings">NYC Detail — Central Park vs Urban Surroundings</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1">nyc_labeled <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> nyc_clean <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb8-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mutate</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">land_type =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ifelse</span>(</span>
+<span id="cb8-3">    lon <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&gt;=</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">73.981</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&amp;</span> lon <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&lt;=</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">73.949</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&amp;</span> lat <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&gt;=</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">40.764</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&amp;</span> lat <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&lt;=</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">40.800</span>,</span>
+<span id="cb8-4">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Central Park (Green Space)"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Urban Surroundings"</span></span>
+<span id="cb8-5">  ))</span></code></pre></div></div>
+</div>
+<img src="https://Programmer112321.github.io/dingjin/posts/gedi-l2a/fig_nyc_rh95_detail.png" style="width:100%; border-radius:6px; margin:0.5rem 0;">
+<hr>
+</section>
+<section id="canopy-vertical-structure-rh50-vs-rh95" class="level3">
+<h3 class="anchored" data-anchor-id="canopy-vertical-structure-rh50-vs-rh95">Canopy Vertical Structure — RH50 vs RH95</h3>
+<img src="https://Programmer112321.github.io/dingjin/posts/gedi-l2a/fig_rh50_vs_rh95.png" style="width:75%; border-radius:6px; margin:0.5rem auto; display:block;">
+<blockquote class="blockquote">
+<p>The steeper RH50–RH95 slope in SCBI indicates a top-heavy canopy (closed overstory, open understory), while NYC shows a shallower, more compressed relationship — canopy is both lower and more uniformly distributed vertically.</p>
+</blockquote>
+<hr>
+</section>
+<section id="summary-statistics" class="level3">
+<h3 class="anchored" data-anchor-id="summary-statistics">Summary Statistics</h3>
+<div class="cell">
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 29%">
+<col style="width: 7%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">region</th>
+<th style="text-align: right;">N shots</th>
+<th style="text-align: right;">Mean RH50 (m)</th>
+<th style="text-align: right;">Mean RH75 (m)</th>
+<th style="text-align: right;">Mean RH95 (m)</th>
+<th style="text-align: right;">Mean RH98 (m)</th>
+<th style="text-align: right;">Max RH100 (m)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Central Park &amp; NYC</td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">(Urban, NY)</td>
+<td style="text-align: right;">1612</td>
+<td style="text-align: right;">2.8</td>
+<td style="text-align: right;">4.4</td>
+<td style="text-align: right;">6.7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">34.4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">NEON SCBI</td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">(Temperate Forest, VA)</td>
+<td style="text-align: right;">673</td>
+<td style="text-align: right;">13.8</td>
+<td style="text-align: right;">20.3</td>
+<td style="text-align: right;">28.3</td>
+<td style="text-align: right;">30</td>
+<td style="text-align: right;">49.8</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<hr>
+</section>
+</section>
+<section id="step-6-rasterize-rh95-to-500-m-grid" class="level2">
+<h2 class="anchored" data-anchor-id="step-6-rasterize-rh95-to-500-m-grid">Step 6 — Rasterize RH95 to 500 m Grid</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1">rasterize_rh <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">function</span>(df, region, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">field =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"rh95"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">res =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.0045</span>) {</span>
+<span id="cb9-2">  r_tmpl <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rast</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">xmin =</span> region<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>lon_min, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">xmax =</span> region<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>lon_max,</span>
+<span id="cb9-3">                 <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">ymin =</span> region<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>lat_min, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">ymax =</span> region<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>lat_max,</span>
+<span id="cb9-4">                 <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">resolution =</span> res, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">crs =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"EPSG:4326"</span>)</span>
+<span id="cb9-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">vect</span>(df, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">geom =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"lon"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"lat"</span>), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">crs =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"EPSG:4326"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb9-6">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rasterize</span>(r_tmpl, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">field =</span> field, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fun =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"mean"</span>)</span>
+<span id="cb9-7">}</span>
+<span id="cb9-8"></span>
+<span id="cb9-9">r_scbi_rh95 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rasterize_rh</span>(scbi_clean, scbi)</span>
+<span id="cb9-10">r_nyc_rh95  <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rasterize_rh</span>(nyc_clean,  nyc)</span>
+<span id="cb9-11"></span>
+<span id="cb9-12"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">par</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">mfrow =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>))</span>
+<span id="cb9-13"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plot</span>(r_scbi_rh95, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">col =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">hcl.colors</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"plasma"</span>),</span>
+<span id="cb9-14">     <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">main =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"SCBI — Mean RH95 (m)"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">range =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">45</span>))</span>
+<span id="cb9-15"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plot</span>(r_nyc_rh95,  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">col =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">hcl.colors</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"plasma"</span>),</span>
+<span id="cb9-16">     <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">main =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"NYC  — Mean RH95 (m)"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">range =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">30</span>))</span>
+<span id="cb9-17"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">par</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">mfrow =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>))</span></code></pre></div></div>
+</div>
+<hr>
+</section>
+<section id="step-7-compare-rh-metrics-across-sites" class="level2">
+<h2 class="anchored" data-anchor-id="step-7-compare-rh-metrics-across-sites">Step 7 — Compare RH Metrics Across Sites</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1">combined <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">bind_rows</span>(</span>
+<span id="cb10-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mutate</span>(scbi_clean, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">region =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"NEON SCBI"</span>),</span>
+<span id="cb10-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mutate</span>(nyc_clean,  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">region =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"NYC Urban"</span>)</span>
+<span id="cb10-4">)</span>
+<span id="cb10-5"></span>
+<span id="cb10-6"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Long format for multi-metric comparison</span></span>
+<span id="cb10-7">rh_long <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> combined <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb10-8">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">select</span>(region, rh25, rh50, rh75, rh95, rh98) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb10-9">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">pivot_longer</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">cols =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(rh25, rh50, rh75, rh95, rh98),</span>
+<span id="cb10-10">               <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">names_to =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"metric"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">values_to =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"height"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb10-11">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mutate</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">metric =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">toupper</span>(metric))</span>
+<span id="cb10-12"></span>
+<span id="cb10-13"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Summary table</span></span>
+<span id="cb10-14">rh_long <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb10-15">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">group_by</span>(region, metric) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb10-16">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">summarise</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">mean =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">round</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mean</span>(height), <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>),</span>
+<span id="cb10-17">            <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">sd   =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">round</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sd</span>(height),   <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">.groups =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"drop"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb10-18">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">pivot_wider</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">names_from =</span> metric,</span>
+<span id="cb10-19">              <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">values_from =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(mean, sd))</span></code></pre></div></div>
+</div>
+<hr>
+</section>
+<section id="key-notes" class="level2">
+<h2 class="anchored" data-anchor-id="key-notes">Key Notes</h2>
+<ul>
+<li><strong>RH95 as canopy height:</strong> RH95 is the most widely used canopy height proxy from GEDI L2A, more stable than RH100 which is sensitive to noise returns.</li>
+<li><strong>Coordinate system:</strong> WGS84 (EPSG:4326) for all coordinates.</li>
+<li><strong>RH array indexing:</strong> In the HDF5 file, <code>rh</code> is 0-indexed — <code>rh[96]</code> = RH95, <code>rh[51]</code> = RH50, etc.</li>
+<li><strong>Quality flag:</strong> L2A uses <code>quality_flag</code> (not <code>l4_quality_flag</code> as in L4A). Keep only shots where <code>quality_flag == 1</code>.</li>
+<li><strong>Urban canopy:</strong> Low RH values in urban areas do not mean no trees — they reflect the <em>average</em> canopy height including large fractions of impervious surface within the ~25 m footprint.</li>
+<li><strong>Version:</strong> Always use <strong>V002</strong> for the most accurate waveform decomposition algorithm.</li>
+</ul>
+<hr>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<ul>
+<li>Dubayah, R. et al.&nbsp;(2020). GEDI L2A Elevation and Height Metrics, Version 2. ORNL DAAC. <a href="https://doi.org/10.3334/ORNLDAAC/1908">https://doi.org/10.3334/ORNLDAAC/1908</a></li>
+<li>GEDI Mission: <a href="https://gedi.umd.edu">https://gedi.umd.edu</a></li>
+<li>NEON SCBI site: <a href="https://www.neonscience.org/field-sites/scbi">https://www.neonscience.org/field-sites/scbi</a></li>
+<li>NASA EarthData: <a href="https://earthdata.nasa.gov">https://earthdata.nasa.gov</a></li>
+<li><code>rGEDI</code> R package: <a href="https://github.com/carlos-alberto-silva/rGEDI">https://github.com/carlos-alberto-silva/rGEDI</a></li>
+</ul>
+
+
+</section>
+
+ ]]></description>
+  <category>LiDAR</category>
+  <category>GEDI</category>
+  <category>Canopy Height</category>
+  <category>R</category>
+  <category>Tutorial</category>
+  <guid>https://Programmer112321.github.io/dingjin/posts/gedi-l2a/</guid>
+  <pubDate>Thu, 14 May 2026 05:00:00 GMT</pubDate>
+</item>
+<item>
   <title>Downloading and Analyzing GEDI L4A Above-Ground Biomass Data</title>
   <dc:creator>Dingjin Chu</dc:creator>
   <link>https://Programmer112321.github.io/dingjin/posts/gedi-l4a/</link>
