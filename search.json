@@ -7,326 +7,81 @@
     "text": "Aims:\nIntegrate field investigations with remote sensing to reveal cross-scale mechanisms, support the development of robust model to improve forest management for enhanced human well-being.\n\n\nForest above ground biomass estimation\nHow to estimate forest AGB across large spatial scale?\n\nLiDAR-based modeling of forest above-ground biomass (AGB) using USGS 3DEP and NEON airborne point clouds, integrated with GEDI spaceborne LiDAR footprints and ESA CCI Biomass products for cross-scale validation. Built a large-scale processing pipeline that derives canopy structure metrics (height percentiles, density, rumple index) and predicts plot-level AGB with Random Forest, XGBoost, LightGBM, and stacked ensemble models, evaluated with grouped cross-validation and SHAP-based interpretation.\nTools: R (lidR, lasR, terra, sf), Python (scikit-learn, XGBoost, LightGBM, SHAP)\n\n\n\nCooling effect of urban green space\nHow does the urban green space regulate the temperature?\n\nQuantifying how the structure and composition of urban green spaces moderate land surface temperature across cities. Integrates USGS 3DEP airborne LiDAR-derived canopy metrics (height, cover, vertical complexity) with land cover and satellite-derived LST to model cooling magnitude as a function of canopy structure, patch geometry, and surrounding impervious context.\nTools: R (lidR, terra, sf, lme4), Python (xarray, rasterio, scikit-learn)\n\n\nForest Loss Analysis\nHow to accurately detect the forest loss and what is their relationship to climate change?\n\n1: How forest disturbance Quantifying forest loss trends and drivers across large spatial extents using time-series satellite imagery. The workflow integrates Hansen Global Forest Change data with climate and topographic covariates to attribute disturbance to fire, harvest, and insect outbreak.\nTools: R, Google Earth Engine, tidyverse\n\n\n\n\n\n\n\n\nNote\n\n\n\nMore projects and reproducible notebooks will be added here over time."
   },
   {
-    "objectID": "posts/gedi-l4a/index.html",
-    "href": "posts/gedi-l4a/index.html",
-    "title": "Downloading and Analyzing GEDI L4A Above-Ground Biomass Data",
+    "objectID": "posts/gedi-urban-nyc/index.html",
+    "href": "posts/gedi-urban-nyc/index.html",
+    "title": "Urban GEDI: Separating Vegetation from Buildings in New York City",
     "section": "",
-    "text": "GEDI L4A (Global Ecosystem Dynamics Investigation, Level 4A) provides footprint-level estimates of above-ground biomass density (AGBD) in Mg/ha derived from NASA’s full-waveform LiDAR aboard the ISS. Each footprint is ~25 m in diameter with ~60 m along-track and ~600 m cross-track spacing.\nThis tutorial compares GEDI L4A AGBD across two contrasting landscapes:\n\n\n\n\n\n\n\n\nRegion\nSite\nLand Cover\n\n\n\n\nRegion 1\nNEON SCBI — Front Royal, Virginia\nTemperate deciduous forest\n\n\nRegion 2\nCentral Park & surroundings — New York City\nUrban green space"
+    "text": "GEDI L2A measures the vertical distribution of returned laser energy — but in urban areas the sensor cannot distinguish a 20 m tree from a 20 m rooftop. Both produce similar waveform returns. This post focuses exclusively on the Central Park–Manhattan corridor to explore:\n\n\n\n\n\n\n\nQuestion\nWhat we measure\n\n\n\n\nHow well does GEDI detect park trees?\nRH95 vs field-reference canopy heights\n\n\nHow does building height affect RH metrics?\nRH95 vs OSM building heights\n\n\nCan we tell buildings apart from trees?\nWaveform width (RH95 − RH25) as a diagnostic\n\n\nHow much data survives quality filtering?\nQuality flag pass rate by surface type\n\n\n\nStudy zones (6 urban zones, same 0.12° × 0.09° footprint):\n\n\n\n\n\n\n\n\nZone\nDominant surface\nExpected GEDI signal\n\n\n\n\nCentral Park\nDeciduous trees 15–25 m\nBroad waveform, high RH95\n\n\nUpper West / East Side\nBrownstones + apartment blocks 10–30 m\nNarrow waveform, moderate RH95\n\n\nMidtown\nMixed low-commercial + high-rise 5–300 m\nWide RH95 spread, many failures\n\n\nLower Manhattan\nDense high-rise 10–400 m\nHigh RH95, high quality-fail rate\n\n\nNorth Manhattan\nResidential 8–25 m\nLow RH95, moderate pass rate"
   },
   {
-    "objectID": "posts/gedi-l4a/index.html#overview",
-    "href": "posts/gedi-l4a/index.html#overview",
-    "title": "Downloading and Analyzing GEDI L4A Above-Ground Biomass Data",
+    "objectID": "posts/gedi-urban-nyc/index.html#overview",
+    "href": "posts/gedi-urban-nyc/index.html#overview",
+    "title": "Urban GEDI: Separating Vegetation from Buildings in New York City",
     "section": "",
-    "text": "GEDI L4A (Global Ecosystem Dynamics Investigation, Level 4A) provides footprint-level estimates of above-ground biomass density (AGBD) in Mg/ha derived from NASA’s full-waveform LiDAR aboard the ISS. Each footprint is ~25 m in diameter with ~60 m along-track and ~600 m cross-track spacing.\nThis tutorial compares GEDI L4A AGBD across two contrasting landscapes:\n\n\n\n\n\n\n\n\nRegion\nSite\nLand Cover\n\n\n\n\nRegion 1\nNEON SCBI — Front Royal, Virginia\nTemperate deciduous forest\n\n\nRegion 2\nCentral Park & surroundings — New York City\nUrban green space"
+    "text": "GEDI L2A measures the vertical distribution of returned laser energy — but in urban areas the sensor cannot distinguish a 20 m tree from a 20 m rooftop. Both produce similar waveform returns. This post focuses exclusively on the Central Park–Manhattan corridor to explore:\n\n\n\n\n\n\n\nQuestion\nWhat we measure\n\n\n\n\nHow well does GEDI detect park trees?\nRH95 vs field-reference canopy heights\n\n\nHow does building height affect RH metrics?\nRH95 vs OSM building heights\n\n\nCan we tell buildings apart from trees?\nWaveform width (RH95 − RH25) as a diagnostic\n\n\nHow much data survives quality filtering?\nQuality flag pass rate by surface type\n\n\n\nStudy zones (6 urban zones, same 0.12° × 0.09° footprint):\n\n\n\n\n\n\n\n\nZone\nDominant surface\nExpected GEDI signal\n\n\n\n\nCentral Park\nDeciduous trees 15–25 m\nBroad waveform, high RH95\n\n\nUpper West / East Side\nBrownstones + apartment blocks 10–30 m\nNarrow waveform, moderate RH95\n\n\nMidtown\nMixed low-commercial + high-rise 5–300 m\nWide RH95 spread, many failures\n\n\nLower Manhattan\nDense high-rise 10–400 m\nHigh RH95, high quality-fail rate\n\n\nNorth Manhattan\nResidential 8–25 m\nLow RH95, moderate pass rate"
   },
   {
-    "objectID": "posts/gedi-l4a/index.html#setup",
-    "href": "posts/gedi-l4a/index.html#setup",
-    "title": "Downloading and Analyzing GEDI L4A Above-Ground Biomass Data",
+    "objectID": "posts/gedi-urban-nyc/index.html#setup",
+    "href": "posts/gedi-urban-nyc/index.html#setup",
+    "title": "Urban GEDI: Separating Vegetation from Buildings in New York City",
     "section": "Setup",
-    "text": "Setup\n\ninstall.packages(c(\"rGEDI\", \"hdf5r\", \"sf\", \"terra\",\n                   \"ggplot2\", \"dplyr\", \"leaflet\", \"viridis\", \"patchwork\"))\n\n\nlibrary(hdf5r); library(sf); library(terra)\nlibrary(ggplot2); library(dplyr); library(leaflet)\nlibrary(viridis); library(patchwork); library(scales)"
+    "text": "Setup\n\ninstall.packages(c(\"rGEDI\",\"hdf5r\",\"sf\",\"osmdata\",\n                   \"ggplot2\",\"dplyr\",\"tidyr\",\n                   \"leaflet\",\"viridis\",\"patchwork\",\"scales\"))\n\n\nlibrary(hdf5r); library(sf);       library(osmdata)\nlibrary(ggplot2); library(dplyr);  library(tidyr)\nlibrary(leaflet); library(viridis); library(patchwork); library(scales)"
   },
   {
-    "objectID": "posts/gedi-l4a/index.html#step-1-define-two-study-areas",
-    "href": "posts/gedi-l4a/index.html#step-1-define-two-study-areas",
-    "title": "Downloading and Analyzing GEDI L4A Above-Ground Biomass Data",
-    "section": "Step 1 — Define Two Study Areas",
-    "text": "Step 1 — Define Two Study Areas\n\n# ── Region 1: NEON SCBI, Front Royal, VA ─────────────────────────────────\nscbi &lt;- list(\n  name    = \"NEON SCBI — Front Royal, VA\",\n  lon_min = -78.20, lat_min = 38.85,\n  lon_max = -78.10, lat_max = 38.95\n)\n\n# ── Region 2: Central Park & surrounding urban area, NYC ─────────────────\nnyc &lt;- list(\n  name    = \"Central Park & surroundings — New York City\",\n  lon_min = -74.05, lat_min = 40.70,\n  lon_max = -73.85, lat_max = 40.85\n)\n\nregion_to_sf &lt;- function(r) {\n  st_bbox(c(xmin = r$lon_min, ymin = r$lat_min,\n            xmax = r$lon_max, ymax = r$lat_max),\n          crs = 4326) |&gt; st_as_sfc() |&gt; st_as_sf()\n}\n\nThe map below shows the GEDI orbital track coverage (green lines) over both study areas (red bounding boxes). Ascending (SW→NE) and descending (NW→SE) passes cross due to the ISS orbital inclination of ~51.6°."
+    "objectID": "posts/gedi-urban-nyc/index.html#step-1-define-study-area",
+    "href": "posts/gedi-urban-nyc/index.html#step-1-define-study-area",
+    "title": "Urban GEDI: Separating Vegetation from Buildings in New York City",
+    "section": "Step 1 — Define Study Area",
+    "text": "Step 1 — Define Study Area\n\nnyc &lt;- list(\n  lon_min = -74.02, lat_min = 40.73,\n  lon_max = -73.90, lat_max = 40.82\n)\n\n# Approximate Central Park boundary for zone labeling\ncp_bounds &lt;- list(\n  lon_min = -73.981, lon_max = -73.949,\n  lat_min =  40.764, lat_max =  40.800\n)\n\nclassify_zone &lt;- function(lon, lat) {\n  in_park &lt;- lon &gt;= cp_bounds$lon_min & lon &lt;= cp_bounds$lon_max &\n             lat &gt;= cp_bounds$lat_min & lat &lt;= cp_bounds$lat_max\n  dplyr::case_when(\n    in_park                                                         ~ \"Central Park\",\n    lat &gt;= 40.764 & lat &lt;= 40.800 & lon &lt; cp_bounds$lon_min        ~ \"Upper West Side\",\n    lat &gt;= 40.764 & lat &lt;= 40.800 & lon &gt; cp_bounds$lon_max        ~ \"Upper East Side\",\n    lat &gt; 40.800                                                    ~ \"North Manhattan\",\n    lat &gt;= 40.748 & lat &lt; 40.764                                    ~ \"Midtown\",\n    TRUE                                                            ~ \"Lower Manhattan\"\n  )\n}\n\nThe interactive map below shows the 6 zones and approximate GEDI orbital track coverage."
   },
   {
-    "objectID": "posts/gedi-l4a/index.html#step-2-find-gedi-l4a-granules",
-    "href": "posts/gedi-l4a/index.html#step-2-find-gedi-l4a-granules",
-    "title": "Downloading and Analyzing GEDI L4A Above-Ground Biomass Data",
-    "section": "Step 2 — Find GEDI L4A Granules",
-    "text": "Step 2 — Find GEDI L4A Granules\n\nlibrary(httr); library(jsonlite)\n\ngedi_finder &lt;- function(r) {\n  url  &lt;- paste0(\"https://lpdaacsvc.cr.usgs.gov/services/gedifinder\",\n                 \"?product=GEDI04_A&version=002\",\n                 \"&bbox=\", r$lon_min, \",\", r$lat_min,\n                 \",\",      r$lon_max, \",\", r$lat_max)\n  fromJSON(content(GET(url), \"text\"))$data\n}\n\nscbi_granules &lt;- gedi_finder(scbi)\nnyc_granules  &lt;- gedi_finder(nyc)\n\ncat(\"SCBI granules:\", length(scbi_granules), \"\\n\")\ncat(\"NYC  granules:\", length(nyc_granules),  \"\\n\")"
+    "objectID": "posts/gedi-urban-nyc/index.html#step-2-download-gedi-l2a",
+    "href": "posts/gedi-urban-nyc/index.html#step-2-download-gedi-l2a",
+    "title": "Urban GEDI: Separating Vegetation from Buildings in New York City",
+    "section": "Step 2 — Download GEDI L2A",
+    "text": "Step 2 — Download GEDI L2A\nSee the GEDI L2A tutorial for the full download workflow. Use the same gedi_finder() + gediDownload() pipeline with the NYC bounding box defined above.\n\nlibrary(httr); library(jsonlite); library(rGEDI)\n\ngedi_finder &lt;- function(r, product = \"GEDI02_A\") {\n  url &lt;- paste0(\"https://lpdaacsvc.cr.usgs.gov/services/gedifinder\",\n                \"?product=\", product, \"&version=002\",\n                \"&bbox=\", r$lon_min, \",\", r$lat_min,\n                \",\",      r$lon_max, \",\", r$lat_max)\n  fromJSON(content(GET(url), \"text\"))$data\n}\n\nnyc_granules &lt;- gedi_finder(nyc)\ngediDownload(filepath = nyc_granules, outdir = \"data/gedi_l2a_nyc\")"
   },
   {
-    "objectID": "posts/gedi-l4a/index.html#step-3-download-granules",
-    "href": "posts/gedi-l4a/index.html#step-3-download-granules",
-    "title": "Downloading and Analyzing GEDI L4A Above-Ground Biomass Data",
-    "section": "Step 3 — Download Granules",
-    "text": "Step 3 — Download Granules\nRequires a free NASA EarthData account (urs.earthdata.nasa.gov).\n\nlibrary(rGEDI)\ngediDownload(filepath = scbi_granules, outdir = \"data/gedi_scbi\")\ngediDownload(filepath = nyc_granules,  outdir = \"data/gedi_nyc\")\n\n\nEach granule is ~500 MB–2 GB. For a small bounding box, typically 1–3 granules suffice."
+    "objectID": "posts/gedi-urban-nyc/index.html#step-3-extract-and-quality-filter-rh-metrics",
+    "href": "posts/gedi-urban-nyc/index.html#step-3-extract-and-quality-filter-rh-metrics",
+    "title": "Urban GEDI: Separating Vegetation from Buildings in New York City",
+    "section": "Step 3 — Extract and Quality-Filter RH Metrics",
+    "text": "Step 3 — Extract and Quality-Filter RH Metrics\n\nlibrary(hdf5r)\n\nextract_l2a &lt;- function(h5_path, region) {\n  h5    &lt;- H5File$new(h5_path, mode = \"r\")\n  beams &lt;- c(\"BEAM0000\",\"BEAM0001\",\"BEAM0010\",\"BEAM0011\",\n             \"BEAM0101\",\"BEAM0110\",\"BEAM1000\",\"BEAM1011\")\n  results &lt;- lapply(beams, function(beam) {\n    if (!beam %in% names(h5)) return(NULL)\n    tryCatch({\n      b  &lt;- h5[[beam]]\n      rh &lt;- b[[\"rh\"]][]\n      data.frame(\n        lon          = b[[\"lon_lowestmode\"]][],\n        lat          = b[[\"lat_lowestmode\"]][],\n        rh25 = rh[,26], rh50 = rh[,51],\n        rh75 = rh[,76], rh95 = rh[,96], rh98 = rh[,99],\n        quality_flag = b[[\"quality_flag\"]][],\n        degrade_flag = b[[\"degrade_flag\"]][],\n        beam = beam\n      )\n    }, error = function(e) NULL)\n  })\n  h5$close_all()\n  bind_rows(results) |&gt;\n    filter(lon &gt;= region$lon_min, lon &lt;= region$lon_max,\n           lat &gt;= region$lat_min, lat &lt;= region$lat_max)\n}\n\nnyc_raw   &lt;- list.files(\"data/gedi_l2a_nyc\", \"\\\\.h5$\", full.names = TRUE) |&gt;\n  lapply(extract_l2a, region = nyc) |&gt; bind_rows()\n\nnyc_clean &lt;- nyc_raw |&gt;\n  filter(quality_flag == 1, degrade_flag == 0, rh95 &gt;= 0, rh95 &lt; 200) |&gt;\n  mutate(\n    zone           = classify_zone(lon, lat),\n    waveform_width = rh95 - rh25\n  )"
   },
   {
-    "objectID": "posts/gedi-l4a/index.html#step-4-read-and-extract-agbd-from-hdf5",
-    "href": "posts/gedi-l4a/index.html#step-4-read-and-extract-agbd-from-hdf5",
-    "title": "Downloading and Analyzing GEDI L4A Above-Ground Biomass Data",
-    "section": "Step 4 — Read and Extract AGBD from HDF5",
-    "text": "Step 4 — Read and Extract AGBD from HDF5\nGEDI L4A files are HDF5 with 8 beam groups. This function loops all beams and clips to the bounding box:\n\nextract_gedi_l4a &lt;- function(h5_path, region) {\n  h5    &lt;- H5File$new(h5_path, mode = \"r\")\n  beams &lt;- c(\"BEAM0000\",\"BEAM0001\",\"BEAM0010\",\"BEAM0011\",\n             \"BEAM0101\",\"BEAM0110\",\"BEAM1000\",\"BEAM1011\")\n\n  results &lt;- lapply(beams, function(beam) {\n    if (!beam %in% names(h5)) return(NULL)\n    tryCatch({\n      b &lt;- h5[[beam]]\n      data.frame(\n        lon        = b[[\"lon_lowestmode\"]][],\n        lat        = b[[\"lat_lowestmode\"]][],\n        agbd       = b[[\"agbd\"]][],\n        agbd_lower = b[[\"agbd_pi_lower\"]][],\n        agbd_upper = b[[\"agbd_pi_upper\"]][],\n        quality    = b[[\"l4_quality_flag\"]][],\n        degrade    = b[[\"degrade_flag\"]][],\n        beam       = beam\n      )\n    }, error = function(e) NULL)\n  })\n  h5$close_all()\n\n  bind_rows(results) |&gt;\n    filter(lon &gt;= region$lon_min, lon &lt;= region$lon_max,\n           lat &gt;= region$lat_min, lat &lt;= region$lat_max)\n}\n\nscbi_raw &lt;- list.files(\"data/gedi_scbi\", \"\\\\.h5$\", full.names = TRUE) |&gt;\n  lapply(extract_gedi_l4a, region = scbi) |&gt; bind_rows()\n\nnyc_raw  &lt;- list.files(\"data/gedi_nyc\",  \"\\\\.h5$\", full.names = TRUE) |&gt;\n  lapply(extract_gedi_l4a, region = nyc)  |&gt; bind_rows()"
+    "objectID": "posts/gedi-urban-nyc/index.html#step-4-get-osm-building-heights",
+    "href": "posts/gedi-urban-nyc/index.html#step-4-get-osm-building-heights",
+    "title": "Urban GEDI: Separating Vegetation from Buildings in New York City",
+    "section": "Step 4 — Get OSM Building Heights",
+    "text": "Step 4 — Get OSM Building Heights\n\nnyc_bldg_raw &lt;- opq(bbox = c(nyc$lon_min, nyc$lat_min,\n                              nyc$lon_max, nyc$lat_max)) |&gt;\n  add_osm_feature(key = \"building\") |&gt;\n  osmdata_sf()\n\nbldg_poly &lt;- nyc_bldg_raw$osm_polygons |&gt;\n  mutate(\n    height_m   = suppressWarnings(as.numeric(`height`)),\n    floors     = suppressWarnings(as.numeric(`building:levels`)),\n    height_est = dplyr::coalesce(height_m, floors * 3.5)\n  ) |&gt;\n  filter(!is.na(height_est), height_est &gt; 0) |&gt;\n  st_transform(4326)\n\n# Spatial join GEDI footprints → buildings\nnyc_sf &lt;- st_as_sf(nyc_clean, coords = c(\"lon\",\"lat\"), crs = 4326)\nnyc_joined &lt;- st_join(nyc_sf, bldg_poly[, c(\"height_est\",\"geometry\")],\n                      join = st_intersects, left = TRUE) |&gt;\n  st_drop_geometry() |&gt;\n  mutate(\n    surface = case_when(\n      zone == \"Central Park\"           ~ \"Vegetation\",\n      !is.na(height_est)               ~ \"Building\",\n      TRUE                             ~ \"Street / Open\"\n    ),\n    bldg_height = height_est\n  )"
   },
   {
-    "objectID": "posts/gedi-l4a/index.html#step-5-quality-filtering",
-    "href": "posts/gedi-l4a/index.html#step-5-quality-filtering",
-    "title": "Downloading and Analyzing GEDI L4A Above-Ground Biomass Data",
-    "section": "Step 5 — Quality Filtering",
-    "text": "Step 5 — Quality Filtering\n\nquality_filter &lt;- function(df) {\n  df |&gt; filter(quality == 1, degrade == 0, agbd &gt;= 0, agbd &lt; 1000)\n}\n\nscbi_clean &lt;- quality_filter(scbi_raw)\nnyc_clean  &lt;- quality_filter(nyc_raw)\n\nQuality flags used:\n\n\n\nFlag\nKeep value\nMeaning\n\n\n\n\nl4_quality_flag\n1\nReliable AGBD estimate\n\n\ndegrade_flag\n0\nNominal acquisition (no data degradation)"
-  },
-  {
-    "objectID": "posts/gedi-l4a/index.html#results",
-    "href": "posts/gedi-l4a/index.html#results",
-    "title": "Downloading and Analyzing GEDI L4A Above-Ground Biomass Data",
+    "objectID": "posts/gedi-urban-nyc/index.html#results",
+    "href": "posts/gedi-urban-nyc/index.html#results",
+    "title": "Urban GEDI: Separating Vegetation from Buildings in New York City",
     "section": "Results",
-    "text": "Results\nThe figures below show processed GEDI L4A output for both regions.\n\nSpatial Distribution of AGBD\nEach point represents one GEDI footprint (~25 m diameter). Colors encode AGBD in Mg/ha.\n\n\nSCBI shows dense, continuous forest cover with high AGBD (100–400 Mg/ha). The NYC panel reveals a strong spatial contrast between the vegetated core of Central Park (higher AGBD) and the surrounding impervious urban fabric (near-zero AGBD).\n\n\n\nInteractive Footprint Map — AGBD\nClick any point to see AGBD and uncertainty bounds. Toggle sites using the layer control (top-right).\n\n\nWarning in pal(agbd): Some values were outside the color scale and will be\ntreated as NA\n\n\n\n\n\n\n\n\n\nAGBD Frequency Distribution\n\n\nSCBI follows a right-skewed log-normal distribution typical of mature temperate forest. NYC shows a strongly bimodal pattern: a large spike near zero (impervious surfaces, sparse street trees) and a secondary mode around 80–130 Mg/ha (park tree canopy).\n\n\n\n\nAGBD Violin + Box Plot\n\n\n\n\nNYC Detail — Central Park vs Urban Surroundings\nGEDI footprints are classified by whether they fall inside the Central Park boundary (~-73.981 to -73.949 lon, 40.764 to 40.800 lat):\n\nnyc_labeled &lt;- nyc_clean |&gt;\n  mutate(land_type = ifelse(\n    lon &gt;= -73.981 & lon &lt;= -73.949 & lat &gt;= 40.764 & lat &lt;= 40.800,\n    \"Central Park (Green Space)\", \"Urban Surroundings\"\n  ))\n\n\n\n\n\nSummary Statistics\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nregion\nN footprints\nMean AGBD\nMedian AGBD\nSD\nMin\nMax\n\n\n\n\nCentral Park & NYC\n\n\n\n\n\n\n\n\n(Urban, NY)\n1628\n34.3\n22.6\n35.2\n0.7\n280\n\n\nNEON SCBI\n\n\n\n\n\n\n\n\n(Temperate Forest, VA)\n657\n206.5\n192.3\n87.1\n62.2\n480"
+    "text": "Results\n\nSpatial Distribution — Footprints by Zone\n\n\nEach dot is a quality-passing GEDI footprint. The green dashed box marks the Central Park boundary. Lower Manhattan and Midtown show the most mixed signal — tall buildings, low streets, and occasional small parks all within the same 0.12° × 0.09° window.\n\n\n\n\nInteractive Map — Surface Classification\n\n\n\n\n\n\n\n\n\nRH95 by Urban Zone\n\n\nCentral Park shows the tallest and most consistent RH95 (~20 m), entirely from tree canopy. Lower Manhattan has the highest mean RH95 (~60 m) — but this reflects skyscraper rooftops, not trees. North Manhattan and the Upper West/East Side cluster around 15–20 m, a mix of street trees and low apartment buildings.\n\n\n\n\nWaveform Width (RH95 − RH25) — The Key Diagnostic\nThe waveform width (RH95 − RH25) captures how spread out the returned energy is vertically:\n\nTrees: wide spread — laser penetrates through the canopy and still gets returns from the ground and understory (low RH25), while the top return comes from the canopy surface (high RH95)\nBuildings: narrow spread — a flat rooftop concentrates almost all returns at one height; RH25 is nearly as high as RH95\nStreets: near-zero — all returns from the ground\n\n\n\nThis single metric can act as a building/vegetation separator without any external data: footprints with waveform_width &gt; 10 m are almost exclusively vegetation; those with waveform_width &lt; 5 m are likely buildings or streets. A threshold of ~8 m gives a practical first-pass filter.\n\n\n\n\nFull RH Profile Comparison\n\n\nThe RH25–RH95 profile shape differs fundamentally between surface types. For vegetation, RH25 stays low (ground/understory) while RH75 and RH95 jump sharply — a signature of a closed-canopy forest. For buildings, all four percentiles step upward uniformly, tracking the roof height. For streets, all percentiles hover near zero.\n\n\n\n\nGEDI RH95 vs OSM Building Height\n\n\nGEDI RH95 tracks building height but systematically underestimates — increasingly so for tall buildings. A 10 m brownstone might yield RH95 ≈ 9 m (small underestimate), but a 200 m skyscraper might yield RH95 ≈ 170 m. The underestimate arises because the ~25 m GEDI footprint inevitably overlaps a street edge at building corners, diluting the roof-level return with near-ground signal.\n\n\n\n\nQuality Flag Pass Rate\n\n\nVegetation footprints pass QC at ~88 % — the GEDI waveform decomposition algorithm was designed for forest returns. Building and street footprints pass at ~44–50 %: the algorithm flags the abnormal waveform shapes (sharp single-return peaks from rooftops; very weak returns from roads) as unreliable. After quality filtering, urban datasets are dominated by vegetation and mixed-footprint shots, which partially self-corrects the building contamination problem.\n\n\n\n\nSummary Statistics\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nZone\nN\n% Veg\n% Bldg\n% Street\nMean RH95\nMedian RH95\nMean Width\n\n\n\n\nCentral Park\n207\n86.5\n2.4\n11.1\n20.1\n21.8\n15.4\n\n\nLower Manhattan\n152\n3.3\n71.1\n25.7\n59.5\n29.0\n23.4\n\n\nMidtown\n178\n7.3\n62.4\n30.3\n40.5\n22.4\n17.1\n\n\nNorth Manhattan\n165\n15.8\n52.7\n31.5\n13.0\n12.9\n6.9\n\n\nUpper East Side\n180\n16.7\n52.2\n31.1\n16.4\n17.3\n8.4\n\n\nUpper West Side\n151\n17.9\n56.3\n25.8\n16.5\n17.6\n8.9"
   },
   {
-    "objectID": "posts/gedi-l4a/index.html#step-6-rasterize-to-500-m-grid",
-    "href": "posts/gedi-l4a/index.html#step-6-rasterize-to-500-m-grid",
-    "title": "Downloading and Analyzing GEDI L4A Above-Ground Biomass Data",
-    "section": "Step 6 — Rasterize to 500 m Grid",
-    "text": "Step 6 — Rasterize to 500 m Grid\n\nrasterize_agbd &lt;- function(df, region, res = 0.0045) {\n  r_tmpl &lt;- rast(xmin = region$lon_min, xmax = region$lon_max,\n                 ymin = region$lat_min, ymax = region$lat_max,\n                 resolution = res, crs = \"EPSG:4326\")\n  vect(df, geom = c(\"lon\", \"lat\"), crs = \"EPSG:4326\") |&gt;\n    rasterize(r_tmpl, field = \"agbd\", fun = \"mean\")\n}\n\nr_scbi &lt;- rasterize_agbd(scbi_clean, scbi)\nr_nyc  &lt;- rasterize_agbd(nyc_clean,  nyc)\n\npar(mfrow = c(1, 2))\nplot(r_scbi, col = hcl.colors(100, \"viridis\"),\n     main = \"SCBI Mean AGBD (Mg/ha)\", range = c(0, 400))\nplot(r_nyc,  col = hcl.colors(100, \"viridis\"),\n     main = \"NYC Mean AGBD (Mg/ha)\",  range = c(0, 200))\npar(mfrow = c(1, 1))"
+    "objectID": "posts/gedi-urban-nyc/index.html#step-5-practical-filtering-strategy-for-urban-gedi",
+    "href": "posts/gedi-urban-nyc/index.html#step-5-practical-filtering-strategy-for-urban-gedi",
+    "title": "Urban GEDI: Separating Vegetation from Buildings in New York City",
+    "section": "Step 5 — Practical Filtering Strategy for Urban GEDI",
+    "text": "Step 5 — Practical Filtering Strategy for Urban GEDI\nCombining everything above, a three-layer filter improves vegetation signal in urban GEDI:\n\nnyc_veg &lt;- nyc_joined |&gt;\n  filter(\n    quality_flag == 1,          # standard GEDI QC\n    degrade_flag == 0,\n    waveform_width &gt; 8,         # removes most building returns\n    is.na(bldg_height) |        # not on a known building footprint\n      bldg_height &lt; 5           # (or a very small structure like a shed)\n  )\n\n\n\n\n\n\n\n\n\nFilter\nWhat it removes\nTypical urban retention\n\n\n\n\nquality_flag == 1\nFailed waveform decompositions\n~50 % of all urban shots\n\n\nwaveform_width &gt; 8 m\nFlat-roof building returns\n~75 % of remaining building shots\n\n\nOSM building mask\nKnown building footprints\nResidual rooftop contamination\n\n\n\n\nAfter all three filters, the remaining shots in Central Park will be ~95 % true vegetation canopy. In Midtown the retained fraction drops to ~20 % of raw shots — reflecting the genuine scarcity of tall vegetation in dense commercial districts."
   },
   {
-    "objectID": "posts/gedi-l4a/index.html#key-notes",
-    "href": "posts/gedi-l4a/index.html#key-notes",
-    "title": "Downloading and Analyzing GEDI L4A Above-Ground Biomass Data",
-    "section": "Key Notes",
-    "text": "Key Notes\n\nAGBD fill value: Filter out agbd == -9999 before any analysis.\nPrediction interval: agbd_pi_lower / agbd_pi_upper give per-footprint 90% uncertainty bounds.\nPower beams: BEAM0101, BEAM0110, BEAM1000, BEAM1011 penetrate dense canopy better and yield higher-quality waveforms.\nUrban interpretation: GEDI AGBD in cities reflects canopy trees only — not building structure. Near-zero AGBD in NYC corresponds to streets, rooftops, and parking lots.\nVersion: Always use V002 — it includes updated allometric models and improved algorithm."
+    "objectID": "posts/gedi-urban-nyc/index.html#key-takeaways",
+    "href": "posts/gedi-urban-nyc/index.html#key-takeaways",
+    "title": "Urban GEDI: Separating Vegetation from Buildings in New York City",
+    "section": "Key Takeaways",
+    "text": "Key Takeaways\n\nWaveform width is a free diagnostic: RH95 − RH25 &gt; 8–10 m strongly indicates vegetation; &lt; 5 m indicates a flat built surface.\nQuality filtering is biased toward vegetation: Buildings naturally fail QC at higher rates, so standard GEDI pipelines inadvertently self-filter some building contamination.\nUnderestimation scales with building height: GEDI systematically underestimates tall buildings because the footprint always samples some street-level signal at roof edges.\nUrban GEDI is most reliable inside parks: Central Park footprints are clean and vegetation-dominated after standard quality filtering.\nCombine GEDI with OSM or land-cover masks for fully rigorous urban analyses — especially when building heights &gt; 20 m are common."
   },
   {
-    "objectID": "posts/gedi-l4a/index.html#references",
-    "href": "posts/gedi-l4a/index.html#references",
-    "title": "Downloading and Analyzing GEDI L4A Above-Ground Biomass Data",
+    "objectID": "posts/gedi-urban-nyc/index.html#references",
+    "href": "posts/gedi-urban-nyc/index.html#references",
+    "title": "Urban GEDI: Separating Vegetation from Buildings in New York City",
     "section": "References",
-    "text": "References\n\nDubayah, R. et al. (2022). GEDI L4A Footprint Level Aboveground Biomass Density, Version 2. ORNL DAAC. https://doi.org/10.3334/ORNLDAAC/2056\nGEDI Mission: https://gedi.umd.edu\nNEON SCBI site: https://www.neonscience.org/field-sites/scbi\nNASA EarthData: https://earthdata.nasa.gov\nrGEDI R package: https://github.com/carlos-alberto-silva/rGEDI"
-  },
-  {
-    "objectID": "news.html",
-    "href": "news.html",
-    "title": "Recent News",
-    "section": "",
-    "text": "2025\n\n20 Dec 2025\n\n\nNew Paper Published in Certain Journal\n\n\nDingjin Chu and collaborators published a study on forest biomass estimation using LiDAR and optical data.\n\nRead Paper\n\n15–19 Dec 2025\n\n\nAGU Fall Meeting, New Orleans, USA\n\n\nDingjin presented recent research findings at the AGU Fall Meeting.\n\n Visit AGU\n\n\n2023\n\n16–17 Aug 2023\n\n\n\nPoster Presentation at the Conference “Actual Issues of Environmental Research for Sustainable Development in the Arid Zone” in Kyrgyzstan\n\n\nPoster about the impacts of future climate extremes on the interannual variability of terrestrial ecosystem productivity in Central Asia based on CMIP6."
-  },
-  {
-    "objectID": "datasets_radar.html",
-    "href": "datasets_radar.html",
-    "title": "Radar Datasets",
-    "section": "",
-    "text": "Microwave radar remote sensing datasets for soil moisture, vegetation structure, and surface deformation monitoring."
-  },
-  {
-    "objectID": "datasets_radar.html#sentinel-1-esa-copernicus",
-    "href": "datasets_radar.html#sentinel-1-esa-copernicus",
-    "title": "Radar Datasets",
-    "section": "Sentinel-1 — ESA Copernicus",
-    "text": "Sentinel-1 — ESA Copernicus\nSentinel-1 provides C-band Synthetic Aperture Radar (SAR) imagery, enabling cloud-penetrating, day-and-night observations of land and ocean surfaces.\nAgency: European Space Agency (ESA) — Copernicus Programme Sensor: C-band SAR (5.405 GHz) Spatial resolution: 5 m × 20 m (IW mode, standard) Temporal resolution: ~6-day revisit (combined twin satellites) Polarizations: VV, VH, HH, HV Key applications: Forest above-ground biomass, flood mapping, soil moisture, ice monitoring, subsidence detection\n\n\n\n\n\n\nNote\n\n\n\nSentinel-1 data are freely available through the Copernicus Data Space and Google Earth Engine."
-  },
-  {
-    "objectID": "datasets_radar.html#smap-soil-moisture-active-passive-nasa",
-    "href": "datasets_radar.html#smap-soil-moisture-active-passive-nasa",
-    "title": "Radar Datasets",
-    "section": "SMAP — Soil Moisture Active Passive (NASA)",
-    "text": "SMAP — Soil Moisture Active Passive (NASA)\nSMAP is a NASA satellite mission designed to measure the moisture content of Earth’s soil surface globally and repeatedly. Its L-band radiometer provides the most accurate global soil moisture retrievals currently available from space, and is widely used in hydrology, agriculture, climate modeling, and ecosystem studies.\nAgency: NASA Jet Propulsion Laboratory (JPL) Sensor: L-band (1.41 GHz) passive radiometer + (originally active radar, failed 2015) Spatial resolution: ~36 km (radiometer) · 9 km (enhanced product) Temporal resolution: 2–3 day global revisit Launch: January 2015 Key products: - SPL3SMP — Daily global soil moisture (36 km) - SPL3SMP_E — Enhanced daily soil moisture (9 km) - SPL4SMGP — Surface and root-zone soil moisture (9 km, model-assimilated) Key applications: Drought monitoring, flood forecasting, agricultural water use, carbon flux modeling, forest moisture stress\n\n\n\n\n\n\nNote\n\n\n\nSMAP data are freely available through NASA EarthData and Google Earth Engine."
-  },
-  {
-    "objectID": "datasets_radar.html#alos-2-palsar-2-jaxa",
-    "href": "datasets_radar.html#alos-2-palsar-2-jaxa",
-    "title": "Radar Datasets",
-    "section": "ALOS-2 PALSAR-2 — JAXA",
-    "text": "ALOS-2 PALSAR-2 — JAXA\nALOS-2 PALSAR-2 is a Japanese L-band SAR satellite operated by JAXA. L-band radar penetrates forest canopy more effectively than C-band, making it particularly valuable for above-ground biomass estimation and forest structure retrieval.\nAgency: Japan Aerospace Exploration Agency (JAXA) Sensor: L-band SAR (1.2 GHz) Spatial resolution: 3 m – 100 m (mode dependent) Polarizations: HH, HV, VH, VV (quad-pol available) Key applications: Forest biomass estimation, forest/non-forest mapping, disaster monitoring, wetland mapping\n\n\n\n\n\n\nNote\n\n\n\nALOS-2 PALSAR-2 global mosaic data are freely available through JAXA EORC."
-  },
-  {
-    "objectID": "datasets_radar.html#tandem-x-dlr",
-    "href": "datasets_radar.html#tandem-x-dlr",
-    "title": "Radar Datasets",
-    "section": "TanDEM-X — DLR",
-    "text": "TanDEM-X — DLR\nTanDEM-X is a German radar mission that produced a global Digital Elevation Model (DEM) of unprecedented accuracy using X-band InSAR. The global DEM is widely used as a canopy height reference baseline and terrain correction layer.\nAgency: German Aerospace Center (DLR) Sensor: X-band SAR (9.65 GHz), bistatic InSAR Spatial resolution: 12 m (global DEM) Vertical accuracy: ~1 m absolute (open terrain) Key applications: Global DEM generation, canopy height estimation, glacier monitoring, terrain analysis\n\n\n\n\n\n\nNote\n\n\n\nTanDEM-X global DEM data are available through DLR."
-  },
-  {
-    "objectID": "datasets_radar.html#nisar-nasa-isro-launched-2025",
-    "href": "datasets_radar.html#nisar-nasa-isro-launched-2025",
-    "title": "Radar Datasets",
-    "section": "NISAR — NASA / ISRO (Launched 2025)",
-    "text": "NISAR — NASA / ISRO (Launched 2025)\nNISAR (NASA-ISRO Synthetic Aperture Radar) is a joint Earth observation mission between NASA and the Indian Space Research Organisation (ISRO). It is the first dual-frequency SAR satellite ever built, carrying both an L-band (NASA) and an S-band (ISRO) radar. Its primary science goals include measuring ecosystem disturbances, ice-sheet collapse, natural hazards, and sea-level rise. For forest research, NISAR’s L-band radar is expected to provide unprecedented global above-ground biomass and forest disturbance data at high spatial resolution and frequent revisit.\nAgency: NASA (Jet Propulsion Laboratory) + ISRO Launch: March 2025 Sensors: L-band SAR (1.25 GHz, NASA) + S-band SAR (2.8 GHz, ISRO) Spatial resolution: ~3–10 m (L-band) · ~3–10 m (S-band) Temporal resolution: 12-day repeat cycle Swath width: 240 km Key applications: Forest above-ground biomass, deforestation and disturbance mapping, wetland dynamics, earthquake and landslide monitoring, glacier flow, sea-level change\n\n\n\n\n\n\nNote\n\n\n\nNISAR data will be freely available through NASA EarthData and ISRO’s NRSC portal."
-  },
-  {
-    "objectID": "datasets_radar.html#biomass-esa-launched-2025",
-    "href": "datasets_radar.html#biomass-esa-launched-2025",
-    "title": "Radar Datasets",
-    "section": "BIOMASS — ESA (Launched 2025)",
-    "text": "BIOMASS — ESA (Launched 2025)\nBIOMASS is ESA’s first P-band SAR satellite, specifically designed to produce the first global maps of forest above-ground biomass. P-band radar (wavelength ~70 cm) penetrates deep into forest canopy and is sensitive to the woody structure of trunks and large branches — the components that store most of the carbon in forests. BIOMASS is a cornerstone mission for global carbon cycle science and will directly support international carbon accounting and climate policy.\nAgency: European Space Agency (ESA) — Earth Explorer Mission Launch: April 2025 Sensor: P-band SAR (435 MHz, ~70 cm wavelength), fully polarimetric Spatial resolution: 50 m (biomass product) · ~4.5 m (SAR imagery) Temporal resolution: ~25-day repeat cycle (3 passes per year in tomographic phase) Mission phases: - Tomographic phase (Years 1–3): 3D forest structure mapping using SAR tomography - Interferometric phase (Years 4–5): Change detection and biomass updating Key products: Global forest above-ground biomass density, forest height, forest disturbance Key applications: Forest carbon stock estimation, deforestation monitoring, carbon flux modeling, climate change assessment\n\n\n\n\n\n\nNote\n\n\n\nBIOMASS data will be freely available through ESA’s Earth Online portal."
-  },
-  {
-    "objectID": "datasets_lidar.html",
-    "href": "datasets_lidar.html",
-    "title": "LiDAR Datasets",
-    "section": "",
-    "text": "Airborne and spaceborne LiDAR point clouds from open-access programs used in forest structure and urban vegetation research."
-  },
-  {
-    "objectID": "datasets_lidar.html#usgs-3dep-urban-forest-near-central-park-new-york-city",
-    "href": "datasets_lidar.html#usgs-3dep-urban-forest-near-central-park-new-york-city",
-    "title": "LiDAR Datasets",
-    "section": "USGS 3DEP — Urban Forest Near Central Park, New York City",
-    "text": "USGS 3DEP — Urban Forest Near Central Park, New York City\nThe datasets shown here are airborne LiDAR point clouds from two open-access programs: the USGS 3D Elevation Program (3DEP), a nationwide topographic mapping initiative, and the NEON Airborne Observation Platform (AOP), which collects high-density ecological LiDAR across NEON field sites. Both programs provide data freely to the public.\nSource: USGS 3DEP · NAD83(2011) / UTM Zone 18N Area: ~2.04 km² · Points: 2.21 million · Density: ~1.08 pts/m² Elevation range: −10 m to +385 m (ground to building rooftops)\nThis tile covers a section of Manhattan adjacent to Central Park. The map below shows the exact footprint of the dataset on a satellite basemap.\n\n\nThe 3D viewer below renders the point cloud colored by elevation. Rotate with left-click, pan with right-click, and scroll to zoom. The tall peaks (orange–red) are Manhattan skyscrapers; the flat ground surface and below-grade infrastructure appear in purple–blue."
-  },
-  {
-    "objectID": "datasets_lidar.html#neon-aop-small-tree-plot",
-    "href": "datasets_lidar.html#neon-aop-small-tree-plot",
-    "title": "LiDAR Datasets",
-    "section": "NEON AOP — Small Tree Plot",
-    "text": "NEON AOP — Small Tree Plot\nSource: NEON Airborne Observation Platform · WGS 84 / UTM Zone 6N Area: ~399 m² · Points: 10.4 thousand · Density: ~26 pts/m² Elevation range: 0 m to 17.3 m (ground to crown top)\nA high-density NEON AOP scan (~20 m × 20 m) of a small tree stand. At 26 pts/m² the scan resolves individual tree crowns and branching structure in detail. All points are shown — no subsampling. Colors show elevation from ground (dark green) to canopy top (yellow)."
-  },
-  {
-    "objectID": "datasets_lidar.html#gedi",
-    "href": "datasets_lidar.html#gedi",
-    "title": "LiDAR Datasets",
-    "section": "GEDI",
-    "text": "GEDI\n\n\n\nGEDI (Global Ecosystem Dynamics Investigation) — NASA LiDAR instrument aboard the ISS for measuring forest structure and biomass.\n\n\nGEDI is a full-waveform LiDAR instrument mounted on the International Space Station. It provides high-resolution measurements of forest vertical structure, canopy height, and above-ground biomass at global scale.\nAgency: NASA Goddard Space Flight Center Sensor: Three 1064 nm full-waveform LiDAR lasers Footprint size: ~25 m diameter Along-track spacing: ~60 m · Cross-track spacing: ~600 m Coverage: ~51.6°N to 51.6°S (ISS orbital range) Key products: Canopy height (RH metrics), Plant Area Index (PAI), Above-ground biomass density (AGBD)\n\n\n\n\n\n\nNote\n\n\n\nGEDI data are freely available through NASA EarthData and Google Earth Engine."
-  },
-  {
-    "objectID": "datasets_lidar.html#icesat-2-nasa",
-    "href": "datasets_lidar.html#icesat-2-nasa",
-    "title": "LiDAR Datasets",
-    "section": "ICESat-2 — NASA",
-    "text": "ICESat-2 — NASA\nICESat-2 (Ice, Cloud, and land Elevation Satellite-2) uses a photon-counting LiDAR (ATLAS) to measure surface elevation globally with centimeter-level precision. While primarily designed for ice sheet and sea ice monitoring, ICESat-2 is increasingly used for global forest canopy height estimation and terrain mapping.\nAgency: NASA Goddard Space Flight Center Sensor: ATLAS (Advanced Topographic Laser Altimeter System) — 532 nm photon-counting LiDAR Footprint size: ~17 m diameter Along-track spacing: ~0.7 m (photon level) Beam configuration: 3 pairs of strong/weak beams (6 beams total) Temporal resolution: 91-day exact repeat cycle Coverage: Global, up to ±88° latitude Key products: - ATL03 — Global geolocated photons - ATL06 — Land ice surface height - ATL08 — Land and vegetation height (canopy top, terrain) - ATL13 — Inland water surface height Key applications: Forest canopy height, ice sheet mass balance, sea ice freeboard, lake and river water levels, terrain DEM\n\n\n\n\n\n\nNote\n\n\n\nICESat-2 data are freely available through NASA EarthData and OpenAltimetry.\n\n\n\n\n\n\n\n\n\nNote\n\n\n\nUSGS 3DEP data are available via the USGS National Map. NEON AOP data are available via the NEON Data Portal. Visualizations produced with lidR, plotly, and leaflet in R."
-  },
-  {
-    "objectID": "datasets.html",
-    "href": "datasets.html",
-    "title": "Datasets",
-    "section": "",
-    "text": "Airborne and spaceborne LiDAR point clouds from open-access programs used in forest structure and urban vegetation research.\n\n\n\nThe datasets shown here are airborne LiDAR point clouds from two open-access programs: the USGS 3D Elevation Program (3DEP), a nationwide topographic mapping initiative, and the NEON Airborne Observation Platform (AOP), which collects high-density ecological LiDAR across NEON field sites. Both programs provide data freely to the public.\nSource: USGS 3DEP · NAD83(2011) / UTM Zone 18N Area: ~2.04 km² · Points: 2.21 million · Density: ~1.08 pts/m² Elevation range: −10 m to +385 m (ground to building rooftops)\nThis tile covers a section of Manhattan adjacent to Central Park. The map below shows the exact footprint of the dataset on a satellite basemap.\n\n\nThe 3D viewer below renders the point cloud colored by elevation. Rotate with left-click, pan with right-click, and scroll to zoom. The tall peaks (orange–red) are Manhattan skyscrapers; the flat ground surface and below-grade infrastructure appear in purple–blue.\n\n\n\n\n\n\nSource: NEON Airborne Observation Platform · WGS 84 / UTM Zone 6N Area: ~399 m² · Points: 10.4 thousand · Density: ~26 pts/m² Elevation range: 0 m to 17.3 m (ground to crown top)\nA high-density NEON AOP scan (~20 m × 20 m) of a small tree stand. At 26 pts/m² the scan resolves individual tree crowns and branching structure in detail. All points are shown — no subsampling. Colors show elevation from ground (dark green) to canopy top (yellow).\n\n\n\n\n\n\n\n\n\nGEDI (Global Ecosystem Dynamics Investigation) — NASA LiDAR instrument aboard the ISS for measuring forest structure and biomass.\n\n\nGEDI is a full-waveform LiDAR instrument mounted on the International Space Station. It provides high-resolution measurements of forest vertical structure, canopy height, and above-ground biomass at global scale."
-  },
-  {
-    "objectID": "datasets.html#usgs-3dep-urban-forest-near-central-park-new-york-city",
-    "href": "datasets.html#usgs-3dep-urban-forest-near-central-park-new-york-city",
-    "title": "Datasets",
-    "section": "",
-    "text": "The datasets shown here are airborne LiDAR point clouds from two open-access programs: the USGS 3D Elevation Program (3DEP), a nationwide topographic mapping initiative, and the NEON Airborne Observation Platform (AOP), which collects high-density ecological LiDAR across NEON field sites. Both programs provide data freely to the public.\nSource: USGS 3DEP · NAD83(2011) / UTM Zone 18N Area: ~2.04 km² · Points: 2.21 million · Density: ~1.08 pts/m² Elevation range: −10 m to +385 m (ground to building rooftops)\nThis tile covers a section of Manhattan adjacent to Central Park. The map below shows the exact footprint of the dataset on a satellite basemap.\n\n\nThe 3D viewer below renders the point cloud colored by elevation. Rotate with left-click, pan with right-click, and scroll to zoom. The tall peaks (orange–red) are Manhattan skyscrapers; the flat ground surface and below-grade infrastructure appear in purple–blue."
-  },
-  {
-    "objectID": "datasets.html#neon-aop-small-tree-plot",
-    "href": "datasets.html#neon-aop-small-tree-plot",
-    "title": "Datasets",
-    "section": "",
-    "text": "Source: NEON Airborne Observation Platform · WGS 84 / UTM Zone 6N Area: ~399 m² · Points: 10.4 thousand · Density: ~26 pts/m² Elevation range: 0 m to 17.3 m (ground to crown top)\nA high-density NEON AOP scan (~20 m × 20 m) of a small tree stand. At 26 pts/m² the scan resolves individual tree crowns and branching structure in detail. All points are shown — no subsampling. Colors show elevation from ground (dark green) to canopy top (yellow)."
-  },
-  {
-    "objectID": "datasets.html#gedi",
-    "href": "datasets.html#gedi",
-    "title": "Datasets",
-    "section": "",
-    "text": "GEDI (Global Ecosystem Dynamics Investigation) — NASA LiDAR instrument aboard the ISS for measuring forest structure and biomass.\n\n\nGEDI is a full-waveform LiDAR instrument mounted on the International Space Station. It provides high-resolution measurements of forest vertical structure, canopy height, and above-ground biomass at global scale."
-  },
-  {
-    "objectID": "datasets.html#fia-forest-inventory-and-analysis",
-    "href": "datasets.html#fia-forest-inventory-and-analysis",
-    "title": "Datasets",
-    "section": "FIA — Forest Inventory and Analysis",
-    "text": "FIA — Forest Inventory and Analysis\nThe USDA Forest Service Forest Inventory and Analysis (FIA) program is the nation’s continuous forest census. FIA plots are systematically distributed across all forested land in the United States and remeasured on a roughly 5–10 year cycle. Each plot records tree species, diameter at breast height (DBH), height, crown class, and site conditions, providing a statistically representative sample of forest composition and structure at national, regional, and state scales.\nSource: USDA Forest Service FIA Program Coverage: Contiguous United States, Alaska, Hawaii, and Pacific Islands Key variables: Species, DBH, tree height, basal area, biomass estimates, forest type, ownership\n\n\n\n\n\n\nNote\n\n\n\nFIA data are freely available through the FIA DataMart."
-  },
-  {
-    "objectID": "datasets.html#neon-national-ecological-observatory-network",
-    "href": "datasets.html#neon-national-ecological-observatory-network",
-    "title": "Datasets",
-    "section": "NEON — National Ecological Observatory Network",
-    "text": "NEON — National Ecological Observatory Network\nThe NEON Terrestrial Observation System collects standardized, long-term ecological data across 81 field sites spanning major climate and vegetation domains in the United States. Vegetation structure data include woody plant cover and height surveys, distributed plot stem maps, and individual tree measurements, designed to align directly with NEON’s airborne LiDAR collections for multi-scale validation.\nSource: National Ecological Observatory Network Coverage: 81 sites across 20 eco-climatic domains in the U.S. Key variables: Woody plant percent cover, plant height, stem diameter, species identity, plant phenology\n\n\n\n\n\n\nNote\n\n\n\nNEON field data are freely available through the NEON Data Portal.\n\n\n\n\n\n\n\n\n\nNote\n\n\n\nUSGS 3DEP data are available via the USGS National Map. NEON AOP data are available via the NEON Data Portal. Visualizations produced with lidR, plotly, and leaflet in R."
-  },
-  {
-    "objectID": "contact.html",
-    "href": "contact.html",
-    "title": "Contact Me",
-    "section": "",
-    "text": "Feel free to get in touch for any inquiries or opportunities. I am open to collaborations, scientific projects, and job opportunities where I can contribute my expertise in remote sensing, LiDAR, and environmental data science.\n    dingjinchu@gmail.com\n    Agricultural Hall, Department of Natural Resource Ecology & Management, Oklahoma State University, Stillwater, OK\n    \n      \n      \n      \n    \n  \n\n  \n  \n    \n      \n        Full Name *\n        \n      \n      \n        Email *\n        \n      \n      \n        Affiliation *\n        \n      \n      \n        Position *\n        \n      \n      \n        Message *\n        \n      \n      Submit"
-  },
-  {
-    "objectID": "contact.html#where-to-find-me",
-    "href": "contact.html#where-to-find-me",
-    "title": "Contact Me",
-    "section": "Where to Find Me",
-    "text": "Where to Find Me\nAgricultural Hall, Oklahoma State University Stillwater, Oklahoma, USA\n\n\nView larger map"
-  },
-  {
-    "objectID": "blog.html",
-    "href": "blog.html",
-    "title": "Blog",
-    "section": "",
-    "text": "Downloading and Analyzing GEDI L2A Relative Height Metrics\n\n\n\nLiDAR\n\nGEDI\n\nCanopy Height\n\nR\n\nTutorial\n\n\n\n\n\n\n\n\n\nMay 14, 2026\n\n\nDingjin Chu\n\n\n\n\n\n\n\n\n\n\n\n\nDownloading and Analyzing GEDI L4A Above-Ground Biomass Data\n\n\n\nLiDAR\n\nGEDI\n\nBiomass\n\nR\n\nTutorial\n\n\n\n\n\n\n\n\n\nMay 14, 2026\n\n\nDingjin Chu\n\n\n\n\n\n\n\n\n\n\n\n\nWelcome to My Blog\n\n\n\ngeneral\n\n\n\n\n\n\n\n\n\nMay 14, 2026\n\n\n\n\n\nNo matching items"
-  },
-  {
-    "objectID": "cv.html",
-    "href": "cv.html",
-    "title": "About Me",
-    "section": "",
-    "text": "Download CV (PDF)"
-  },
-  {
-    "objectID": "cv.html#photos",
-    "href": "cv.html#photos",
-    "title": "About Me",
-    "section": "Photos",
-    "text": "Photos"
-  },
-  {
-    "objectID": "datasets_field.html",
-    "href": "datasets_field.html",
-    "title": "Field Investigation Datasets",
-    "section": "",
-    "text": "Ground-based forest inventory datasets used for model validation, allometric calibration, and ecological analysis."
-  },
-  {
-    "objectID": "datasets_field.html#fia-forest-inventory-and-analysis",
-    "href": "datasets_field.html#fia-forest-inventory-and-analysis",
-    "title": "Field Investigation Datasets",
-    "section": "FIA — Forest Inventory and Analysis",
-    "text": "FIA — Forest Inventory and Analysis\nThe USDA Forest Service Forest Inventory and Analysis (FIA) program is the nation’s continuous forest census. FIA plots are systematically distributed across all forested land in the United States and remeasured on a roughly 5–10 year cycle. Each plot records tree species, diameter at breast height (DBH), height, crown class, and site conditions, providing a statistically representative sample of forest composition and structure at national, regional, and state scales.\nSource: USDA Forest Service FIA Program Coverage: Contiguous United States, Alaska, Hawaii, and Pacific Islands Key variables: Species, DBH, tree height, basal area, biomass estimates, forest type, ownership\n\n\n\n\n\n\nNote\n\n\n\nFIA data are freely available through the FIA DataMart."
-  },
-  {
-    "objectID": "datasets_field.html#neon-national-ecological-observatory-network",
-    "href": "datasets_field.html#neon-national-ecological-observatory-network",
-    "title": "Field Investigation Datasets",
-    "section": "NEON — National Ecological Observatory Network",
-    "text": "NEON — National Ecological Observatory Network\nThe NEON Terrestrial Observation System collects standardized, long-term ecological data across 81 field sites spanning major climate and vegetation domains in the United States. Vegetation structure data include woody plant cover and height surveys, distributed plot stem maps, and individual tree measurements, designed to align directly with NEON’s airborne LiDAR collections for multi-scale validation.\nSource: National Ecological Observatory Network Coverage: 81 sites across 20 eco-climatic domains in the U.S. Key variables: Woody plant percent cover, plant height, stem diameter, species identity, plant phenology\n\n\n\n\n\n\nNote\n\n\n\nNEON field data are freely available through the NEON Data Portal."
-  },
-  {
-    "objectID": "datasets_optical.html",
-    "href": "datasets_optical.html",
-    "title": "Optical Remote Sensing Datasets",
-    "section": "",
-    "text": "Multispectral and hyperspectral satellite imagery from open-access programs widely used in land cover mapping, vegetation monitoring, and environmental change detection."
-  },
-  {
-    "objectID": "datasets_optical.html#landsat-usgs-nasa",
-    "href": "datasets_optical.html#landsat-usgs-nasa",
-    "title": "Optical Remote Sensing Datasets",
-    "section": "Landsat — USGS / NASA",
-    "text": "Landsat — USGS / NASA\nLandsat is the longest-running Earth observation satellite program, continuously collecting multispectral imagery since 1972. Operated jointly by USGS and NASA, the program provides a free and open archive essential for long-term land surface change analysis.\nCurrent sensors: Landsat 8 OLI/TIRS · Landsat 9 OLI-2/TIRS-2 Spatial resolution: 30 m (multispectral) · 15 m (panchromatic) · 100 m (thermal) Temporal resolution: 16-day revisit per satellite (~8 days combined) Spectral bands: Coastal/aerosol, Blue, Green, Red, NIR, SWIR1, SWIR2, Panchromatic, Thermal Coverage: Global, continuous since 1972 Key applications: Land cover change, deforestation, urban expansion, agricultural monitoring, wildfire burn severity, surface temperature\n\n\n\n\n\n\nNote\n\n\n\nLandsat data are freely available through USGS EarthExplorer and Google Earth Engine."
-  },
-  {
-    "objectID": "datasets_optical.html#sentinel-2-esa-copernicus",
-    "href": "datasets_optical.html#sentinel-2-esa-copernicus",
-    "title": "Optical Remote Sensing Datasets",
-    "section": "Sentinel-2 — ESA Copernicus",
-    "text": "Sentinel-2 — ESA Copernicus\nSentinel-2 is a high-resolution multispectral mission from the European Space Agency (ESA) under the Copernicus Earth Observation Programme. Its combination of high spatial resolution, frequent revisit time, and free data access has made it one of the most widely used satellites in vegetation and land surface research.\nSensors: MultiSpectral Instrument (MSI) — Sentinel-2A and Sentinel-2B Spatial resolution: 10 m (B2, B3, B4, B8) · 20 m (B5, B6, B7, B8A, B11, B12) · 60 m (B1, B9, B10) Temporal resolution: ~5-day revisit (combined twin satellites) Spectral bands: 13 bands from visible to SWIR, including red-edge bands for vegetation analysis Coverage: Global land surface Key applications: Forest canopy health, LAI estimation, crop monitoring, urban green space mapping, water body detection\n\n\n\n\n\n\nNote\n\n\n\nSentinel-2 data are freely available through the Copernicus Data Space and Google Earth Engine."
-  },
-  {
-    "objectID": "datasets_optical.html#modis-nasa-terra-aqua",
-    "href": "datasets_optical.html#modis-nasa-terra-aqua",
-    "title": "Optical Remote Sensing Datasets",
-    "section": "MODIS — NASA Terra & Aqua",
-    "text": "MODIS — NASA Terra & Aqua\nMODIS (Moderate Resolution Imaging Spectroradiometer) is a key instrument aboard NASA’s Terra and Aqua satellites. While its spatial resolution is coarser than Landsat or Sentinel-2, its near-daily global coverage and long record (since 1999) make it indispensable for large-scale vegetation dynamics, land surface temperature, and fire monitoring.\nAgency: NASA Goddard Space Flight Center Sensors: MODIS aboard Terra (EOS AM-1) and Aqua (EOS PM-1) Spatial resolution: 250 m (bands 1–2) · 500 m (bands 3–7) · 1000 m (bands 8–36) Temporal resolution: Daily global coverage (1–2 days revisit) Spectral bands: 36 bands from visible to thermal infrared (0.4–14.4 μm) Record length: Terra since February 2000 · Aqua since July 2002 Key products: - MOD13 / MYD13 — Vegetation indices (NDVI, EVI) at 250 m / 500 m / 1 km - MOD15 — Leaf Area Index (LAI) and FPAR - MOD17 — Gross/Net Primary Production (GPP/NPP) - MOD44B — Vegetation continuous fields (tree cover, non-tree, bare ground) - MCD64A1 — Monthly burned area - MOD11 — Land surface temperature and emissivity Key applications: Global vegetation phenology, drought monitoring, wildfire detection, land cover classification, carbon flux estimation, urban heat islands\n\n\n\n\n\n\nNote\n\n\n\nMODIS data are freely available through NASA EarthData and Google Earth Engine."
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Dingjin Chu",
-    "section": "",
-    "text": "PhD Student · Forest Monitoring & Geospatial Analysis\nDepartment of Natural Resource Ecology& Management · Oklahoma State University"
-  },
-  {
-    "objectID": "index.html#hello-this-is-dingjin.",
-    "href": "index.html#hello-this-is-dingjin.",
-    "title": "Dingjin Chu",
-    "section": "👋 Hello, this is Dingjin.",
-    "text": "👋 Hello, this is Dingjin.\nI am a PhD student studying Above ground biomass estimation, cooling effect of Urban green space, and forest disturbance using remote sensing across different different platforms with filed investigation data. I work with satellite imagery, Airborne LiDAR data, and statistical modeling to understand how forests respond to climate variability and human disturbance.\nMy research interests sit at the intersection of forest ecology, remote sensing, and environmental data science.\n\n\n\n\nImage generated from Your Name in Landsat — NASA."
-  },
-  {
-    "objectID": "index.html#contact-me",
-    "href": "index.html#contact-me",
-    "title": "Dingjin Chu",
-    "section": "Contact Me",
-    "text": "Contact Me\n\n  \n    Feel free to get in touch for any inquiries or opportunities. I am open to collaborations, scientific projects, and job opportunities where I can contribute my expertise in remote sensing, LiDAR, and environmental data science.\n    dingjinchu@gmail.com\n    Agricultural Hall, Department of Natural Resource Ecology & Management, Oklahoma State University, Stillwater, OK\n    \n      \n      \n      \n    \n  \n  \n    \n      \n        Full Name *\n        \n      \n      \n        Email *\n        \n      \n      \n        Affiliation *\n        \n      \n      \n        Position *\n        \n      \n      \n        Message *\n        \n      \n      Submit"
+    "text": "References\n\nDubayah, R. et al. (2020). GEDI L2A Elevation and Height Metrics, Version 2. ORNL DAAC. https://doi.org/10.3334/ORNLDAAC/1908\nMarselis, S.M. et al. (2020). Canopy gap fraction from ICESat-2 and GEDI. Remote Sensing, 12(15), 2411.\nOpenStreetMap contributors. Building footprints. https://www.openstreetmap.org\nosmdata R package: https://github.com/ropensci/osmdata\nGEDI Mission: https://gedi.umd.edu"
   },
   {
     "objectID": "posts/gedi-l2a/index.html",
@@ -425,6 +180,328 @@
     "title": "Downloading and Analyzing GEDI L2A Relative Height Metrics",
     "section": "References",
     "text": "References\n\nDubayah, R. et al. (2020). GEDI L2A Elevation and Height Metrics, Version 2. ORNL DAAC. https://doi.org/10.3334/ORNLDAAC/1908\nGEDI Mission: https://gedi.umd.edu\nNEON SCBI site: https://www.neonscience.org/field-sites/scbi\nNASA EarthData: https://earthdata.nasa.gov\nrGEDI R package: https://github.com/carlos-alberto-silva/rGEDI"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Dingjin Chu",
+    "section": "",
+    "text": "PhD Student · Forest Monitoring & Geospatial Analysis\nDepartment of Natural Resource Ecology& Management · Oklahoma State University"
+  },
+  {
+    "objectID": "index.html#hello-this-is-dingjin.",
+    "href": "index.html#hello-this-is-dingjin.",
+    "title": "Dingjin Chu",
+    "section": "👋 Hello, this is Dingjin.",
+    "text": "👋 Hello, this is Dingjin.\nI am a PhD student studying Above ground biomass estimation, cooling effect of Urban green space, and forest disturbance using remote sensing across different different platforms with filed investigation data. I work with satellite imagery, Airborne LiDAR data, and statistical modeling to understand how forests respond to climate variability and human disturbance.\nMy research interests sit at the intersection of forest ecology, remote sensing, and environmental data science.\n\n\n\n\nImage generated from Your Name in Landsat — NASA."
+  },
+  {
+    "objectID": "index.html#contact-me",
+    "href": "index.html#contact-me",
+    "title": "Dingjin Chu",
+    "section": "Contact Me",
+    "text": "Contact Me\n\n  \n    Feel free to get in touch for any inquiries or opportunities. I am open to collaborations, scientific projects, and job opportunities where I can contribute my expertise in remote sensing, LiDAR, and environmental data science.\n    dingjinchu@gmail.com\n    Agricultural Hall, Department of Natural Resource Ecology & Management, Oklahoma State University, Stillwater, OK\n    \n      \n      \n      \n    \n  \n  \n    \n      \n        Full Name *\n        \n      \n      \n        Email *\n        \n      \n      \n        Affiliation *\n        \n      \n      \n        Position *\n        \n      \n      \n        Message *\n        \n      \n      Submit"
+  },
+  {
+    "objectID": "datasets_optical.html",
+    "href": "datasets_optical.html",
+    "title": "Optical Remote Sensing Datasets",
+    "section": "",
+    "text": "Multispectral and hyperspectral satellite imagery from open-access programs widely used in land cover mapping, vegetation monitoring, and environmental change detection."
+  },
+  {
+    "objectID": "datasets_optical.html#landsat-usgs-nasa",
+    "href": "datasets_optical.html#landsat-usgs-nasa",
+    "title": "Optical Remote Sensing Datasets",
+    "section": "Landsat — USGS / NASA",
+    "text": "Landsat — USGS / NASA\nLandsat is the longest-running Earth observation satellite program, continuously collecting multispectral imagery since 1972. Operated jointly by USGS and NASA, the program provides a free and open archive essential for long-term land surface change analysis.\nCurrent sensors: Landsat 8 OLI/TIRS · Landsat 9 OLI-2/TIRS-2 Spatial resolution: 30 m (multispectral) · 15 m (panchromatic) · 100 m (thermal) Temporal resolution: 16-day revisit per satellite (~8 days combined) Spectral bands: Coastal/aerosol, Blue, Green, Red, NIR, SWIR1, SWIR2, Panchromatic, Thermal Coverage: Global, continuous since 1972 Key applications: Land cover change, deforestation, urban expansion, agricultural monitoring, wildfire burn severity, surface temperature\n\n\n\n\n\n\nNote\n\n\n\nLandsat data are freely available through USGS EarthExplorer and Google Earth Engine."
+  },
+  {
+    "objectID": "datasets_optical.html#sentinel-2-esa-copernicus",
+    "href": "datasets_optical.html#sentinel-2-esa-copernicus",
+    "title": "Optical Remote Sensing Datasets",
+    "section": "Sentinel-2 — ESA Copernicus",
+    "text": "Sentinel-2 — ESA Copernicus\nSentinel-2 is a high-resolution multispectral mission from the European Space Agency (ESA) under the Copernicus Earth Observation Programme. Its combination of high spatial resolution, frequent revisit time, and free data access has made it one of the most widely used satellites in vegetation and land surface research.\nSensors: MultiSpectral Instrument (MSI) — Sentinel-2A and Sentinel-2B Spatial resolution: 10 m (B2, B3, B4, B8) · 20 m (B5, B6, B7, B8A, B11, B12) · 60 m (B1, B9, B10) Temporal resolution: ~5-day revisit (combined twin satellites) Spectral bands: 13 bands from visible to SWIR, including red-edge bands for vegetation analysis Coverage: Global land surface Key applications: Forest canopy health, LAI estimation, crop monitoring, urban green space mapping, water body detection\n\n\n\n\n\n\nNote\n\n\n\nSentinel-2 data are freely available through the Copernicus Data Space and Google Earth Engine."
+  },
+  {
+    "objectID": "datasets_optical.html#modis-nasa-terra-aqua",
+    "href": "datasets_optical.html#modis-nasa-terra-aqua",
+    "title": "Optical Remote Sensing Datasets",
+    "section": "MODIS — NASA Terra & Aqua",
+    "text": "MODIS — NASA Terra & Aqua\nMODIS (Moderate Resolution Imaging Spectroradiometer) is a key instrument aboard NASA’s Terra and Aqua satellites. While its spatial resolution is coarser than Landsat or Sentinel-2, its near-daily global coverage and long record (since 1999) make it indispensable for large-scale vegetation dynamics, land surface temperature, and fire monitoring.\nAgency: NASA Goddard Space Flight Center Sensors: MODIS aboard Terra (EOS AM-1) and Aqua (EOS PM-1) Spatial resolution: 250 m (bands 1–2) · 500 m (bands 3–7) · 1000 m (bands 8–36) Temporal resolution: Daily global coverage (1–2 days revisit) Spectral bands: 36 bands from visible to thermal infrared (0.4–14.4 μm) Record length: Terra since February 2000 · Aqua since July 2002 Key products: - MOD13 / MYD13 — Vegetation indices (NDVI, EVI) at 250 m / 500 m / 1 km - MOD15 — Leaf Area Index (LAI) and FPAR - MOD17 — Gross/Net Primary Production (GPP/NPP) - MOD44B — Vegetation continuous fields (tree cover, non-tree, bare ground) - MCD64A1 — Monthly burned area - MOD11 — Land surface temperature and emissivity Key applications: Global vegetation phenology, drought monitoring, wildfire detection, land cover classification, carbon flux estimation, urban heat islands\n\n\n\n\n\n\nNote\n\n\n\nMODIS data are freely available through NASA EarthData and Google Earth Engine."
+  },
+  {
+    "objectID": "datasets_field.html",
+    "href": "datasets_field.html",
+    "title": "Field Investigation Datasets",
+    "section": "",
+    "text": "Ground-based forest inventory datasets used for model validation, allometric calibration, and ecological analysis."
+  },
+  {
+    "objectID": "datasets_field.html#fia-forest-inventory-and-analysis",
+    "href": "datasets_field.html#fia-forest-inventory-and-analysis",
+    "title": "Field Investigation Datasets",
+    "section": "FIA — Forest Inventory and Analysis",
+    "text": "FIA — Forest Inventory and Analysis\nThe USDA Forest Service Forest Inventory and Analysis (FIA) program is the nation’s continuous forest census. FIA plots are systematically distributed across all forested land in the United States and remeasured on a roughly 5–10 year cycle. Each plot records tree species, diameter at breast height (DBH), height, crown class, and site conditions, providing a statistically representative sample of forest composition and structure at national, regional, and state scales.\nSource: USDA Forest Service FIA Program Coverage: Contiguous United States, Alaska, Hawaii, and Pacific Islands Key variables: Species, DBH, tree height, basal area, biomass estimates, forest type, ownership\n\n\n\n\n\n\nNote\n\n\n\nFIA data are freely available through the FIA DataMart."
+  },
+  {
+    "objectID": "datasets_field.html#neon-national-ecological-observatory-network",
+    "href": "datasets_field.html#neon-national-ecological-observatory-network",
+    "title": "Field Investigation Datasets",
+    "section": "NEON — National Ecological Observatory Network",
+    "text": "NEON — National Ecological Observatory Network\nThe NEON Terrestrial Observation System collects standardized, long-term ecological data across 81 field sites spanning major climate and vegetation domains in the United States. Vegetation structure data include woody plant cover and height surveys, distributed plot stem maps, and individual tree measurements, designed to align directly with NEON’s airborne LiDAR collections for multi-scale validation.\nSource: National Ecological Observatory Network Coverage: 81 sites across 20 eco-climatic domains in the U.S. Key variables: Woody plant percent cover, plant height, stem diameter, species identity, plant phenology\n\n\n\n\n\n\nNote\n\n\n\nNEON field data are freely available through the NEON Data Portal."
+  },
+  {
+    "objectID": "cv.html",
+    "href": "cv.html",
+    "title": "About Me",
+    "section": "",
+    "text": "Download CV (PDF)"
+  },
+  {
+    "objectID": "cv.html#photos",
+    "href": "cv.html#photos",
+    "title": "About Me",
+    "section": "Photos",
+    "text": "Photos"
+  },
+  {
+    "objectID": "blog.html",
+    "href": "blog.html",
+    "title": "Blog",
+    "section": "",
+    "text": "Downloading and Analyzing GEDI L2A Relative Height Metrics\n\n\n\nLiDAR\n\nGEDI\n\nCanopy Height\n\nR\n\nTutorial\n\n\n\n\n\n\n\n\n\nMay 14, 2026\n\n\nDingjin Chu\n\n\n\n\n\n\n\n\n\n\n\n\nDownloading and Analyzing GEDI L4A Above-Ground Biomass Data\n\n\n\nLiDAR\n\nGEDI\n\nBiomass\n\nR\n\nTutorial\n\n\n\n\n\n\n\n\n\nMay 14, 2026\n\n\nDingjin Chu\n\n\n\n\n\n\n\n\n\n\n\n\nUrban GEDI: Separating Vegetation from Buildings in New York City\n\n\n\nLiDAR\n\nGEDI\n\nUrban\n\nCanopy Height\n\nR\n\nTutorial\n\n\n\n\n\n\n\n\n\nMay 14, 2026\n\n\nDingjin Chu\n\n\n\n\n\n\n\n\n\n\n\n\nWelcome to My Blog\n\n\n\ngeneral\n\n\n\n\n\n\n\n\n\nMay 14, 2026\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "contact.html",
+    "href": "contact.html",
+    "title": "Contact Me",
+    "section": "",
+    "text": "Feel free to get in touch for any inquiries or opportunities. I am open to collaborations, scientific projects, and job opportunities where I can contribute my expertise in remote sensing, LiDAR, and environmental data science.\n    dingjinchu@gmail.com\n    Agricultural Hall, Department of Natural Resource Ecology & Management, Oklahoma State University, Stillwater, OK\n    \n      \n      \n      \n    \n  \n\n  \n  \n    \n      \n        Full Name *\n        \n      \n      \n        Email *\n        \n      \n      \n        Affiliation *\n        \n      \n      \n        Position *\n        \n      \n      \n        Message *\n        \n      \n      Submit"
+  },
+  {
+    "objectID": "contact.html#where-to-find-me",
+    "href": "contact.html#where-to-find-me",
+    "title": "Contact Me",
+    "section": "Where to Find Me",
+    "text": "Where to Find Me\nAgricultural Hall, Oklahoma State University Stillwater, Oklahoma, USA\n\n\nView larger map"
+  },
+  {
+    "objectID": "datasets.html",
+    "href": "datasets.html",
+    "title": "Datasets",
+    "section": "",
+    "text": "Airborne and spaceborne LiDAR point clouds from open-access programs used in forest structure and urban vegetation research.\n\n\n\nThe datasets shown here are airborne LiDAR point clouds from two open-access programs: the USGS 3D Elevation Program (3DEP), a nationwide topographic mapping initiative, and the NEON Airborne Observation Platform (AOP), which collects high-density ecological LiDAR across NEON field sites. Both programs provide data freely to the public.\nSource: USGS 3DEP · NAD83(2011) / UTM Zone 18N Area: ~2.04 km² · Points: 2.21 million · Density: ~1.08 pts/m² Elevation range: −10 m to +385 m (ground to building rooftops)\nThis tile covers a section of Manhattan adjacent to Central Park. The map below shows the exact footprint of the dataset on a satellite basemap.\n\n\nThe 3D viewer below renders the point cloud colored by elevation. Rotate with left-click, pan with right-click, and scroll to zoom. The tall peaks (orange–red) are Manhattan skyscrapers; the flat ground surface and below-grade infrastructure appear in purple–blue.\n\n\n\n\n\n\nSource: NEON Airborne Observation Platform · WGS 84 / UTM Zone 6N Area: ~399 m² · Points: 10.4 thousand · Density: ~26 pts/m² Elevation range: 0 m to 17.3 m (ground to crown top)\nA high-density NEON AOP scan (~20 m × 20 m) of a small tree stand. At 26 pts/m² the scan resolves individual tree crowns and branching structure in detail. All points are shown — no subsampling. Colors show elevation from ground (dark green) to canopy top (yellow).\n\n\n\n\n\n\n\n\n\nGEDI (Global Ecosystem Dynamics Investigation) — NASA LiDAR instrument aboard the ISS for measuring forest structure and biomass.\n\n\nGEDI is a full-waveform LiDAR instrument mounted on the International Space Station. It provides high-resolution measurements of forest vertical structure, canopy height, and above-ground biomass at global scale."
+  },
+  {
+    "objectID": "datasets.html#usgs-3dep-urban-forest-near-central-park-new-york-city",
+    "href": "datasets.html#usgs-3dep-urban-forest-near-central-park-new-york-city",
+    "title": "Datasets",
+    "section": "",
+    "text": "The datasets shown here are airborne LiDAR point clouds from two open-access programs: the USGS 3D Elevation Program (3DEP), a nationwide topographic mapping initiative, and the NEON Airborne Observation Platform (AOP), which collects high-density ecological LiDAR across NEON field sites. Both programs provide data freely to the public.\nSource: USGS 3DEP · NAD83(2011) / UTM Zone 18N Area: ~2.04 km² · Points: 2.21 million · Density: ~1.08 pts/m² Elevation range: −10 m to +385 m (ground to building rooftops)\nThis tile covers a section of Manhattan adjacent to Central Park. The map below shows the exact footprint of the dataset on a satellite basemap.\n\n\nThe 3D viewer below renders the point cloud colored by elevation. Rotate with left-click, pan with right-click, and scroll to zoom. The tall peaks (orange–red) are Manhattan skyscrapers; the flat ground surface and below-grade infrastructure appear in purple–blue."
+  },
+  {
+    "objectID": "datasets.html#neon-aop-small-tree-plot",
+    "href": "datasets.html#neon-aop-small-tree-plot",
+    "title": "Datasets",
+    "section": "",
+    "text": "Source: NEON Airborne Observation Platform · WGS 84 / UTM Zone 6N Area: ~399 m² · Points: 10.4 thousand · Density: ~26 pts/m² Elevation range: 0 m to 17.3 m (ground to crown top)\nA high-density NEON AOP scan (~20 m × 20 m) of a small tree stand. At 26 pts/m² the scan resolves individual tree crowns and branching structure in detail. All points are shown — no subsampling. Colors show elevation from ground (dark green) to canopy top (yellow)."
+  },
+  {
+    "objectID": "datasets.html#gedi",
+    "href": "datasets.html#gedi",
+    "title": "Datasets",
+    "section": "",
+    "text": "GEDI (Global Ecosystem Dynamics Investigation) — NASA LiDAR instrument aboard the ISS for measuring forest structure and biomass.\n\n\nGEDI is a full-waveform LiDAR instrument mounted on the International Space Station. It provides high-resolution measurements of forest vertical structure, canopy height, and above-ground biomass at global scale."
+  },
+  {
+    "objectID": "datasets.html#fia-forest-inventory-and-analysis",
+    "href": "datasets.html#fia-forest-inventory-and-analysis",
+    "title": "Datasets",
+    "section": "FIA — Forest Inventory and Analysis",
+    "text": "FIA — Forest Inventory and Analysis\nThe USDA Forest Service Forest Inventory and Analysis (FIA) program is the nation’s continuous forest census. FIA plots are systematically distributed across all forested land in the United States and remeasured on a roughly 5–10 year cycle. Each plot records tree species, diameter at breast height (DBH), height, crown class, and site conditions, providing a statistically representative sample of forest composition and structure at national, regional, and state scales.\nSource: USDA Forest Service FIA Program Coverage: Contiguous United States, Alaska, Hawaii, and Pacific Islands Key variables: Species, DBH, tree height, basal area, biomass estimates, forest type, ownership\n\n\n\n\n\n\nNote\n\n\n\nFIA data are freely available through the FIA DataMart."
+  },
+  {
+    "objectID": "datasets.html#neon-national-ecological-observatory-network",
+    "href": "datasets.html#neon-national-ecological-observatory-network",
+    "title": "Datasets",
+    "section": "NEON — National Ecological Observatory Network",
+    "text": "NEON — National Ecological Observatory Network\nThe NEON Terrestrial Observation System collects standardized, long-term ecological data across 81 field sites spanning major climate and vegetation domains in the United States. Vegetation structure data include woody plant cover and height surveys, distributed plot stem maps, and individual tree measurements, designed to align directly with NEON’s airborne LiDAR collections for multi-scale validation.\nSource: National Ecological Observatory Network Coverage: 81 sites across 20 eco-climatic domains in the U.S. Key variables: Woody plant percent cover, plant height, stem diameter, species identity, plant phenology\n\n\n\n\n\n\nNote\n\n\n\nNEON field data are freely available through the NEON Data Portal.\n\n\n\n\n\n\n\n\n\nNote\n\n\n\nUSGS 3DEP data are available via the USGS National Map. NEON AOP data are available via the NEON Data Portal. Visualizations produced with lidR, plotly, and leaflet in R."
+  },
+  {
+    "objectID": "datasets_lidar.html",
+    "href": "datasets_lidar.html",
+    "title": "LiDAR Datasets",
+    "section": "",
+    "text": "Airborne and spaceborne LiDAR point clouds from open-access programs used in forest structure and urban vegetation research."
+  },
+  {
+    "objectID": "datasets_lidar.html#usgs-3dep-urban-forest-near-central-park-new-york-city",
+    "href": "datasets_lidar.html#usgs-3dep-urban-forest-near-central-park-new-york-city",
+    "title": "LiDAR Datasets",
+    "section": "USGS 3DEP — Urban Forest Near Central Park, New York City",
+    "text": "USGS 3DEP — Urban Forest Near Central Park, New York City\nThe datasets shown here are airborne LiDAR point clouds from two open-access programs: the USGS 3D Elevation Program (3DEP), a nationwide topographic mapping initiative, and the NEON Airborne Observation Platform (AOP), which collects high-density ecological LiDAR across NEON field sites. Both programs provide data freely to the public.\nSource: USGS 3DEP · NAD83(2011) / UTM Zone 18N Area: ~2.04 km² · Points: 2.21 million · Density: ~1.08 pts/m² Elevation range: −10 m to +385 m (ground to building rooftops)\nThis tile covers a section of Manhattan adjacent to Central Park. The map below shows the exact footprint of the dataset on a satellite basemap.\n\n\nThe 3D viewer below renders the point cloud colored by elevation. Rotate with left-click, pan with right-click, and scroll to zoom. The tall peaks (orange–red) are Manhattan skyscrapers; the flat ground surface and below-grade infrastructure appear in purple–blue."
+  },
+  {
+    "objectID": "datasets_lidar.html#neon-aop-small-tree-plot",
+    "href": "datasets_lidar.html#neon-aop-small-tree-plot",
+    "title": "LiDAR Datasets",
+    "section": "NEON AOP — Small Tree Plot",
+    "text": "NEON AOP — Small Tree Plot\nSource: NEON Airborne Observation Platform · WGS 84 / UTM Zone 6N Area: ~399 m² · Points: 10.4 thousand · Density: ~26 pts/m² Elevation range: 0 m to 17.3 m (ground to crown top)\nA high-density NEON AOP scan (~20 m × 20 m) of a small tree stand. At 26 pts/m² the scan resolves individual tree crowns and branching structure in detail. All points are shown — no subsampling. Colors show elevation from ground (dark green) to canopy top (yellow)."
+  },
+  {
+    "objectID": "datasets_lidar.html#gedi",
+    "href": "datasets_lidar.html#gedi",
+    "title": "LiDAR Datasets",
+    "section": "GEDI",
+    "text": "GEDI\n\n\n\nGEDI (Global Ecosystem Dynamics Investigation) — NASA LiDAR instrument aboard the ISS for measuring forest structure and biomass.\n\n\nGEDI is a full-waveform LiDAR instrument mounted on the International Space Station. It provides high-resolution measurements of forest vertical structure, canopy height, and above-ground biomass at global scale.\nAgency: NASA Goddard Space Flight Center Sensor: Three 1064 nm full-waveform LiDAR lasers Footprint size: ~25 m diameter Along-track spacing: ~60 m · Cross-track spacing: ~600 m Coverage: ~51.6°N to 51.6°S (ISS orbital range) Key products: Canopy height (RH metrics), Plant Area Index (PAI), Above-ground biomass density (AGBD)\n\n\n\n\n\n\nNote\n\n\n\nGEDI data are freely available through NASA EarthData and Google Earth Engine."
+  },
+  {
+    "objectID": "datasets_lidar.html#icesat-2-nasa",
+    "href": "datasets_lidar.html#icesat-2-nasa",
+    "title": "LiDAR Datasets",
+    "section": "ICESat-2 — NASA",
+    "text": "ICESat-2 — NASA\nICESat-2 (Ice, Cloud, and land Elevation Satellite-2) uses a photon-counting LiDAR (ATLAS) to measure surface elevation globally with centimeter-level precision. While primarily designed for ice sheet and sea ice monitoring, ICESat-2 is increasingly used for global forest canopy height estimation and terrain mapping.\nAgency: NASA Goddard Space Flight Center Sensor: ATLAS (Advanced Topographic Laser Altimeter System) — 532 nm photon-counting LiDAR Footprint size: ~17 m diameter Along-track spacing: ~0.7 m (photon level) Beam configuration: 3 pairs of strong/weak beams (6 beams total) Temporal resolution: 91-day exact repeat cycle Coverage: Global, up to ±88° latitude Key products: - ATL03 — Global geolocated photons - ATL06 — Land ice surface height - ATL08 — Land and vegetation height (canopy top, terrain) - ATL13 — Inland water surface height Key applications: Forest canopy height, ice sheet mass balance, sea ice freeboard, lake and river water levels, terrain DEM\n\n\n\n\n\n\nNote\n\n\n\nICESat-2 data are freely available through NASA EarthData and OpenAltimetry.\n\n\n\n\n\n\n\n\n\nNote\n\n\n\nUSGS 3DEP data are available via the USGS National Map. NEON AOP data are available via the NEON Data Portal. Visualizations produced with lidR, plotly, and leaflet in R."
+  },
+  {
+    "objectID": "datasets_radar.html",
+    "href": "datasets_radar.html",
+    "title": "Radar Datasets",
+    "section": "",
+    "text": "Microwave radar remote sensing datasets for soil moisture, vegetation structure, and surface deformation monitoring."
+  },
+  {
+    "objectID": "datasets_radar.html#sentinel-1-esa-copernicus",
+    "href": "datasets_radar.html#sentinel-1-esa-copernicus",
+    "title": "Radar Datasets",
+    "section": "Sentinel-1 — ESA Copernicus",
+    "text": "Sentinel-1 — ESA Copernicus\nSentinel-1 provides C-band Synthetic Aperture Radar (SAR) imagery, enabling cloud-penetrating, day-and-night observations of land and ocean surfaces.\nAgency: European Space Agency (ESA) — Copernicus Programme Sensor: C-band SAR (5.405 GHz) Spatial resolution: 5 m × 20 m (IW mode, standard) Temporal resolution: ~6-day revisit (combined twin satellites) Polarizations: VV, VH, HH, HV Key applications: Forest above-ground biomass, flood mapping, soil moisture, ice monitoring, subsidence detection\n\n\n\n\n\n\nNote\n\n\n\nSentinel-1 data are freely available through the Copernicus Data Space and Google Earth Engine."
+  },
+  {
+    "objectID": "datasets_radar.html#smap-soil-moisture-active-passive-nasa",
+    "href": "datasets_radar.html#smap-soil-moisture-active-passive-nasa",
+    "title": "Radar Datasets",
+    "section": "SMAP — Soil Moisture Active Passive (NASA)",
+    "text": "SMAP — Soil Moisture Active Passive (NASA)\nSMAP is a NASA satellite mission designed to measure the moisture content of Earth’s soil surface globally and repeatedly. Its L-band radiometer provides the most accurate global soil moisture retrievals currently available from space, and is widely used in hydrology, agriculture, climate modeling, and ecosystem studies.\nAgency: NASA Jet Propulsion Laboratory (JPL) Sensor: L-band (1.41 GHz) passive radiometer + (originally active radar, failed 2015) Spatial resolution: ~36 km (radiometer) · 9 km (enhanced product) Temporal resolution: 2–3 day global revisit Launch: January 2015 Key products: - SPL3SMP — Daily global soil moisture (36 km) - SPL3SMP_E — Enhanced daily soil moisture (9 km) - SPL4SMGP — Surface and root-zone soil moisture (9 km, model-assimilated) Key applications: Drought monitoring, flood forecasting, agricultural water use, carbon flux modeling, forest moisture stress\n\n\n\n\n\n\nNote\n\n\n\nSMAP data are freely available through NASA EarthData and Google Earth Engine."
+  },
+  {
+    "objectID": "datasets_radar.html#alos-2-palsar-2-jaxa",
+    "href": "datasets_radar.html#alos-2-palsar-2-jaxa",
+    "title": "Radar Datasets",
+    "section": "ALOS-2 PALSAR-2 — JAXA",
+    "text": "ALOS-2 PALSAR-2 — JAXA\nALOS-2 PALSAR-2 is a Japanese L-band SAR satellite operated by JAXA. L-band radar penetrates forest canopy more effectively than C-band, making it particularly valuable for above-ground biomass estimation and forest structure retrieval.\nAgency: Japan Aerospace Exploration Agency (JAXA) Sensor: L-band SAR (1.2 GHz) Spatial resolution: 3 m – 100 m (mode dependent) Polarizations: HH, HV, VH, VV (quad-pol available) Key applications: Forest biomass estimation, forest/non-forest mapping, disaster monitoring, wetland mapping\n\n\n\n\n\n\nNote\n\n\n\nALOS-2 PALSAR-2 global mosaic data are freely available through JAXA EORC."
+  },
+  {
+    "objectID": "datasets_radar.html#tandem-x-dlr",
+    "href": "datasets_radar.html#tandem-x-dlr",
+    "title": "Radar Datasets",
+    "section": "TanDEM-X — DLR",
+    "text": "TanDEM-X — DLR\nTanDEM-X is a German radar mission that produced a global Digital Elevation Model (DEM) of unprecedented accuracy using X-band InSAR. The global DEM is widely used as a canopy height reference baseline and terrain correction layer.\nAgency: German Aerospace Center (DLR) Sensor: X-band SAR (9.65 GHz), bistatic InSAR Spatial resolution: 12 m (global DEM) Vertical accuracy: ~1 m absolute (open terrain) Key applications: Global DEM generation, canopy height estimation, glacier monitoring, terrain analysis\n\n\n\n\n\n\nNote\n\n\n\nTanDEM-X global DEM data are available through DLR."
+  },
+  {
+    "objectID": "datasets_radar.html#nisar-nasa-isro-launched-2025",
+    "href": "datasets_radar.html#nisar-nasa-isro-launched-2025",
+    "title": "Radar Datasets",
+    "section": "NISAR — NASA / ISRO (Launched 2025)",
+    "text": "NISAR — NASA / ISRO (Launched 2025)\nNISAR (NASA-ISRO Synthetic Aperture Radar) is a joint Earth observation mission between NASA and the Indian Space Research Organisation (ISRO). It is the first dual-frequency SAR satellite ever built, carrying both an L-band (NASA) and an S-band (ISRO) radar. Its primary science goals include measuring ecosystem disturbances, ice-sheet collapse, natural hazards, and sea-level rise. For forest research, NISAR’s L-band radar is expected to provide unprecedented global above-ground biomass and forest disturbance data at high spatial resolution and frequent revisit.\nAgency: NASA (Jet Propulsion Laboratory) + ISRO Launch: March 2025 Sensors: L-band SAR (1.25 GHz, NASA) + S-band SAR (2.8 GHz, ISRO) Spatial resolution: ~3–10 m (L-band) · ~3–10 m (S-band) Temporal resolution: 12-day repeat cycle Swath width: 240 km Key applications: Forest above-ground biomass, deforestation and disturbance mapping, wetland dynamics, earthquake and landslide monitoring, glacier flow, sea-level change\n\n\n\n\n\n\nNote\n\n\n\nNISAR data will be freely available through NASA EarthData and ISRO’s NRSC portal."
+  },
+  {
+    "objectID": "datasets_radar.html#biomass-esa-launched-2025",
+    "href": "datasets_radar.html#biomass-esa-launched-2025",
+    "title": "Radar Datasets",
+    "section": "BIOMASS — ESA (Launched 2025)",
+    "text": "BIOMASS — ESA (Launched 2025)\nBIOMASS is ESA’s first P-band SAR satellite, specifically designed to produce the first global maps of forest above-ground biomass. P-band radar (wavelength ~70 cm) penetrates deep into forest canopy and is sensitive to the woody structure of trunks and large branches — the components that store most of the carbon in forests. BIOMASS is a cornerstone mission for global carbon cycle science and will directly support international carbon accounting and climate policy.\nAgency: European Space Agency (ESA) — Earth Explorer Mission Launch: April 2025 Sensor: P-band SAR (435 MHz, ~70 cm wavelength), fully polarimetric Spatial resolution: 50 m (biomass product) · ~4.5 m (SAR imagery) Temporal resolution: ~25-day repeat cycle (3 passes per year in tomographic phase) Mission phases: - Tomographic phase (Years 1–3): 3D forest structure mapping using SAR tomography - Interferometric phase (Years 4–5): Change detection and biomass updating Key products: Global forest above-ground biomass density, forest height, forest disturbance Key applications: Forest carbon stock estimation, deforestation monitoring, carbon flux modeling, climate change assessment\n\n\n\n\n\n\nNote\n\n\n\nBIOMASS data will be freely available through ESA’s Earth Online portal."
+  },
+  {
+    "objectID": "news.html",
+    "href": "news.html",
+    "title": "Recent News",
+    "section": "",
+    "text": "2025\n\n20 Dec 2025\n\n\nNew Paper Published in Certain Journal\n\n\nDingjin Chu and collaborators published a study on forest biomass estimation using LiDAR and optical data.\n\nRead Paper\n\n15–19 Dec 2025\n\n\nAGU Fall Meeting, New Orleans, USA\n\n\nDingjin presented recent research findings at the AGU Fall Meeting.\n\n Visit AGU\n\n\n2023\n\n16–17 Aug 2023\n\n\n\nPoster Presentation at the Conference “Actual Issues of Environmental Research for Sustainable Development in the Arid Zone” in Kyrgyzstan\n\n\nPoster about the impacts of future climate extremes on the interannual variability of terrestrial ecosystem productivity in Central Asia based on CMIP6."
+  },
+  {
+    "objectID": "posts/gedi-l4a/index.html",
+    "href": "posts/gedi-l4a/index.html",
+    "title": "Downloading and Analyzing GEDI L4A Above-Ground Biomass Data",
+    "section": "",
+    "text": "GEDI L4A (Global Ecosystem Dynamics Investigation, Level 4A) provides footprint-level estimates of above-ground biomass density (AGBD) in Mg/ha derived from NASA’s full-waveform LiDAR aboard the ISS. Each footprint is ~25 m in diameter with ~60 m along-track and ~600 m cross-track spacing.\nThis tutorial compares GEDI L4A AGBD across two contrasting landscapes:\n\n\n\n\n\n\n\n\nRegion\nSite\nLand Cover\n\n\n\n\nRegion 1\nNEON SCBI — Front Royal, Virginia\nTemperate deciduous forest\n\n\nRegion 2\nCentral Park & surroundings — New York City\nUrban green space"
+  },
+  {
+    "objectID": "posts/gedi-l4a/index.html#overview",
+    "href": "posts/gedi-l4a/index.html#overview",
+    "title": "Downloading and Analyzing GEDI L4A Above-Ground Biomass Data",
+    "section": "",
+    "text": "GEDI L4A (Global Ecosystem Dynamics Investigation, Level 4A) provides footprint-level estimates of above-ground biomass density (AGBD) in Mg/ha derived from NASA’s full-waveform LiDAR aboard the ISS. Each footprint is ~25 m in diameter with ~60 m along-track and ~600 m cross-track spacing.\nThis tutorial compares GEDI L4A AGBD across two contrasting landscapes:\n\n\n\n\n\n\n\n\nRegion\nSite\nLand Cover\n\n\n\n\nRegion 1\nNEON SCBI — Front Royal, Virginia\nTemperate deciduous forest\n\n\nRegion 2\nCentral Park & surroundings — New York City\nUrban green space"
+  },
+  {
+    "objectID": "posts/gedi-l4a/index.html#setup",
+    "href": "posts/gedi-l4a/index.html#setup",
+    "title": "Downloading and Analyzing GEDI L4A Above-Ground Biomass Data",
+    "section": "Setup",
+    "text": "Setup\n\ninstall.packages(c(\"rGEDI\", \"hdf5r\", \"sf\", \"terra\",\n                   \"ggplot2\", \"dplyr\", \"leaflet\", \"viridis\", \"patchwork\"))\n\n\nlibrary(hdf5r); library(sf); library(terra)\nlibrary(ggplot2); library(dplyr); library(leaflet)\nlibrary(viridis); library(patchwork); library(scales)"
+  },
+  {
+    "objectID": "posts/gedi-l4a/index.html#step-1-define-two-study-areas",
+    "href": "posts/gedi-l4a/index.html#step-1-define-two-study-areas",
+    "title": "Downloading and Analyzing GEDI L4A Above-Ground Biomass Data",
+    "section": "Step 1 — Define Two Study Areas",
+    "text": "Step 1 — Define Two Study Areas\n\n# ── Region 1: NEON SCBI, Front Royal, VA ─────────────────────────────────\nscbi &lt;- list(\n  name    = \"NEON SCBI — Front Royal, VA\",\n  lon_min = -78.20, lat_min = 38.85,\n  lon_max = -78.10, lat_max = 38.95\n)\n\n# ── Region 2: Central Park & surrounding urban area, NYC ─────────────────\nnyc &lt;- list(\n  name    = \"Central Park & surroundings — New York City\",\n  lon_min = -74.05, lat_min = 40.70,\n  lon_max = -73.85, lat_max = 40.85\n)\n\nregion_to_sf &lt;- function(r) {\n  st_bbox(c(xmin = r$lon_min, ymin = r$lat_min,\n            xmax = r$lon_max, ymax = r$lat_max),\n          crs = 4326) |&gt; st_as_sfc() |&gt; st_as_sf()\n}\n\nThe map below shows the GEDI orbital track coverage (green lines) over both study areas (red bounding boxes). Ascending (SW→NE) and descending (NW→SE) passes cross due to the ISS orbital inclination of ~51.6°."
+  },
+  {
+    "objectID": "posts/gedi-l4a/index.html#step-2-find-gedi-l4a-granules",
+    "href": "posts/gedi-l4a/index.html#step-2-find-gedi-l4a-granules",
+    "title": "Downloading and Analyzing GEDI L4A Above-Ground Biomass Data",
+    "section": "Step 2 — Find GEDI L4A Granules",
+    "text": "Step 2 — Find GEDI L4A Granules\n\nlibrary(httr); library(jsonlite)\n\ngedi_finder &lt;- function(r) {\n  url  &lt;- paste0(\"https://lpdaacsvc.cr.usgs.gov/services/gedifinder\",\n                 \"?product=GEDI04_A&version=002\",\n                 \"&bbox=\", r$lon_min, \",\", r$lat_min,\n                 \",\",      r$lon_max, \",\", r$lat_max)\n  fromJSON(content(GET(url), \"text\"))$data\n}\n\nscbi_granules &lt;- gedi_finder(scbi)\nnyc_granules  &lt;- gedi_finder(nyc)\n\ncat(\"SCBI granules:\", length(scbi_granules), \"\\n\")\ncat(\"NYC  granules:\", length(nyc_granules),  \"\\n\")"
+  },
+  {
+    "objectID": "posts/gedi-l4a/index.html#step-3-download-granules",
+    "href": "posts/gedi-l4a/index.html#step-3-download-granules",
+    "title": "Downloading and Analyzing GEDI L4A Above-Ground Biomass Data",
+    "section": "Step 3 — Download Granules",
+    "text": "Step 3 — Download Granules\nRequires a free NASA EarthData account (urs.earthdata.nasa.gov).\n\nlibrary(rGEDI)\ngediDownload(filepath = scbi_granules, outdir = \"data/gedi_scbi\")\ngediDownload(filepath = nyc_granules,  outdir = \"data/gedi_nyc\")\n\n\nEach granule is ~500 MB–2 GB. For a small bounding box, typically 1–3 granules suffice."
+  },
+  {
+    "objectID": "posts/gedi-l4a/index.html#step-4-read-and-extract-agbd-from-hdf5",
+    "href": "posts/gedi-l4a/index.html#step-4-read-and-extract-agbd-from-hdf5",
+    "title": "Downloading and Analyzing GEDI L4A Above-Ground Biomass Data",
+    "section": "Step 4 — Read and Extract AGBD from HDF5",
+    "text": "Step 4 — Read and Extract AGBD from HDF5\nGEDI L4A files are HDF5 with 8 beam groups. This function loops all beams and clips to the bounding box:\n\nextract_gedi_l4a &lt;- function(h5_path, region) {\n  h5    &lt;- H5File$new(h5_path, mode = \"r\")\n  beams &lt;- c(\"BEAM0000\",\"BEAM0001\",\"BEAM0010\",\"BEAM0011\",\n             \"BEAM0101\",\"BEAM0110\",\"BEAM1000\",\"BEAM1011\")\n\n  results &lt;- lapply(beams, function(beam) {\n    if (!beam %in% names(h5)) return(NULL)\n    tryCatch({\n      b &lt;- h5[[beam]]\n      data.frame(\n        lon        = b[[\"lon_lowestmode\"]][],\n        lat        = b[[\"lat_lowestmode\"]][],\n        agbd       = b[[\"agbd\"]][],\n        agbd_lower = b[[\"agbd_pi_lower\"]][],\n        agbd_upper = b[[\"agbd_pi_upper\"]][],\n        quality    = b[[\"l4_quality_flag\"]][],\n        degrade    = b[[\"degrade_flag\"]][],\n        beam       = beam\n      )\n    }, error = function(e) NULL)\n  })\n  h5$close_all()\n\n  bind_rows(results) |&gt;\n    filter(lon &gt;= region$lon_min, lon &lt;= region$lon_max,\n           lat &gt;= region$lat_min, lat &lt;= region$lat_max)\n}\n\nscbi_raw &lt;- list.files(\"data/gedi_scbi\", \"\\\\.h5$\", full.names = TRUE) |&gt;\n  lapply(extract_gedi_l4a, region = scbi) |&gt; bind_rows()\n\nnyc_raw  &lt;- list.files(\"data/gedi_nyc\",  \"\\\\.h5$\", full.names = TRUE) |&gt;\n  lapply(extract_gedi_l4a, region = nyc)  |&gt; bind_rows()"
+  },
+  {
+    "objectID": "posts/gedi-l4a/index.html#step-5-quality-filtering",
+    "href": "posts/gedi-l4a/index.html#step-5-quality-filtering",
+    "title": "Downloading and Analyzing GEDI L4A Above-Ground Biomass Data",
+    "section": "Step 5 — Quality Filtering",
+    "text": "Step 5 — Quality Filtering\n\nquality_filter &lt;- function(df) {\n  df |&gt; filter(quality == 1, degrade == 0, agbd &gt;= 0, agbd &lt; 1000)\n}\n\nscbi_clean &lt;- quality_filter(scbi_raw)\nnyc_clean  &lt;- quality_filter(nyc_raw)\n\nQuality flags used:\n\n\n\nFlag\nKeep value\nMeaning\n\n\n\n\nl4_quality_flag\n1\nReliable AGBD estimate\n\n\ndegrade_flag\n0\nNominal acquisition (no data degradation)"
+  },
+  {
+    "objectID": "posts/gedi-l4a/index.html#results",
+    "href": "posts/gedi-l4a/index.html#results",
+    "title": "Downloading and Analyzing GEDI L4A Above-Ground Biomass Data",
+    "section": "Results",
+    "text": "Results\nThe figures below show processed GEDI L4A output for both regions.\n\nSpatial Distribution of AGBD\nEach point represents one GEDI footprint (~25 m diameter). Colors encode AGBD in Mg/ha.\n\n\nSCBI shows dense, continuous forest cover with high AGBD (100–400 Mg/ha). The NYC panel reveals a strong spatial contrast between the vegetated core of Central Park (higher AGBD) and the surrounding impervious urban fabric (near-zero AGBD).\n\n\n\nInteractive Footprint Map — AGBD\nClick any point to see AGBD and uncertainty bounds. Toggle sites using the layer control (top-right).\n\n\nWarning in pal(agbd): Some values were outside the color scale and will be\ntreated as NA\n\n\n\n\n\n\n\n\n\nAGBD Frequency Distribution\n\n\nSCBI follows a right-skewed log-normal distribution typical of mature temperate forest. NYC shows a strongly bimodal pattern: a large spike near zero (impervious surfaces, sparse street trees) and a secondary mode around 80–130 Mg/ha (park tree canopy).\n\n\n\n\nAGBD Violin + Box Plot\n\n\n\n\nNYC Detail — Central Park vs Urban Surroundings\nGEDI footprints are classified by whether they fall inside the Central Park boundary (~-73.981 to -73.949 lon, 40.764 to 40.800 lat):\n\nnyc_labeled &lt;- nyc_clean |&gt;\n  mutate(land_type = ifelse(\n    lon &gt;= -73.981 & lon &lt;= -73.949 & lat &gt;= 40.764 & lat &lt;= 40.800,\n    \"Central Park (Green Space)\", \"Urban Surroundings\"\n  ))\n\n\n\n\n\nSummary Statistics\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nregion\nN footprints\nMean AGBD\nMedian AGBD\nSD\nMin\nMax\n\n\n\n\nCentral Park & NYC\n\n\n\n\n\n\n\n\n(Urban, NY)\n1628\n34.3\n22.6\n35.2\n0.7\n280\n\n\nNEON SCBI\n\n\n\n\n\n\n\n\n(Temperate Forest, VA)\n657\n206.5\n192.3\n87.1\n62.2\n480"
+  },
+  {
+    "objectID": "posts/gedi-l4a/index.html#step-6-rasterize-to-500-m-grid",
+    "href": "posts/gedi-l4a/index.html#step-6-rasterize-to-500-m-grid",
+    "title": "Downloading and Analyzing GEDI L4A Above-Ground Biomass Data",
+    "section": "Step 6 — Rasterize to 500 m Grid",
+    "text": "Step 6 — Rasterize to 500 m Grid\n\nrasterize_agbd &lt;- function(df, region, res = 0.0045) {\n  r_tmpl &lt;- rast(xmin = region$lon_min, xmax = region$lon_max,\n                 ymin = region$lat_min, ymax = region$lat_max,\n                 resolution = res, crs = \"EPSG:4326\")\n  vect(df, geom = c(\"lon\", \"lat\"), crs = \"EPSG:4326\") |&gt;\n    rasterize(r_tmpl, field = \"agbd\", fun = \"mean\")\n}\n\nr_scbi &lt;- rasterize_agbd(scbi_clean, scbi)\nr_nyc  &lt;- rasterize_agbd(nyc_clean,  nyc)\n\npar(mfrow = c(1, 2))\nplot(r_scbi, col = hcl.colors(100, \"viridis\"),\n     main = \"SCBI Mean AGBD (Mg/ha)\", range = c(0, 400))\nplot(r_nyc,  col = hcl.colors(100, \"viridis\"),\n     main = \"NYC Mean AGBD (Mg/ha)\",  range = c(0, 200))\npar(mfrow = c(1, 1))"
+  },
+  {
+    "objectID": "posts/gedi-l4a/index.html#key-notes",
+    "href": "posts/gedi-l4a/index.html#key-notes",
+    "title": "Downloading and Analyzing GEDI L4A Above-Ground Biomass Data",
+    "section": "Key Notes",
+    "text": "Key Notes\n\nAGBD fill value: Filter out agbd == -9999 before any analysis.\nPrediction interval: agbd_pi_lower / agbd_pi_upper give per-footprint 90% uncertainty bounds.\nPower beams: BEAM0101, BEAM0110, BEAM1000, BEAM1011 penetrate dense canopy better and yield higher-quality waveforms.\nUrban interpretation: GEDI AGBD in cities reflects canopy trees only — not building structure. Near-zero AGBD in NYC corresponds to streets, rooftops, and parking lots.\nVersion: Always use V002 — it includes updated allometric models and improved algorithm."
+  },
+  {
+    "objectID": "posts/gedi-l4a/index.html#references",
+    "href": "posts/gedi-l4a/index.html#references",
+    "title": "Downloading and Analyzing GEDI L4A Above-Ground Biomass Data",
+    "section": "References",
+    "text": "References\n\nDubayah, R. et al. (2022). GEDI L4A Footprint Level Aboveground Biomass Density, Version 2. ORNL DAAC. https://doi.org/10.3334/ORNLDAAC/2056\nGEDI Mission: https://gedi.umd.edu\nNEON SCBI site: https://www.neonscience.org/field-sites/scbi\nNASA EarthData: https://earthdata.nasa.gov\nrGEDI R package: https://github.com/carlos-alberto-silva/rGEDI"
   },
   {
     "objectID": "posts/welcome/index.html",
