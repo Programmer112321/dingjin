@@ -13,6 +13,9 @@ about:
     - icon: mortarboard-fill
       text: ResearchGate
       href: https://www.researchgate.net/profile/YourResearchGate
+    - icon: archive
+      text: Zenodo
+      href: "https://zenodo.org/search?q=metadata.creators.person_or_org.name%3A%22Chu%2C%20Dingjin%22&l=list&p=1&s=10&sort=bestmatch"
     - icon: envelope
       text: Email
       href: mailto:dingjinchu@gmail.com
