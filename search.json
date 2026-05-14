@@ -21,6 +21,13 @@
     "text": "Microwave radar remote sensing datasets for soil moisture, vegetation structure, and surface deformation monitoring."
   },
   {
+    "objectID": "datasets_radar.html#sentinel-1-esa-copernicus",
+    "href": "datasets_radar.html#sentinel-1-esa-copernicus",
+    "title": "Radar Datasets",
+    "section": "Sentinel-1 — ESA Copernicus",
+    "text": "Sentinel-1 — ESA Copernicus\nSentinel-1 provides C-band Synthetic Aperture Radar (SAR) imagery, enabling cloud-penetrating, day-and-night observations of land and ocean surfaces.\nAgency: European Space Agency (ESA) — Copernicus Programme Sensor: C-band SAR (5.405 GHz) Spatial resolution: 5 m × 20 m (IW mode, standard) Temporal resolution: ~6-day revisit (combined twin satellites) Polarizations: VV, VH, HH, HV Key applications: Forest above-ground biomass, flood mapping, soil moisture, ice monitoring, subsidence detection\n\n\n\n\n\n\nNote\n\n\n\nSentinel-1 data are freely available through the Copernicus Data Space and Google Earth Engine."
+  },
+  {
     "objectID": "datasets_radar.html#smap-soil-moisture-active-passive-nasa",
     "href": "datasets_radar.html#smap-soil-moisture-active-passive-nasa",
     "title": "Radar Datasets",
@@ -194,13 +201,6 @@
     "title": "Optical Remote Sensing Datasets",
     "section": "Sentinel-2 — ESA Copernicus",
     "text": "Sentinel-2 — ESA Copernicus\nSentinel-2 is a high-resolution multispectral mission from the European Space Agency (ESA) under the Copernicus Earth Observation Programme. Its combination of high spatial resolution, frequent revisit time, and free data access has made it one of the most widely used satellites in vegetation and land surface research.\nSensors: MultiSpectral Instrument (MSI) — Sentinel-2A and Sentinel-2B Spatial resolution: 10 m (B2, B3, B4, B8) · 20 m (B5, B6, B7, B8A, B11, B12) · 60 m (B1, B9, B10) Temporal resolution: ~5-day revisit (combined twin satellites) Spectral bands: 13 bands from visible to SWIR, including red-edge bands for vegetation analysis Coverage: Global land surface Key applications: Forest canopy health, LAI estimation, crop monitoring, urban green space mapping, water body detection\n\n\n\n\n\n\nNote\n\n\n\nSentinel-2 data are freely available through the Copernicus Data Space and Google Earth Engine."
-  },
-  {
-    "objectID": "datasets_optical.html#sentinel-1-esa-copernicus-sar",
-    "href": "datasets_optical.html#sentinel-1-esa-copernicus-sar",
-    "title": "Optical Remote Sensing Datasets",
-    "section": "Sentinel-1 — ESA Copernicus (SAR)",
-    "text": "Sentinel-1 — ESA Copernicus (SAR)\nSentinel-1 provides C-band Synthetic Aperture Radar (SAR) imagery, enabling cloud-penetrating, day-and-night observations of land and ocean surfaces.\nSensor: C-band SAR (5.405 GHz) Spatial resolution: 5 m × 20 m (IW mode, standard) Temporal resolution: ~6-day revisit (combined) Polarizations: VV, VH, HH, HV Key applications: Forest above-ground biomass, flood mapping, soil moisture, ice monitoring, subsidence detection\n\n\n\n\n\n\nNote\n\n\n\nSentinel-1 data are freely available through the Copernicus Data Space and Google Earth Engine."
   },
   {
     "objectID": "index.html",
