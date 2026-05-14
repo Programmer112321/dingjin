@@ -49,6 +49,20 @@
     "text": "TanDEM-X — DLR\nTanDEM-X is a German radar mission that produced a global Digital Elevation Model (DEM) of unprecedented accuracy using X-band InSAR. The global DEM is widely used as a canopy height reference baseline and terrain correction layer.\nAgency: German Aerospace Center (DLR) Sensor: X-band SAR (9.65 GHz), bistatic InSAR Spatial resolution: 12 m (global DEM) Vertical accuracy: ~1 m absolute (open terrain) Key applications: Global DEM generation, canopy height estimation, glacier monitoring, terrain analysis\n\n\n\n\n\n\nNote\n\n\n\nTanDEM-X global DEM data are available through DLR."
   },
   {
+    "objectID": "datasets_radar.html#nisar-nasa-isro-launched-2025",
+    "href": "datasets_radar.html#nisar-nasa-isro-launched-2025",
+    "title": "Radar Datasets",
+    "section": "NISAR — NASA / ISRO (Launched 2025)",
+    "text": "NISAR — NASA / ISRO (Launched 2025)\nNISAR (NASA-ISRO Synthetic Aperture Radar) is a joint Earth observation mission between NASA and the Indian Space Research Organisation (ISRO). It is the first dual-frequency SAR satellite ever built, carrying both an L-band (NASA) and an S-band (ISRO) radar. Its primary science goals include measuring ecosystem disturbances, ice-sheet collapse, natural hazards, and sea-level rise. For forest research, NISAR’s L-band radar is expected to provide unprecedented global above-ground biomass and forest disturbance data at high spatial resolution and frequent revisit.\nAgency: NASA (Jet Propulsion Laboratory) + ISRO Launch: March 2025 Sensors: L-band SAR (1.25 GHz, NASA) + S-band SAR (2.8 GHz, ISRO) Spatial resolution: ~3–10 m (L-band) · ~3–10 m (S-band) Temporal resolution: 12-day repeat cycle Swath width: 240 km Key applications: Forest above-ground biomass, deforestation and disturbance mapping, wetland dynamics, earthquake and landslide monitoring, glacier flow, sea-level change\n\n\n\n\n\n\nNote\n\n\n\nNISAR data will be freely available through NASA EarthData and ISRO’s NRSC portal."
+  },
+  {
+    "objectID": "datasets_radar.html#biomass-esa-launched-2025",
+    "href": "datasets_radar.html#biomass-esa-launched-2025",
+    "title": "Radar Datasets",
+    "section": "BIOMASS — ESA (Launched 2025)",
+    "text": "BIOMASS — ESA (Launched 2025)\nBIOMASS is ESA’s first P-band SAR satellite, specifically designed to produce the first global maps of forest above-ground biomass. P-band radar (wavelength ~70 cm) penetrates deep into forest canopy and is sensitive to the woody structure of trunks and large branches — the components that store most of the carbon in forests. BIOMASS is a cornerstone mission for global carbon cycle science and will directly support international carbon accounting and climate policy.\nAgency: European Space Agency (ESA) — Earth Explorer Mission Launch: April 2025 Sensor: P-band SAR (435 MHz, ~70 cm wavelength), fully polarimetric Spatial resolution: 50 m (biomass product) · ~4.5 m (SAR imagery) Temporal resolution: ~25-day repeat cycle (3 passes per year in tomographic phase) Mission phases: - Tomographic phase (Years 1–3): 3D forest structure mapping using SAR tomography - Interferometric phase (Years 4–5): Change detection and biomass updating Key products: Global forest above-ground biomass density, forest height, forest disturbance Key applications: Forest carbon stock estimation, deforestation monitoring, carbon flux modeling, climate change assessment\n\n\n\n\n\n\nNote\n\n\n\nBIOMASS data will be freely available through ESA’s Earth Online portal."
+  },
+  {
     "objectID": "datasets_lidar.html",
     "href": "datasets_lidar.html",
     "title": "LiDAR Datasets",
