@@ -43,6 +43,20 @@ h2 {
   font-size: 0.9rem;
 }
 
+/* Highlight Contact Me link */
+.navbar-nav .nav-link[href$="contact.html"] {
+  color: #fff !important;
+  background-color: #0d6efd;
+  border-radius: 6px;
+  padding-left: 0.75rem !important;
+  padding-right: 0.75rem !important;
+  margin-left: 0.25rem;
+}
+
+.navbar-nav .nav-link[href$="contact.html"]:hover {
+  background-color: #0b5ed7;
+}
+
 /* social icon links in navbar */
 .navbar-nav .nav-link .bi {
   font-size: 1.05rem;
