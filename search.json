@@ -7,53 +7,11 @@
     "text": "Integrate field investigations with remote sensing to reveal cross-scale mechanisms, support the development of robust models, and improve forest management for enhanced human well-being.\n\n\nForest above ground biomass estimation\nHow to estimate forest AGB across large spatial scale?\n\nLiDAR-based modeling of forest above-ground biomass (AGB) using USGS 3DEP and NEON airborne point clouds, integrated with GEDI spaceborne LiDAR footprints and ESA CCI Biomass products for cross-scale validation. Built a large-scale processing pipeline that derives canopy structure metrics (height percentiles, density, rumple index) and predicts plot-level AGB with Random Forest, XGBoost, LightGBM, and stacked ensemble models, evaluated with grouped cross-validation and SHAP-based interpretation.\nTools: R (lidR, lasR, terra, sf), Python (scikit-learn, XGBoost, LightGBM, SHAP)\n\n\n\nCooling effect of urban green space\n\nHow does the urban green space regulate the temperature?\nQuantifying how the structure and composition of urban green spaces moderate land surface temperature across cities. Integrates USGS 3DEP airborne LiDAR-derived canopy metrics (height, cover, vertical complexity) with land cover and satellite-derived LST to model cooling magnitude as a function of canopy structure, patch geometry, and surrounding impervious context.\nTools: R (lidR, terra, sf, lme4), Python (xarray, rasterio, scikit-learn)\n\n\nForest Loss Analysis\n\nHow to accurately detect the forest loss and what is their relationship to climate change?\n1: How forest disturbance Quantifying forest loss trends and drivers across large spatial extents using time-series satellite imagery. The workflow integrates Hansen Global Forest Change data with climate and topographic covariates to attribute disturbance to fire, harvest, and insect outbreak.\nTools: R, Google Earth Engine, tidyverse\n\n\n\n\n\n\n\n\nNote\n\n\n\nMore projects and reproducible notebooks will be added here over time."
   },
   {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Dingjin Chu",
+    "objectID": "news.html",
+    "href": "news.html",
+    "title": "Recent News",
     "section": "",
-    "text": "PhD Student · Forest Monitoring & Geospatial Analysis\nDepartment of Natural Resource Ecology& Management · Oklahoma State University"
-  },
-  {
-    "objectID": "index.html#hello-this-is-dingjin.",
-    "href": "index.html#hello-this-is-dingjin.",
-    "title": "Dingjin Chu",
-    "section": "👋 Hello, this is Dingjin.",
-    "text": "👋 Hello, this is Dingjin.\nI am a PhD student studying Above ground biomass estimation, cooling effect of Urban green space, and forest disturbance using remote sensing across different different platforms with filed investigation data. I work with satellite imagery, Airborne LiDAR data, and statistical modeling to understand how forests respond to climate variability and human disturbance.\nMy research interests sit at the intersection of forest ecology, remote sensing, and environmental data science.\n\n\n\n\nImage generated from Your Name in Landsat — NASA."
-  },
-  {
-    "objectID": "index.html#contact-me",
-    "href": "index.html#contact-me",
-    "title": "Dingjin Chu",
-    "section": "Contact Me",
-    "text": "Contact Me\n\n  \n    Feel free to get in touch for any inquiries or opportunities. I am open to collaborations, scientific projects, and job opportunities where I can contribute my expertise in remote sensing, LiDAR, and environmental data science.\n    dingjinchu@gmail.com\n    Agricultural Hall, Department of Natural Resource Ecology & Management, Oklahoma State University, Stillwater, OK\n    \n      \n      \n      \n    \n  \n  \n    \n      \n        Full Name *\n        \n      \n      \n        Email *\n        \n      \n      \n        Affiliation *\n        \n      \n      \n        Position *\n        \n      \n      \n        Message *\n        \n      \n      Submit"
-  },
-  {
-    "objectID": "cv.html",
-    "href": "cv.html",
-    "title": "About Me",
-    "section": "",
-    "text": "Download CV (PDF)"
-  },
-  {
-    "objectID": "cv.html#photos",
-    "href": "cv.html#photos",
-    "title": "About Me",
-    "section": "Photos",
-    "text": "Photos"
-  },
-  {
-    "objectID": "contact.html",
-    "href": "contact.html",
-    "title": "Contact Me",
-    "section": "",
-    "text": "Feel free to get in touch for any inquiries or opportunities. I am open to collaborations, scientific projects, and job opportunities where I can contribute my expertise in remote sensing, LiDAR, and environmental data science.\n    dingjinchu@gmail.com\n    Agricultural Hall, Department of Natural Resource Ecology & Management, Oklahoma State University, Stillwater, OK\n    \n      \n      \n      \n    \n  \n\n  \n  \n    \n      \n        Full Name *\n        \n      \n      \n        Email *\n        \n      \n      \n        Affiliation *\n        \n      \n      \n        Position *\n        \n      \n      \n        Message *\n        \n      \n      Submit"
-  },
-  {
-    "objectID": "contact.html#where-to-find-me",
-    "href": "contact.html#where-to-find-me",
-    "title": "Contact Me",
-    "section": "Where to Find Me",
-    "text": "Where to Find Me\nAgricultural Hall, Oklahoma State University Stillwater, Oklahoma, USA\n\n\nView larger map"
+    "text": "2025\n\n20 Dec 2025\n\n\nNew Paper Published in Certain Journal\n\n\nDingjin Chu and collaborators published a study on forest biomass estimation using LiDAR and optical data.\n\nRead Paper\n\n15–19 Dec 2025\n\n\nAGU Fall Meeting, New Orleans, USA\n\n\nDingjin presented recent research findings at the AGU Fall Meeting.\n\n Visit AGU\n\n\n2023\n\n16–17 Aug 2023\n\n\n\nPoster Presentation at the Conference “Actual Issues of Environmental Research for Sustainable Development in the Arid Zone” in Kyrgyzstan\n\n\nPoster about the impacts of future climate extremes on the interannual variability of terrestrial ecosystem productivity in Central Asia based on CMIP6."
   },
   {
     "objectID": "datasets.html",
@@ -98,10 +56,66 @@
     "text": "NEON — National Ecological Observatory Network\nThe NEON Terrestrial Observation System collects standardized, long-term ecological data across 81 field sites spanning major climate and vegetation domains in the United States. Vegetation structure data include woody plant cover and height surveys, distributed plot stem maps, and individual tree measurements, designed to align directly with NEON’s airborne LiDAR collections for multi-scale validation.\nSource: National Ecological Observatory Network Coverage: 81 sites across 20 eco-climatic domains in the U.S. Key variables: Woody plant percent cover, plant height, stem diameter, species identity, plant phenology\n\n\n\n\n\n\nNote\n\n\n\nNEON field data are freely available through the NEON Data Portal.\n\n\n\n\n\n\n\n\n\nNote\n\n\n\nUSGS 3DEP data are available via the USGS National Map. NEON AOP data are available via the NEON Data Portal. Visualizations produced with lidR, plotly, and leaflet in R."
   },
   {
-    "objectID": "news.html",
-    "href": "news.html",
-    "title": "Recent News",
+    "objectID": "contact.html",
+    "href": "contact.html",
+    "title": "Contact Me",
     "section": "",
-    "text": "2025\n\n20 Dec 2025\n\n\nNew Paper Published in Certain Journal\n\n\nDingjin Chu and collaborators published a study on forest biomass estimation using LiDAR and optical data.\n\nRead Paper\n\n15–19 Dec 2025\n\n\nAGU Fall Meeting, New Orleans, USA\n\n\nDingjin presented recent research findings at the AGU Fall Meeting.\n\n Visit AGU\n\n\n2023\n\n16–17 Aug 2023\n\n\n\nPoster Presentation at the Conference “Actual Issues of Environmental Research for Sustainable Development in the Arid Zone” in Kyrgyzstan\n\n\nPoster about the impacts of future climate extremes on the interannual variability of terrestrial ecosystem productivity in Central Asia based on CMIP6."
+    "text": "Feel free to get in touch for any inquiries or opportunities. I am open to collaborations, scientific projects, and job opportunities where I can contribute my expertise in remote sensing, LiDAR, and environmental data science.\n    dingjinchu@gmail.com\n    Agricultural Hall, Department of Natural Resource Ecology & Management, Oklahoma State University, Stillwater, OK\n    \n      \n      \n      \n    \n  \n\n  \n  \n    \n      \n        Full Name *\n        \n      \n      \n        Email *\n        \n      \n      \n        Affiliation *\n        \n      \n      \n        Position *\n        \n      \n      \n        Message *\n        \n      \n      Submit"
+  },
+  {
+    "objectID": "contact.html#where-to-find-me",
+    "href": "contact.html#where-to-find-me",
+    "title": "Contact Me",
+    "section": "Where to Find Me",
+    "text": "Where to Find Me\nAgricultural Hall, Oklahoma State University Stillwater, Oklahoma, USA\n\n\nView larger map"
+  },
+  {
+    "objectID": "blog.html",
+    "href": "blog.html",
+    "title": "Blog",
+    "section": "",
+    "text": "Welcome to My Blog\n\n\n\ngeneral\n\n\n\n\n\n\n\n\n\nMay 14, 2026\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "cv.html",
+    "href": "cv.html",
+    "title": "About Me",
+    "section": "",
+    "text": "Download CV (PDF)"
+  },
+  {
+    "objectID": "cv.html#photos",
+    "href": "cv.html#photos",
+    "title": "About Me",
+    "section": "Photos",
+    "text": "Photos"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Dingjin Chu",
+    "section": "",
+    "text": "PhD Student · Forest Monitoring & Geospatial Analysis\nDepartment of Natural Resource Ecology& Management · Oklahoma State University"
+  },
+  {
+    "objectID": "index.html#hello-this-is-dingjin.",
+    "href": "index.html#hello-this-is-dingjin.",
+    "title": "Dingjin Chu",
+    "section": "👋 Hello, this is Dingjin.",
+    "text": "👋 Hello, this is Dingjin.\nI am a PhD student studying Above ground biomass estimation, cooling effect of Urban green space, and forest disturbance using remote sensing across different different platforms with filed investigation data. I work with satellite imagery, Airborne LiDAR data, and statistical modeling to understand how forests respond to climate variability and human disturbance.\nMy research interests sit at the intersection of forest ecology, remote sensing, and environmental data science.\n\n\n\n\nImage generated from Your Name in Landsat — NASA."
+  },
+  {
+    "objectID": "index.html#contact-me",
+    "href": "index.html#contact-me",
+    "title": "Dingjin Chu",
+    "section": "Contact Me",
+    "text": "Contact Me\n\n  \n    Feel free to get in touch for any inquiries or opportunities. I am open to collaborations, scientific projects, and job opportunities where I can contribute my expertise in remote sensing, LiDAR, and environmental data science.\n    dingjinchu@gmail.com\n    Agricultural Hall, Department of Natural Resource Ecology & Management, Oklahoma State University, Stillwater, OK\n    \n      \n      \n      \n    \n  \n  \n    \n      \n        Full Name *\n        \n      \n      \n        Email *\n        \n      \n      \n        Affiliation *\n        \n      \n      \n        Position *\n        \n      \n      \n        Message *\n        \n      \n      Submit"
+  },
+  {
+    "objectID": "posts/welcome/index.html",
+    "href": "posts/welcome/index.html",
+    "title": "Welcome to My Blog",
+    "section": "",
+    "text": "This is the first post on my blog. I will use this space to share thoughts on remote sensing, LiDAR analysis, forest ecology, and my research journey as a PhD student at Oklahoma State University.\nStay tuned for updates on ongoing projects, field work, and data science tips."
   }
 ]

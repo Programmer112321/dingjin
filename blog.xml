@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss  xmlns:atom="http://www.w3.org/2005/Atom" 
+      xmlns:media="http://search.yahoo.com/mrss/" 
+      xmlns:content="http://purl.org/rss/1.0/modules/content/" 
+      xmlns:dc="http://purl.org/dc/elements/1.1/" 
+      version="2.0">
+<channel>
+<title>Dingjin Chu</title>
+<link>https://Programmer112321.github.io/dingjin/blog.html</link>
+<atom:link href="https://Programmer112321.github.io/dingjin/blog.xml" rel="self" type="application/rss+xml"/>
+<description></description>
+<generator>quarto-1.8.26</generator>
+<lastBuildDate>Thu, 14 May 2026 05:00:00 GMT</lastBuildDate>
+<item>
+  <title>Welcome to My Blog</title>
+  <link>https://Programmer112321.github.io/dingjin/posts/welcome/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<p>This is the first post on my blog. I will use this space to share thoughts on remote sensing, LiDAR analysis, forest ecology, and my research journey as a PhD student at Oklahoma State University.</p>
+<p>Stay tuned for updates on ongoing projects, field work, and data science tips.</p>
+
+
+
+ ]]></description>
+  <category>general</category>
+  <guid>https://Programmer112321.github.io/dingjin/posts/welcome/</guid>
+  <pubDate>Thu, 14 May 2026 05:00:00 GMT</pubDate>
+</item>
+</channel>
+</rss>
