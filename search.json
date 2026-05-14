@@ -203,6 +203,13 @@
     "text": "Sentinel-2 — ESA Copernicus\nSentinel-2 is a high-resolution multispectral mission from the European Space Agency (ESA) under the Copernicus Earth Observation Programme. Its combination of high spatial resolution, frequent revisit time, and free data access has made it one of the most widely used satellites in vegetation and land surface research.\nSensors: MultiSpectral Instrument (MSI) — Sentinel-2A and Sentinel-2B Spatial resolution: 10 m (B2, B3, B4, B8) · 20 m (B5, B6, B7, B8A, B11, B12) · 60 m (B1, B9, B10) Temporal resolution: ~5-day revisit (combined twin satellites) Spectral bands: 13 bands from visible to SWIR, including red-edge bands for vegetation analysis Coverage: Global land surface Key applications: Forest canopy health, LAI estimation, crop monitoring, urban green space mapping, water body detection\n\n\n\n\n\n\nNote\n\n\n\nSentinel-2 data are freely available through the Copernicus Data Space and Google Earth Engine."
   },
   {
+    "objectID": "datasets_optical.html#modis-nasa-terra-aqua",
+    "href": "datasets_optical.html#modis-nasa-terra-aqua",
+    "title": "Optical Remote Sensing Datasets",
+    "section": "MODIS — NASA Terra & Aqua",
+    "text": "MODIS — NASA Terra & Aqua\nMODIS (Moderate Resolution Imaging Spectroradiometer) is a key instrument aboard NASA’s Terra and Aqua satellites. While its spatial resolution is coarser than Landsat or Sentinel-2, its near-daily global coverage and long record (since 1999) make it indispensable for large-scale vegetation dynamics, land surface temperature, and fire monitoring.\nAgency: NASA Goddard Space Flight Center Sensors: MODIS aboard Terra (EOS AM-1) and Aqua (EOS PM-1) Spatial resolution: 250 m (bands 1–2) · 500 m (bands 3–7) · 1000 m (bands 8–36) Temporal resolution: Daily global coverage (1–2 days revisit) Spectral bands: 36 bands from visible to thermal infrared (0.4–14.4 μm) Record length: Terra since February 2000 · Aqua since July 2002 Key products: - MOD13 / MYD13 — Vegetation indices (NDVI, EVI) at 250 m / 500 m / 1 km - MOD15 — Leaf Area Index (LAI) and FPAR - MOD17 — Gross/Net Primary Production (GPP/NPP) - MOD44B — Vegetation continuous fields (tree cover, non-tree, bare ground) - MCD64A1 — Monthly burned area - MOD11 — Land surface temperature and emissivity Key applications: Global vegetation phenology, drought monitoring, wildfire detection, land cover classification, carbon flux estimation, urban heat islands\n\n\n\n\n\n\nNote\n\n\n\nMODIS data are freely available through NASA EarthData and Google Earth Engine."
+  },
+  {
     "objectID": "index.html",
     "href": "index.html",
     "title": "Dingjin Chu",
