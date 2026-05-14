@@ -12,6 +12,15 @@ title: "About Me"
 
 ---
 
+# Open Science
+
+I believe science advances faster when it is built collectively. In academic practice, I support open and reproducible research — sharing data, code, and workflows wherever possible so that others can build on, verify, and extend the work. Collaboration across labs and disciplines is how we make progress that actually lasts.
+
+[<i class="bi bi-github"></i> GitHub](https://github.com/Programmer112321){.btn .btn-outline-secondary target="_blank"}
+[<i class="bi bi-archive"></i> Zenodo](https://zenodo.org/search?q=metadata.creators.person_or_org.name%3A%22Chu%2C%20Dingjin%22&l=list&p=1&s=10&sort=bestmatch){.btn .btn-outline-secondary target="_blank"}
+
+---
+
 # Personal Interest
 
 Hiking, swimming, music, and movie.
