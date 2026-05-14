@@ -330,8 +330,12 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<section id="usgs-3dep-urban-forest-near-central-park-new-york-city" class="level1">
-<h1>USGS 3DEP — Urban Forest Near Central Park, New York City</h1>
+<section id="lidar" class="level1">
+<h1>LiDAR</h1>
+<p>Airborne and spaceborne LiDAR point clouds from open-access programs used in forest structure and urban vegetation research.</p>
+<hr>
+<section id="usgs-3dep-urban-forest-near-central-park-new-york-city" class="level2">
+<h2 class="anchored" data-anchor-id="usgs-3dep-urban-forest-near-central-park-new-york-city">USGS 3DEP — Urban Forest Near Central Park, New York City</h2>
 <p>The datasets shown here are airborne LiDAR point clouds from two open-access programs: the <strong>USGS 3D Elevation Program (3DEP)</strong>, a nationwide topographic mapping initiative, and the <strong>NEON Airborne Observation Platform (AOP)</strong>, which collects high-density ecological LiDAR across NEON field sites. Both programs provide data freely to the public.</p>
 <p><strong>Source:</strong> USGS 3DEP · NAD83(2011) / UTM Zone 18N <strong>Area:</strong> ~2.04 km² · <strong>Points:</strong> 2.21 million · <strong>Density:</strong> ~1.08 pts/m² <strong>Elevation range:</strong> −10 m to +385 m (ground to building rooftops)</p>
 <p>This tile covers a section of Manhattan adjacent to Central Park. The map below shows the exact footprint of the dataset on a satellite basemap.</p>
@@ -342,26 +346,66 @@ ul.task-list li input[type="checkbox"] {
 </iframe>
 <hr>
 </section>
-<section id="neon-aop-small-tree-plot" class="level1">
-<h1>NEON AOP — Small Tree Plot</h1>
+<section id="neon-aop-small-tree-plot" class="level2">
+<h2 class="anchored" data-anchor-id="neon-aop-small-tree-plot">NEON AOP — Small Tree Plot</h2>
 <p><strong>Source:</strong> NEON Airborne Observation Platform · WGS 84 / UTM Zone 6N <strong>Area:</strong> ~399 m² · <strong>Points:</strong> 10.4 thousand · <strong>Density:</strong> ~26 pts/m² <strong>Elevation range:</strong> 0 m to 17.3 m (ground to crown top)</p>
 <p>A high-density NEON AOP scan (~20 m × 20 m) of a small tree stand. At 26 pts/m² the scan resolves individual tree crowns and branching structure in detail. All points are shown — no subsampling. Colors show elevation from ground (dark green) to canopy top (yellow).</p>
 <iframe src="widgets/tree_3d.html" width="100%" height="550px" style="border: 1px solid #dee2e6; border-radius: 6px;" frameborder="0">
 </iframe>
 <hr>
 </section>
-<section id="gedi" class="level1">
-<h1>GEDI</h1>
-<p>Notes on LiDAR data processing, analysis, and applications in forest monitoring.</p>
+<section id="gedi" class="level2">
+<h2 class="anchored" data-anchor-id="gedi">GEDI</h2>
 <div class="quarto-figure quarto-figure-center" style="border-radius: 6px; margin: 1rem 0;">
 <figure class="figure">
 <p><img src="photo/GEDI.png" class="img-fluid figure-img" style="width:100.0%"></p>
 <figcaption><em>GEDI (Global Ecosystem Dynamics Investigation) — NASA LiDAR instrument aboard the ISS for measuring forest structure and biomass.</em></figcaption>
 </figure>
 </div>
-<section id="what-is-gedi" class="level2">
-<h2 class="anchored" data-anchor-id="what-is-gedi">What is GEDI?</h2>
 <p>GEDI is a full-waveform LiDAR instrument mounted on the International Space Station. It provides high-resolution measurements of forest vertical structure, canopy height, and above-ground biomass at global scale.</p>
+<hr>
+</section>
+</section>
+<section id="field-investigation" class="level1">
+<h1>Field Investigation</h1>
+<p>Ground-based forest inventory datasets used for model validation, allometric calibration, and ecological analysis.</p>
+<hr>
+<section id="fia-forest-inventory-and-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="fia-forest-inventory-and-analysis">FIA — Forest Inventory and Analysis</h2>
+<p>The <strong>USDA Forest Service Forest Inventory and Analysis (FIA)</strong> program is the nation’s continuous forest census. FIA plots are systematically distributed across all forested land in the United States and remeasured on a roughly 5–10 year cycle. Each plot records tree species, diameter at breast height (DBH), height, crown class, and site conditions, providing a statistically representative sample of forest composition and structure at national, regional, and state scales.</p>
+<p><strong>Source:</strong> USDA Forest Service FIA Program <strong>Coverage:</strong> Contiguous United States, Alaska, Hawaii, and Pacific Islands <strong>Key variables:</strong> Species, DBH, tree height, basal area, biomass estimates, forest type, ownership</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>FIA data are freely available through the <a href="https://apps.fs.usda.gov/fia/datamart/">FIA DataMart</a>.</p>
+</div>
+</div>
+<hr>
+</section>
+<section id="neon-national-ecological-observatory-network" class="level2">
+<h2 class="anchored" data-anchor-id="neon-national-ecological-observatory-network">NEON — National Ecological Observatory Network</h2>
+<p>The <strong>NEON Terrestrial Observation System</strong> collects standardized, long-term ecological data across 81 field sites spanning major climate and vegetation domains in the United States. Vegetation structure data include woody plant cover and height surveys, distributed plot stem maps, and individual tree measurements, designed to align directly with NEON’s airborne LiDAR collections for multi-scale validation.</p>
+<p><strong>Source:</strong> National Ecological Observatory Network <strong>Coverage:</strong> 81 sites across 20 eco-climatic domains in the U.S. <strong>Key variables:</strong> Woody plant percent cover, plant height, stem diameter, species identity, plant phenology</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>NEON field data are freely available through the <a href="https://data.neonscience.org">NEON Data Portal</a>.</p>
+</div>
+</div>
 <hr>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
