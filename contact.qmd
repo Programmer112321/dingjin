@@ -2,11 +2,61 @@
 title: "Contact Me"
 ---
 
-## Get in Touch
+<div class="row g-5 mt-2">
 
-Feel free to reach out for research collaboration, questions, or just to connect.
+<!-- ── Left column ─────────────────────────────── -->
+<div class="col-md-5">
 
-**Email:** [dingjinchu@gmail.com](mailto:dingjinchu@gmail.com)
+Feel free to get in touch for any inquiries or opportunities. I am open to collaborations, scientific projects, and job opportunities where I can contribute my expertise in remote sensing, LiDAR, and environmental data science.
+
+<p class="mt-4"><i class="bi bi-envelope me-2"></i>[dingjinchu@gmail.com](mailto:dingjinchu@gmail.com)</p>
+
+<p><i class="bi bi-geo-alt me-2"></i>Agricultural Hall, Department of Natural Resource Ecology & Management, Oklahoma State University, Stillwater, OK</p>
+
+<div class="d-flex gap-2 mt-3">
+  <a href="mailto:dingjinchu@gmail.com" class="btn btn-outline-secondary btn-sm" title="Email"><i class="bi bi-envelope-fill"></i></a>
+  <a href="https://www.linkedin.com/in/dingjin-chu-892ba7352/" target="_blank" class="btn btn-primary btn-sm" title="LinkedIn"><i class="bi bi-linkedin"></i></a>
+  <a href="https://github.com/Programmer112321" target="_blank" class="btn btn-dark btn-sm" title="GitHub"><i class="bi bi-github"></i></a>
+</div>
+
+</div>
+
+<!-- ── Right column — contact form ────────────── -->
+<div class="col-md-7">
+
+<form action="https://formspree.io/f/xpwrjaqg" method="POST">
+
+  <div class="mb-3">
+    <label class="form-label">Full Name <span class="text-danger">*</span></label>
+    <input type="text" name="name" class="form-control" required>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Email <span class="text-danger">*</span></label>
+    <input type="email" name="email" class="form-control" required>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Affiliation <span class="text-danger">*</span></label>
+    <input type="text" name="affiliation" class="form-control" required>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Position <span class="text-danger">*</span></label>
+    <input type="text" name="position" class="form-control" required>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Message <span class="text-danger">*</span></label>
+    <textarea name="message" class="form-control" rows="5" placeholder="Enter your message" required></textarea>
+  </div>
+
+  <button type="submit" class="btn btn-primary px-4">Submit</button>
+
+</form>
+
+</div>
+</div>
 
 ---
 
@@ -16,8 +66,8 @@ Feel free to reach out for research collaboration, questions, or just to connect
 Stillwater, Oklahoma, USA
 
 <iframe
-  src="https://www.openstreetmap.org/export/embed.html?bbox=-97.0750%2C36.1220%2C97.0600%2C36.1300&amp;layer=mapnik&amp;marker=36.1256%2C-97.0671"
-  width="100%" height="450"
+  src="https://www.openstreetmap.org/export/embed.html?bbox=-97.0750%2C36.1220%2C-97.0600%2C36.1300&amp;layer=mapnik&amp;marker=36.1256%2C-97.0671"
+  width="100%" height="420"
   style="border: 1px solid #dee2e6; border-radius: 6px; margin-top: 0.5rem;"
   allowfullscreen>
 </iframe>
