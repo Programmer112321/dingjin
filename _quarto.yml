@@ -15,13 +15,14 @@ website:
         href: cv.qmd
       - text: News
         href: news.qmd
-      - text: "dingjinchu@gmail.com"
+      - text: Contact Me
+        href: contact.qmd
     right:
       - icon: github
-        href: https://github.com/YourGitHub
+        href: https://github.com/Programmer112321
         aria-label: GitHub
       - icon: linkedin
-        href: https://www.linkedin.com/in/YourLinkedIn
+        href: https://www.linkedin.com/in/dingjin-chu-892ba7352/
         aria-label: LinkedIn
       - icon: twitter
         href: https://twitter.com/YourTwitter
