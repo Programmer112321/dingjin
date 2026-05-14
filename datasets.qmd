@@ -2,17 +2,6 @@
 title: "Datasets"
 ---
 
-#  GEDI
-
-Notes on LiDAR data processing, analysis, and applications in forest monitoring.
-
-![*GEDI (Global Ecosystem Dynamics Investigation) — NASA LiDAR instrument aboard the ISS for measuring forest structure and biomass.*](photo/GEDI.png){width="100%" style="border-radius: 6px; margin: 1rem 0;"}
-
-## What is GEDI?
-
-GEDI is a full-waveform LiDAR instrument mounted on the International Space Station. It provides high-resolution measurements of forest vertical structure, canopy height, and above-ground biomass at global scale.
-
----
 
 # USGS 3DEP — Urban Forest Near Central Park, New York City
 
@@ -56,6 +45,20 @@ A high-density NEON AOP scan (~20 m × 20 m) of a small tree stand. At 26 pts/m�
 </iframe>
 
 ---
+
+
+#  GEDI
+
+Notes on LiDAR data processing, analysis, and applications in forest monitoring.
+
+![*GEDI (Global Ecosystem Dynamics Investigation) — NASA LiDAR instrument aboard the ISS for measuring forest structure and biomass.*](photo/GEDI.png){width="100%" style="border-radius: 6px; margin: 1rem 0;"}
+
+## What is GEDI?
+
+GEDI is a full-waveform LiDAR instrument mounted on the International Space Station. It provides high-resolution measurements of forest vertical structure, canopy height, and above-ground biomass at global scale.
+
+---
+
 
 ::: {.callout-note}
 USGS 3DEP data are available via the [USGS National Map](https://www.usgs.gov/3d-elevation-program). NEON AOP data are available via the [NEON Data Portal](https://data.neonscience.org). Visualizations produced with `lidR`, `plotly`, and `leaflet` in R.

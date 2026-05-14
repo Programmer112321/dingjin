@@ -22,7 +22,7 @@ LiDAR-based modeling of forest above-ground biomass (AGB) using USGS 3DEP and NE
 
 ---
 
-# Urban green space of cooling effect
+# Cooling effect of urban green space
 
 ![](photo/urban_green_space_cooling_effect.png){width="100%" style="border-radius: 6px; margin-bottom: 0.75rem;"}
 
