@@ -14,6 +14,34 @@
     "text": "2025\n\n20 Dec 2025\n\n\nNew Paper Published in Certain Journal\n\n\nDingjin Chu and collaborators published a study on forest biomass estimation using LiDAR and optical data.\n\nRead Paper\n\n15–19 Dec 2025\n\n\nAGU Fall Meeting, New Orleans, USA\n\n\nDingjin presented recent research findings at the AGU Fall Meeting.\n\n Visit AGU\n\n\n2023\n\n16–17 Aug 2023\n\n\n\nPoster Presentation at the Conference “Actual Issues of Environmental Research for Sustainable Development in the Arid Zone” in Kyrgyzstan\n\n\nPoster about the impacts of future climate extremes on the interannual variability of terrestrial ecosystem productivity in Central Asia based on CMIP6."
   },
   {
+    "objectID": "datasets_radar.html",
+    "href": "datasets_radar.html",
+    "title": "Radar Datasets",
+    "section": "",
+    "text": "Microwave radar remote sensing datasets for soil moisture, vegetation structure, and surface deformation monitoring."
+  },
+  {
+    "objectID": "datasets_radar.html#smap-soil-moisture-active-passive-nasa",
+    "href": "datasets_radar.html#smap-soil-moisture-active-passive-nasa",
+    "title": "Radar Datasets",
+    "section": "SMAP — Soil Moisture Active Passive (NASA)",
+    "text": "SMAP — Soil Moisture Active Passive (NASA)\nSMAP is a NASA satellite mission designed to measure the moisture content of Earth’s soil surface globally and repeatedly. Its L-band radiometer provides the most accurate global soil moisture retrievals currently available from space, and is widely used in hydrology, agriculture, climate modeling, and ecosystem studies.\nAgency: NASA Jet Propulsion Laboratory (JPL) Sensor: L-band (1.41 GHz) passive radiometer + (originally active radar, failed 2015) Spatial resolution: ~36 km (radiometer) · 9 km (enhanced product) Temporal resolution: 2–3 day global revisit Launch: January 2015 Key products: - SPL3SMP — Daily global soil moisture (36 km) - SPL3SMP_E — Enhanced daily soil moisture (9 km) - SPL4SMGP — Surface and root-zone soil moisture (9 km, model-assimilated) Key applications: Drought monitoring, flood forecasting, agricultural water use, carbon flux modeling, forest moisture stress\n\n\n\n\n\n\nNote\n\n\n\nSMAP data are freely available through NASA EarthData and Google Earth Engine."
+  },
+  {
+    "objectID": "datasets_radar.html#alos-2-palsar-2-jaxa",
+    "href": "datasets_radar.html#alos-2-palsar-2-jaxa",
+    "title": "Radar Datasets",
+    "section": "ALOS-2 PALSAR-2 — JAXA",
+    "text": "ALOS-2 PALSAR-2 — JAXA\nALOS-2 PALSAR-2 is a Japanese L-band SAR satellite operated by JAXA. L-band radar penetrates forest canopy more effectively than C-band, making it particularly valuable for above-ground biomass estimation and forest structure retrieval.\nAgency: Japan Aerospace Exploration Agency (JAXA) Sensor: L-band SAR (1.2 GHz) Spatial resolution: 3 m – 100 m (mode dependent) Polarizations: HH, HV, VH, VV (quad-pol available) Key applications: Forest biomass estimation, forest/non-forest mapping, disaster monitoring, wetland mapping\n\n\n\n\n\n\nNote\n\n\n\nALOS-2 PALSAR-2 global mosaic data are freely available through JAXA EORC."
+  },
+  {
+    "objectID": "datasets_radar.html#tandem-x-dlr",
+    "href": "datasets_radar.html#tandem-x-dlr",
+    "title": "Radar Datasets",
+    "section": "TanDEM-X — DLR",
+    "text": "TanDEM-X — DLR\nTanDEM-X is a German radar mission that produced a global Digital Elevation Model (DEM) of unprecedented accuracy using X-band InSAR. The global DEM is widely used as a canopy height reference baseline and terrain correction layer.\nAgency: German Aerospace Center (DLR) Sensor: X-band SAR (9.65 GHz), bistatic InSAR Spatial resolution: 12 m (global DEM) Vertical accuracy: ~1 m absolute (open terrain) Key applications: Global DEM generation, canopy height estimation, glacier monitoring, terrain analysis\n\n\n\n\n\n\nNote\n\n\n\nTanDEM-X global DEM data are available through DLR."
+  },
+  {
     "objectID": "datasets_lidar.html",
     "href": "datasets_lidar.html",
     "title": "LiDAR Datasets",
@@ -39,7 +67,14 @@
     "href": "datasets_lidar.html#gedi",
     "title": "LiDAR Datasets",
     "section": "GEDI",
-    "text": "GEDI\n\n\n\nGEDI (Global Ecosystem Dynamics Investigation) — NASA LiDAR instrument aboard the ISS for measuring forest structure and biomass.\n\n\nGEDI is a full-waveform LiDAR instrument mounted on the International Space Station. It provides high-resolution measurements of forest vertical structure, canopy height, and above-ground biomass at global scale.\n\n\n\n\n\n\n\nNote\n\n\n\nUSGS 3DEP data are available via the USGS National Map. NEON AOP data are available via the NEON Data Portal. Visualizations produced with lidR, plotly, and leaflet in R."
+    "text": "GEDI\n\n\n\nGEDI (Global Ecosystem Dynamics Investigation) — NASA LiDAR instrument aboard the ISS for measuring forest structure and biomass.\n\n\nGEDI is a full-waveform LiDAR instrument mounted on the International Space Station. It provides high-resolution measurements of forest vertical structure, canopy height, and above-ground biomass at global scale.\nAgency: NASA Goddard Space Flight Center Sensor: Three 1064 nm full-waveform LiDAR lasers Footprint size: ~25 m diameter Along-track spacing: ~60 m · Cross-track spacing: ~600 m Coverage: ~51.6°N to 51.6°S (ISS orbital range) Key products: Canopy height (RH metrics), Plant Area Index (PAI), Above-ground biomass density (AGBD)\n\n\n\n\n\n\nNote\n\n\n\nGEDI data are freely available through NASA EarthData and Google Earth Engine."
+  },
+  {
+    "objectID": "datasets_lidar.html#icesat-2-nasa",
+    "href": "datasets_lidar.html#icesat-2-nasa",
+    "title": "LiDAR Datasets",
+    "section": "ICESat-2 — NASA",
+    "text": "ICESat-2 — NASA\nICESat-2 (Ice, Cloud, and land Elevation Satellite-2) uses a photon-counting LiDAR (ATLAS) to measure surface elevation globally with centimeter-level precision. While primarily designed for ice sheet and sea ice monitoring, ICESat-2 is increasingly used for global forest canopy height estimation and terrain mapping.\nAgency: NASA Goddard Space Flight Center Sensor: ATLAS (Advanced Topographic Laser Altimeter System) — 532 nm photon-counting LiDAR Footprint size: ~17 m diameter Along-track spacing: ~0.7 m (photon level) Beam configuration: 3 pairs of strong/weak beams (6 beams total) Temporal resolution: 91-day exact repeat cycle Coverage: Global, up to ±88° latitude Key products: - ATL03 — Global geolocated photons - ATL06 — Land ice surface height - ATL08 — Land and vegetation height (canopy top, terrain) - ATL13 — Inland water surface height Key applications: Forest canopy height, ice sheet mass balance, sea ice freeboard, lake and river water levels, terrain DEM\n\n\n\n\n\n\nNote\n\n\n\nICESat-2 data are freely available through NASA EarthData and OpenAltimetry.\n\n\n\n\n\n\n\n\n\nNote\n\n\n\nUSGS 3DEP data are available via the USGS National Map. NEON AOP data are available via the NEON Data Portal. Visualizations produced with lidR, plotly, and leaflet in R."
   },
   {
     "objectID": "datasets.html",
@@ -138,6 +173,34 @@
     "title": "Field Investigation Datasets",
     "section": "NEON — National Ecological Observatory Network",
     "text": "NEON — National Ecological Observatory Network\nThe NEON Terrestrial Observation System collects standardized, long-term ecological data across 81 field sites spanning major climate and vegetation domains in the United States. Vegetation structure data include woody plant cover and height surveys, distributed plot stem maps, and individual tree measurements, designed to align directly with NEON’s airborne LiDAR collections for multi-scale validation.\nSource: National Ecological Observatory Network Coverage: 81 sites across 20 eco-climatic domains in the U.S. Key variables: Woody plant percent cover, plant height, stem diameter, species identity, plant phenology\n\n\n\n\n\n\nNote\n\n\n\nNEON field data are freely available through the NEON Data Portal."
+  },
+  {
+    "objectID": "datasets_optical.html",
+    "href": "datasets_optical.html",
+    "title": "Optical Remote Sensing Datasets",
+    "section": "",
+    "text": "Multispectral and hyperspectral satellite imagery from open-access programs widely used in land cover mapping, vegetation monitoring, and environmental change detection."
+  },
+  {
+    "objectID": "datasets_optical.html#landsat-usgs-nasa",
+    "href": "datasets_optical.html#landsat-usgs-nasa",
+    "title": "Optical Remote Sensing Datasets",
+    "section": "Landsat — USGS / NASA",
+    "text": "Landsat — USGS / NASA\nLandsat is the longest-running Earth observation satellite program, continuously collecting multispectral imagery since 1972. Operated jointly by USGS and NASA, the program provides a free and open archive essential for long-term land surface change analysis.\nCurrent sensors: Landsat 8 OLI/TIRS · Landsat 9 OLI-2/TIRS-2 Spatial resolution: 30 m (multispectral) · 15 m (panchromatic) · 100 m (thermal) Temporal resolution: 16-day revisit per satellite (~8 days combined) Spectral bands: Coastal/aerosol, Blue, Green, Red, NIR, SWIR1, SWIR2, Panchromatic, Thermal Coverage: Global, continuous since 1972 Key applications: Land cover change, deforestation, urban expansion, agricultural monitoring, wildfire burn severity, surface temperature\n\n\n\n\n\n\nNote\n\n\n\nLandsat data are freely available through USGS EarthExplorer and Google Earth Engine."
+  },
+  {
+    "objectID": "datasets_optical.html#sentinel-2-esa-copernicus",
+    "href": "datasets_optical.html#sentinel-2-esa-copernicus",
+    "title": "Optical Remote Sensing Datasets",
+    "section": "Sentinel-2 — ESA Copernicus",
+    "text": "Sentinel-2 — ESA Copernicus\nSentinel-2 is a high-resolution multispectral mission from the European Space Agency (ESA) under the Copernicus Earth Observation Programme. Its combination of high spatial resolution, frequent revisit time, and free data access has made it one of the most widely used satellites in vegetation and land surface research.\nSensors: MultiSpectral Instrument (MSI) — Sentinel-2A and Sentinel-2B Spatial resolution: 10 m (B2, B3, B4, B8) · 20 m (B5, B6, B7, B8A, B11, B12) · 60 m (B1, B9, B10) Temporal resolution: ~5-day revisit (combined twin satellites) Spectral bands: 13 bands from visible to SWIR, including red-edge bands for vegetation analysis Coverage: Global land surface Key applications: Forest canopy health, LAI estimation, crop monitoring, urban green space mapping, water body detection\n\n\n\n\n\n\nNote\n\n\n\nSentinel-2 data are freely available through the Copernicus Data Space and Google Earth Engine."
+  },
+  {
+    "objectID": "datasets_optical.html#sentinel-1-esa-copernicus-sar",
+    "href": "datasets_optical.html#sentinel-1-esa-copernicus-sar",
+    "title": "Optical Remote Sensing Datasets",
+    "section": "Sentinel-1 — ESA Copernicus (SAR)",
+    "text": "Sentinel-1 — ESA Copernicus (SAR)\nSentinel-1 provides C-band Synthetic Aperture Radar (SAR) imagery, enabling cloud-penetrating, day-and-night observations of land and ocean surfaces.\nSensor: C-band SAR (5.405 GHz) Spatial resolution: 5 m × 20 m (IW mode, standard) Temporal resolution: ~6-day revisit (combined) Polarizations: VV, VH, HH, HV Key applications: Forest above-ground biomass, flood mapping, soil moisture, ice monitoring, subsidence detection\n\n\n\n\n\n\nNote\n\n\n\nSentinel-1 data are freely available through the Copernicus Data Space and Google Earth Engine."
   },
   {
     "objectID": "index.html",

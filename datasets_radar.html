@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Research – Dingjin Chu</title>
+<title>Radar Datasets – Dingjin Chu</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -258,7 +258,7 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="./projects.html" aria-current="page"> 
+    <a class="nav-link" href="./projects.html"> 
 <span class="menu-text">Research</span></a>
   </li>  
   <li class="nav-item dropdown ">
@@ -336,7 +336,7 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Research</h1>
+<h1 class="title">Radar Datasets</h1>
 </div>
 
 
@@ -353,32 +353,12 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<section id="integrate-field-investigations-with-remote-sensing-to-reveal-cross-scale-mechanisms-support-the-development-of-robust-models-and-improve-forest-management-for-enhanced-human-well-being." class="level1">
-<h1>Integrate field investigations with remote sensing to reveal cross-scale mechanisms, support the development of robust models, and improve forest management for enhanced human well-being.</h1>
-</section>
-<section id="forest-above-ground-biomass-estimation" class="level1">
-<h1>Forest above ground biomass estimation</h1>
-<p><strong>How to estimate forest AGB across large spatial scale?</strong></p>
-<p><img src="photo/AGB_estimation.png" class="img-fluid" style="border-radius: 6px; margin-bottom: 0.75rem;;width:100.0%"></p>
-<p>LiDAR-based modeling of forest above-ground biomass (AGB) using USGS 3DEP and NEON airborne point clouds, integrated with GEDI spaceborne LiDAR footprints and ESA CCI Biomass products for cross-scale validation. Built a large-scale processing pipeline that derives canopy structure metrics (height percentiles, density, rumple index) and predicts plot-level AGB with Random Forest, XGBoost, LightGBM, and stacked ensemble models, evaluated with grouped cross-validation and SHAP-based interpretation.</p>
-<p><strong>Tools:</strong> R (lidR, lasR, terra, sf), Python (scikit-learn, XGBoost, LightGBM, SHAP)</p>
+<p>Microwave radar remote sensing datasets for soil moisture, vegetation structure, and surface deformation monitoring.</p>
 <hr>
-</section>
-<section id="cooling-effect-of-urban-green-space" class="level1">
-<h1>Cooling effect of urban green space</h1>
-<p><img src="photo/urban_green_space_cooling_effect.png" class="img-fluid" style="border-radius: 6px; margin-bottom: 0.75rem;;width:100.0%"></p>
-<p><strong>How does the urban green space regulate the temperature?</strong></p>
-<p>Quantifying how the structure and composition of urban green spaces moderate land surface temperature across cities. Integrates USGS 3DEP airborne LiDAR-derived canopy metrics (height, cover, vertical complexity) with land cover and satellite-derived LST to model cooling magnitude as a function of canopy structure, patch geometry, and surrounding impervious context.</p>
-<p><strong>Tools:</strong> R (lidR, terra, sf, lme4), Python (xarray, rasterio, scikit-learn)</p>
-</section>
-<section id="forest-loss-analysis" class="level1">
-<h1>Forest Loss Analysis</h1>
-<p><img src="photo/tree_mortality.jpg" class="img-fluid" style="border-radius: 6px; margin-bottom: 0.75rem;;width:100.0%"></p>
-<p><strong>How to accurately detect the forest loss and what is their relationship to climate change?</strong></p>
-<p>1: How forest disturbance Quantifying forest loss trends and drivers across large spatial extents using time-series satellite imagery. The workflow integrates Hansen Global Forest Change data with climate and topographic covariates to attribute disturbance to fire, harvest, and insect outbreak.</p>
-<p><strong>Tools:</strong> R, Google Earth Engine, tidyverse</p>
-<hr>
-<hr>
+<section id="smap-soil-moisture-active-passive-nasa" class="level2">
+<h2 class="anchored" data-anchor-id="smap-soil-moisture-active-passive-nasa">SMAP — Soil Moisture Active Passive (NASA)</h2>
+<p><strong>SMAP</strong> is a NASA satellite mission designed to measure the moisture content of Earth’s soil surface globally and repeatedly. Its L-band radiometer provides the most accurate global soil moisture retrievals currently available from space, and is widely used in hydrology, agriculture, climate modeling, and ecosystem studies.</p>
+<p><strong>Agency:</strong> NASA Jet Propulsion Laboratory (JPL) <strong>Sensor:</strong> L-band (1.41 GHz) passive radiometer + (originally active radar, failed 2015) <strong>Spatial resolution:</strong> ~36 km (radiometer) · 9 km (enhanced product) <strong>Temporal resolution:</strong> 2–3 day global revisit <strong>Launch:</strong> January 2015 <strong>Key products:</strong> - <strong>SPL3SMP</strong> — Daily global soil moisture (36 km) - <strong>SPL3SMP_E</strong> — Enhanced daily soil moisture (9 km) - <strong>SPL4SMGP</strong> — Surface and root-zone soil moisture (9 km, model-assimilated) <strong>Key applications:</strong> Drought monitoring, flood forecasting, agricultural water use, carbon flux modeling, forest moisture stress</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -389,7 +369,45 @@ Note
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>More projects and reproducible notebooks will be added here over time.</p>
+<p>SMAP data are freely available through <a href="https://earthdata.nasa.gov">NASA EarthData</a> and <a href="https://earthengine.google.com">Google Earth Engine</a>.</p>
+</div>
+</div>
+<hr>
+</section>
+<section id="alos-2-palsar-2-jaxa" class="level2">
+<h2 class="anchored" data-anchor-id="alos-2-palsar-2-jaxa">ALOS-2 PALSAR-2 — JAXA</h2>
+<p><strong>ALOS-2 PALSAR-2</strong> is a Japanese L-band SAR satellite operated by JAXA. L-band radar penetrates forest canopy more effectively than C-band, making it particularly valuable for above-ground biomass estimation and forest structure retrieval.</p>
+<p><strong>Agency:</strong> Japan Aerospace Exploration Agency (JAXA) <strong>Sensor:</strong> L-band SAR (1.2 GHz) <strong>Spatial resolution:</strong> 3 m – 100 m (mode dependent) <strong>Polarizations:</strong> HH, HV, VH, VV (quad-pol available) <strong>Key applications:</strong> Forest biomass estimation, forest/non-forest mapping, disaster monitoring, wetland mapping</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>ALOS-2 PALSAR-2 global mosaic data are freely available through <a href="https://www.eorc.jaxa.jp/ALOS/en/dataset/fnf_e.htm">JAXA EORC</a>.</p>
+</div>
+</div>
+<hr>
+</section>
+<section id="tandem-x-dlr" class="level2">
+<h2 class="anchored" data-anchor-id="tandem-x-dlr">TanDEM-X — DLR</h2>
+<p><strong>TanDEM-X</strong> is a German radar mission that produced a global Digital Elevation Model (DEM) of unprecedented accuracy using X-band InSAR. The global DEM is widely used as a canopy height reference baseline and terrain correction layer.</p>
+<p><strong>Agency:</strong> German Aerospace Center (DLR) <strong>Sensor:</strong> X-band SAR (9.65 GHz), bistatic InSAR <strong>Spatial resolution:</strong> 12 m (global DEM) <strong>Vertical accuracy:</strong> ~1 m absolute (open terrain) <strong>Key applications:</strong> Global DEM generation, canopy height estimation, glacier monitoring, terrain analysis</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>TanDEM-X global DEM data are available through <a href="https://www.dlr.de/de/eoc/competences/remote-sensing-technology-institute/sar-signal-processing/tandem-x-science-service-system">DLR</a>.</p>
 </div>
 </div>
 

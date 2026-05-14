@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Research – Dingjin Chu</title>
+<title>Optical Remote Sensing Datasets – Dingjin Chu</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -258,7 +258,7 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="./projects.html" aria-current="page"> 
+    <a class="nav-link" href="./projects.html"> 
 <span class="menu-text">Research</span></a>
   </li>  
   <li class="nav-item dropdown ">
@@ -336,7 +336,7 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Research</h1>
+<h1 class="title">Optical Remote Sensing Datasets</h1>
 </div>
 
 
@@ -353,32 +353,12 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<section id="integrate-field-investigations-with-remote-sensing-to-reveal-cross-scale-mechanisms-support-the-development-of-robust-models-and-improve-forest-management-for-enhanced-human-well-being." class="level1">
-<h1>Integrate field investigations with remote sensing to reveal cross-scale mechanisms, support the development of robust models, and improve forest management for enhanced human well-being.</h1>
-</section>
-<section id="forest-above-ground-biomass-estimation" class="level1">
-<h1>Forest above ground biomass estimation</h1>
-<p><strong>How to estimate forest AGB across large spatial scale?</strong></p>
-<p><img src="photo/AGB_estimation.png" class="img-fluid" style="border-radius: 6px; margin-bottom: 0.75rem;;width:100.0%"></p>
-<p>LiDAR-based modeling of forest above-ground biomass (AGB) using USGS 3DEP and NEON airborne point clouds, integrated with GEDI spaceborne LiDAR footprints and ESA CCI Biomass products for cross-scale validation. Built a large-scale processing pipeline that derives canopy structure metrics (height percentiles, density, rumple index) and predicts plot-level AGB with Random Forest, XGBoost, LightGBM, and stacked ensemble models, evaluated with grouped cross-validation and SHAP-based interpretation.</p>
-<p><strong>Tools:</strong> R (lidR, lasR, terra, sf), Python (scikit-learn, XGBoost, LightGBM, SHAP)</p>
+<p>Multispectral and hyperspectral satellite imagery from open-access programs widely used in land cover mapping, vegetation monitoring, and environmental change detection.</p>
 <hr>
-</section>
-<section id="cooling-effect-of-urban-green-space" class="level1">
-<h1>Cooling effect of urban green space</h1>
-<p><img src="photo/urban_green_space_cooling_effect.png" class="img-fluid" style="border-radius: 6px; margin-bottom: 0.75rem;;width:100.0%"></p>
-<p><strong>How does the urban green space regulate the temperature?</strong></p>
-<p>Quantifying how the structure and composition of urban green spaces moderate land surface temperature across cities. Integrates USGS 3DEP airborne LiDAR-derived canopy metrics (height, cover, vertical complexity) with land cover and satellite-derived LST to model cooling magnitude as a function of canopy structure, patch geometry, and surrounding impervious context.</p>
-<p><strong>Tools:</strong> R (lidR, terra, sf, lme4), Python (xarray, rasterio, scikit-learn)</p>
-</section>
-<section id="forest-loss-analysis" class="level1">
-<h1>Forest Loss Analysis</h1>
-<p><img src="photo/tree_mortality.jpg" class="img-fluid" style="border-radius: 6px; margin-bottom: 0.75rem;;width:100.0%"></p>
-<p><strong>How to accurately detect the forest loss and what is their relationship to climate change?</strong></p>
-<p>1: How forest disturbance Quantifying forest loss trends and drivers across large spatial extents using time-series satellite imagery. The workflow integrates Hansen Global Forest Change data with climate and topographic covariates to attribute disturbance to fire, harvest, and insect outbreak.</p>
-<p><strong>Tools:</strong> R, Google Earth Engine, tidyverse</p>
-<hr>
-<hr>
+<section id="landsat-usgs-nasa" class="level2">
+<h2 class="anchored" data-anchor-id="landsat-usgs-nasa">Landsat — USGS / NASA</h2>
+<p><strong>Landsat</strong> is the longest-running Earth observation satellite program, continuously collecting multispectral imagery since 1972. Operated jointly by USGS and NASA, the program provides a free and open archive essential for long-term land surface change analysis.</p>
+<p><strong>Current sensors:</strong> Landsat 8 OLI/TIRS · Landsat 9 OLI-2/TIRS-2 <strong>Spatial resolution:</strong> 30 m (multispectral) · 15 m (panchromatic) · 100 m (thermal) <strong>Temporal resolution:</strong> 16-day revisit per satellite (~8 days combined) <strong>Spectral bands:</strong> Coastal/aerosol, Blue, Green, Red, NIR, SWIR1, SWIR2, Panchromatic, Thermal <strong>Coverage:</strong> Global, continuous since 1972 <strong>Key applications:</strong> Land cover change, deforestation, urban expansion, agricultural monitoring, wildfire burn severity, surface temperature</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -389,7 +369,45 @@ Note
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>More projects and reproducible notebooks will be added here over time.</p>
+<p>Landsat data are freely available through <a href="https://earthexplorer.usgs.gov">USGS EarthExplorer</a> and <a href="https://earthengine.google.com">Google Earth Engine</a>.</p>
+</div>
+</div>
+<hr>
+</section>
+<section id="sentinel-2-esa-copernicus" class="level2">
+<h2 class="anchored" data-anchor-id="sentinel-2-esa-copernicus">Sentinel-2 — ESA Copernicus</h2>
+<p><strong>Sentinel-2</strong> is a high-resolution multispectral mission from the European Space Agency (ESA) under the Copernicus Earth Observation Programme. Its combination of high spatial resolution, frequent revisit time, and free data access has made it one of the most widely used satellites in vegetation and land surface research.</p>
+<p><strong>Sensors:</strong> MultiSpectral Instrument (MSI) — Sentinel-2A and Sentinel-2B <strong>Spatial resolution:</strong> 10 m (B2, B3, B4, B8) · 20 m (B5, B6, B7, B8A, B11, B12) · 60 m (B1, B9, B10) <strong>Temporal resolution:</strong> ~5-day revisit (combined twin satellites) <strong>Spectral bands:</strong> 13 bands from visible to SWIR, including red-edge bands for vegetation analysis <strong>Coverage:</strong> Global land surface <strong>Key applications:</strong> Forest canopy health, LAI estimation, crop monitoring, urban green space mapping, water body detection</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Sentinel-2 data are freely available through the <a href="https://dataspace.copernicus.eu">Copernicus Data Space</a> and <a href="https://earthengine.google.com">Google Earth Engine</a>.</p>
+</div>
+</div>
+<hr>
+</section>
+<section id="sentinel-1-esa-copernicus-sar" class="level2">
+<h2 class="anchored" data-anchor-id="sentinel-1-esa-copernicus-sar">Sentinel-1 — ESA Copernicus (SAR)</h2>
+<p><strong>Sentinel-1</strong> provides C-band Synthetic Aperture Radar (SAR) imagery, enabling cloud-penetrating, day-and-night observations of land and ocean surfaces.</p>
+<p><strong>Sensor:</strong> C-band SAR (5.405 GHz) <strong>Spatial resolution:</strong> 5 m × 20 m (IW mode, standard) <strong>Temporal resolution:</strong> ~6-day revisit (combined) <strong>Polarizations:</strong> VV, VH, HH, HV <strong>Key applications:</strong> Forest above-ground biomass, flood mapping, soil moisture, ice monitoring, subsidence detection</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Sentinel-1 data are freely available through the <a href="https://dataspace.copernicus.eu">Copernicus Data Space</a> and <a href="https://earthengine.google.com">Google Earth Engine</a>.</p>
 </div>
 </div>
 
