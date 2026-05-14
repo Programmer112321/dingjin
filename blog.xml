@@ -149,7 +149,7 @@ font-style: inherit;">library</span>(scales)</span></code></pre></div></div>
 </div>
 <hr>
 </section>
-<section id="step-1-define-two-study-areas" class="level2 page-columns page-full">
+<section id="step-1-define-two-study-areas" class="level2">
 <h2 class="anchored" data-anchor-id="step-1-define-two-study-areas">Step 1 — Define Two Study Areas</h2>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1">scbi <span class="ot" style="color: #003B4F;
@@ -264,9 +264,11 @@ font-style: inherit;">st_as_sf</span>()</span>
 <span id="cb3-17">}</span></code></pre></div></div>
 </div>
 <p>The map below shows GEDI orbital track coverage (green lines) and both study areas (red bounding boxes). Ascending (SW→NE) and descending (NW→SE) passes cross due to the ISS orbital inclination of ~51.6°.</p>
-<div class="column-page">
-<iframe src="fig_track_map.html" width="100%" height="500px" style="border: 1px solid #dee2e6; border-radius: 6px; margin: 0.5rem 0;" frameborder="0">
-</iframe>
+<div class="cell">
+<div class="cell-output-display">
+<div class="leaflet html-widget html-fill-item" id="htmlwidget-ada6e4cdd83cbc326245" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-ada6e4cdd83cbc326245">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}},"zoomControl":true},"calls":[{"method":"addProviderTiles","args":["OpenStreetMap",null,null,{"errorTileUrl":"","noWrap":false,"detectRetina":false}]},{"method":"addPolylines","args":[[[[{"lng":[-82.92500000000001,-73.92500000000001],"lat":[34.50136972453093,43.29863027546907]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-82.92500000000001,-73.92500000000001],"lat":[43.29863027546907,34.50136972453093]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-82.87,-73.87],"lat":[34.50136972453093,43.29863027546907]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-82.87,-73.87],"lat":[43.29863027546907,34.50136972453093]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-82.81500000000001,-73.81500000000001],"lat":[34.50136972453093,43.29863027546907]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-82.81500000000001,-73.81500000000001],"lat":[43.29863027546907,34.50136972453093]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-82.76000000000001,-73.76000000000001],"lat":[34.50136972453093,43.29863027546907]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-82.76000000000001,-73.76000000000001],"lat":[43.29863027546907,34.50136972453093]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-82.70500000000001,-73.70500000000001],"lat":[34.50136972453093,43.29863027546907]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-82.70500000000001,-73.70500000000001],"lat":[43.29863027546907,34.50136972453093]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-82.65000000000001,-73.65000000000001],"lat":[34.50136972453093,43.29863027546907]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-82.65000000000001,-73.65000000000001],"lat":[43.29863027546907,34.50136972453093]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-82.595,-73.595],"lat":[34.50136972453093,43.29863027546907]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-82.595,-73.595],"lat":[43.29863027546907,34.50136972453093]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-82.54000000000001,-73.54000000000001],"lat":[34.50136972453093,43.29863027546907]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-82.54000000000001,-73.54000000000001],"lat":[43.29863027546907,34.50136972453093]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-82.485,-73.485],"lat":[34.50136972453093,43.29863027546907]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-82.485,-73.485],"lat":[43.29863027546907,34.50136972453093]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-82.43000000000001,-73.43000000000001],"lat":[34.50136972453093,43.29863027546907]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-82.43000000000001,-73.43000000000001],"lat":[43.29863027546907,34.50136972453093]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-78.72500000000001,-69.72500000000001],"lat":[36.49485291941902,45.05514708058098]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-78.72500000000001,-69.72500000000001],"lat":[45.05514708058098,36.49485291941902]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-78.67,-69.67],"lat":[36.49485291941902,45.05514708058098]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-78.67,-69.67],"lat":[45.05514708058098,36.49485291941902]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-78.61500000000001,-69.61500000000001],"lat":[36.49485291941902,45.05514708058098]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-78.61500000000001,-69.61500000000001],"lat":[45.05514708058098,36.49485291941902]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-78.56,-69.56],"lat":[36.49485291941902,45.05514708058098]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-78.56,-69.56],"lat":[45.05514708058098,36.49485291941902]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-78.50500000000001,-69.50500000000001],"lat":[36.49485291941902,45.05514708058098]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-78.50500000000001,-69.50500000000001],"lat":[45.05514708058098,36.49485291941902]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-78.45,-69.45],"lat":[36.49485291941902,45.05514708058098]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-78.45,-69.45],"lat":[45.05514708058098,36.49485291941902]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-78.395,-69.395],"lat":[36.49485291941902,45.05514708058098]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-78.395,-69.395],"lat":[45.05514708058098,36.49485291941902]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-78.34,-69.34],"lat":[36.49485291941902,45.05514708058098]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-78.34,-69.34],"lat":[45.05514708058098,36.49485291941902]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-78.285,-69.285],"lat":[36.49485291941902,45.05514708058098]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-78.285,-69.285],"lat":[45.05514708058098,36.49485291941902]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-78.23,-69.23],"lat":[36.49485291941902,45.05514708058098]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-78.23,-69.23],"lat":[45.05514708058098,36.49485291941902]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addRectangles","args":[38.85,-78.2,38.95,-78.09999999999999,null,null,{"interactive":true,"className":"","stroke":true,"color":"red","weight":2.5,"opacity":0.5,"fill":false,"fillColor":"red","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,"NEON SCBI Study Area",{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addRectangles","args":[40.7,-74.05,40.85,-73.84999999999999,null,null,{"interactive":true,"className":"","stroke":true,"color":"red","weight":2.5,"opacity":0.5,"fill":false,"fillColor":"red","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,"Central Park / NYC Study Area",{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addMarkers","args":[38.96,-78.15000000000001,{"iconUrl":{"data":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGP6zwAAAgcBApocMXEAAAAASUVORK5CYII=","index":0},"iconWidth":1,"iconHeight":1},null,null,{"interactive":true,"draggable":false,"keyboard":true,"title":"","alt":"","zIndexOffset":0,"opacity":1,"riseOnHover":false,"riseOffset":250},null,null,null,null,"NEON SCBI",{"interactive":false,"permanent":true,"direction":"top","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"style":{"font-weight":"bold","color":"#c0392b","background":"transparent","border":"none","box-shadow":"none"},"className":"","sticky":true},null]},{"method":"addMarkers","args":[40.86,-73.95,{"iconUrl":{"data":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGP6zwAAAgcBApocMXEAAAAASUVORK5CYII=","index":0},"iconWidth":1,"iconHeight":1},null,null,{"interactive":true,"draggable":false,"keyboard":true,"title":"","alt":"","zIndexOffset":0,"opacity":1,"riseOnHover":false,"riseOffset":250},null,null,null,null,"Central Park / NYC",{"interactive":false,"permanent":true,"direction":"top","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"style":{"font-weight":"bold","color":"#c0392b","background":"transparent","border":"none","box-shadow":"none"},"className":"","sticky":true},null]},{"method":"addLegend","args":[{"colors":["#1a7a1a","red"],"labels":["GEDI Orbital Tracks","Study Area"],"na_color":null,"na_label":"NA","opacity":1,"position":"bottomleft","type":"unknown","title":"GEDI L2A Coverage","extra":null,"layerId":null,"className":"info legend","group":null}]}],"limits":{"lat":[34.50136972453093,45.05514708058098],"lng":[-82.92500000000001,-69.23]},"setView":[[39.9,-76],6,[]]},"evals":[],"jsHooks":[]}</script>
+</div>
 </div>
 <hr>
 </section>
@@ -1272,7 +1274,7 @@ font-style: inherit;">library</span>(scales)</span></code></pre></div></div>
 </div>
 <hr>
 </section>
-<section id="step-1-define-two-study-areas" class="level2 page-columns page-full">
+<section id="step-1-define-two-study-areas" class="level2">
 <h2 class="anchored" data-anchor-id="step-1-define-two-study-areas">Step 1 — Define Two Study Areas</h2>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><span class="co" style="color: #5E5E5E;
@@ -1392,128 +1394,41 @@ background-color: null;
 font-style: inherit;">st_as_sf</span>()</span>
 <span id="cb3-19">}</span></code></pre></div></div>
 </div>
-<p>The map below shows the actual GEDI orbital track coverage (green lines) over both study areas (red bounding boxes). Each line represents one ISS orbital pass; ascending (SW→NE) and descending (NW→SE) passes cross each other due to the ISS orbital inclination of ~51.6°.</p>
-<div class="column-page">
-<iframe src="fig_track_map.html" width="100%" height="500px" style="border: 1px solid #dee2e6; border-radius: 6px; margin: 0.5rem 0;" frameborder="0">
-</iframe>
-</div>
+<p>The map below shows the GEDI orbital track coverage (green lines) over both study areas (red bounding boxes). Ascending (SW→NE) and descending (NW→SE) passes cross due to the ISS orbital inclination of ~51.6°.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># Interactive overview map</span></span>
-<span id="cb4-2"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">leaflet</span>() <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">|&gt;</span></span>
-<span id="cb4-3">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">addProviderTiles</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Esri.WorldImagery"</span>) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">|&gt;</span></span>
-<span id="cb4-4">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">addPolygons</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">data =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">region_to_sf</span>(scbi), <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">color =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"#2d6a4f"</span>,</span>
-<span id="cb4-5">              <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">weight =</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">2</span>, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">fillOpacity =</span> <span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">0.15</span>, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">label =</span> scbi<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">$</span>name) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">|&gt;</span></span>
-<span id="cb4-6">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">addPolygons</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">data =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">region_to_sf</span>(nyc),  <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">color =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"#e63946"</span>,</span>
-<span id="cb4-7">              <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">weight =</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">2</span>, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">fillOpacity =</span> <span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">0.15</span>, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">label =</span> nyc<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">$</span>name) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">|&gt;</span></span>
-<span id="cb4-8">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">addScaleBar</span>() <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">|&gt;</span></span>
-<span id="cb4-9">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">fitBounds</span>(<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">78.20</span>, <span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">38.85</span>, <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">73.85</span>, <span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">40.85</span>)</span></code></pre></div></div>
+<div class="cell-output-display">
+<div class="leaflet html-widget html-fill-item" id="htmlwidget-a7dc01275c42d5dd9867" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-a7dc01275c42d5dd9867">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}},"zoomControl":true},"calls":[{"method":"addProviderTiles","args":["OpenStreetMap",null,null,{"errorTileUrl":"","noWrap":false,"detectRetina":false}]},{"method":"addPolylines","args":[[[[{"lng":[-82.92500000000001,-73.92500000000001],"lat":[34.50136972453093,43.29863027546907]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-82.92500000000001,-73.92500000000001],"lat":[43.29863027546907,34.50136972453093]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-82.87,-73.87],"lat":[34.50136972453093,43.29863027546907]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-82.87,-73.87],"lat":[43.29863027546907,34.50136972453093]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-82.81500000000001,-73.81500000000001],"lat":[34.50136972453093,43.29863027546907]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-82.81500000000001,-73.81500000000001],"lat":[43.29863027546907,34.50136972453093]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-82.76000000000001,-73.76000000000001],"lat":[34.50136972453093,43.29863027546907]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-82.76000000000001,-73.76000000000001],"lat":[43.29863027546907,34.50136972453093]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-82.70500000000001,-73.70500000000001],"lat":[34.50136972453093,43.29863027546907]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-82.70500000000001,-73.70500000000001],"lat":[43.29863027546907,34.50136972453093]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-82.65000000000001,-73.65000000000001],"lat":[34.50136972453093,43.29863027546907]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-82.65000000000001,-73.65000000000001],"lat":[43.29863027546907,34.50136972453093]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-82.595,-73.595],"lat":[34.50136972453093,43.29863027546907]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-82.595,-73.595],"lat":[43.29863027546907,34.50136972453093]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-82.54000000000001,-73.54000000000001],"lat":[34.50136972453093,43.29863027546907]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-82.54000000000001,-73.54000000000001],"lat":[43.29863027546907,34.50136972453093]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-82.485,-73.485],"lat":[34.50136972453093,43.29863027546907]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-82.485,-73.485],"lat":[43.29863027546907,34.50136972453093]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-82.43000000000001,-73.43000000000001],"lat":[34.50136972453093,43.29863027546907]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-82.43000000000001,-73.43000000000001],"lat":[43.29863027546907,34.50136972453093]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-78.72500000000001,-69.72500000000001],"lat":[36.49485291941902,45.05514708058098]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-78.72500000000001,-69.72500000000001],"lat":[45.05514708058098,36.49485291941902]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-78.67,-69.67],"lat":[36.49485291941902,45.05514708058098]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-78.67,-69.67],"lat":[45.05514708058098,36.49485291941902]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-78.61500000000001,-69.61500000000001],"lat":[36.49485291941902,45.05514708058098]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-78.61500000000001,-69.61500000000001],"lat":[45.05514708058098,36.49485291941902]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-78.56,-69.56],"lat":[36.49485291941902,45.05514708058098]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-78.56,-69.56],"lat":[45.05514708058098,36.49485291941902]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-78.50500000000001,-69.50500000000001],"lat":[36.49485291941902,45.05514708058098]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-78.50500000000001,-69.50500000000001],"lat":[45.05514708058098,36.49485291941902]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-78.45,-69.45],"lat":[36.49485291941902,45.05514708058098]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-78.45,-69.45],"lat":[45.05514708058098,36.49485291941902]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-78.395,-69.395],"lat":[36.49485291941902,45.05514708058098]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-78.395,-69.395],"lat":[45.05514708058098,36.49485291941902]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-78.34,-69.34],"lat":[36.49485291941902,45.05514708058098]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-78.34,-69.34],"lat":[45.05514708058098,36.49485291941902]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-78.285,-69.285],"lat":[36.49485291941902,45.05514708058098]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-78.285,-69.285],"lat":[45.05514708058098,36.49485291941902]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-78.23,-69.23],"lat":[36.49485291941902,45.05514708058098]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolylines","args":[[[[{"lng":[-78.23,-69.23],"lat":[45.05514708058098,36.49485291941902]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#1a7a1a","weight":1.5,"opacity":0.75,"fill":false,"fillColor":"#1a7a1a","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addRectangles","args":[38.85,-78.2,38.95,-78.09999999999999,null,null,{"interactive":true,"className":"","stroke":true,"color":"red","weight":2.5,"opacity":0.5,"fill":false,"fillColor":"red","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,"NEON SCBI Study Area",{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addRectangles","args":[40.7,-74.05,40.85,-73.84999999999999,null,null,{"interactive":true,"className":"","stroke":true,"color":"red","weight":2.5,"opacity":0.5,"fill":false,"fillColor":"red","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,"Central Park / NYC Study Area",{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addMarkers","args":[38.96,-78.15000000000001,{"iconUrl":{"data":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGP6zwAAAgcBApocMXEAAAAASUVORK5CYII=","index":0},"iconWidth":1,"iconHeight":1},null,null,{"interactive":true,"draggable":false,"keyboard":true,"title":"","alt":"","zIndexOffset":0,"opacity":1,"riseOnHover":false,"riseOffset":250},null,null,null,null,"NEON SCBI",{"interactive":false,"permanent":true,"direction":"top","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"style":{"font-weight":"bold","color":"#c0392b","background":"transparent","border":"none","box-shadow":"none"},"className":"","sticky":true},null]},{"method":"addMarkers","args":[40.86,-73.95,{"iconUrl":{"data":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGP6zwAAAgcBApocMXEAAAAASUVORK5CYII=","index":0},"iconWidth":1,"iconHeight":1},null,null,{"interactive":true,"draggable":false,"keyboard":true,"title":"","alt":"","zIndexOffset":0,"opacity":1,"riseOnHover":false,"riseOffset":250},null,null,null,null,"Central Park / NYC",{"interactive":false,"permanent":true,"direction":"top","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"style":{"font-weight":"bold","color":"#c0392b","background":"transparent","border":"none","box-shadow":"none"},"className":"","sticky":true},null]},{"method":"addLegend","args":[{"colors":["#1a7a1a","red"],"labels":["GEDI Orbital Tracks","Study Area"],"na_color":null,"na_label":"NA","opacity":1,"position":"bottomleft","type":"unknown","title":"GEDI L4A Coverage","extra":null,"layerId":null,"className":"info legend","group":null}]}],"limits":{"lat":[34.50136972453093,45.05514708058098],"lng":[-82.92500000000001,-69.23]},"setView":[[39.9,-76],6,[]]},"evals":[],"jsHooks":[]}</script>
+</div>
 </div>
 <hr>
 </section>
 <section id="step-2-find-gedi-l4a-granules" class="level2">
 <h2 class="anchored" data-anchor-id="step-2-find-gedi-l4a-granules">Step 2 — Find GEDI L4A Granules</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><span class="fu" style="color: #4758AB;
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">library</span>(httr); <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">library</span>(jsonlite)</span>
-<span id="cb5-2"></span>
-<span id="cb5-3">gedi_finder <span class="ot" style="color: #003B4F;
+<span id="cb4-2"></span>
+<span id="cb4-3">gedi_finder <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">function</span>(r) {</span>
-<span id="cb5-4">  url  <span class="ot" style="color: #003B4F;
+<span id="cb4-4">  url  <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">paste0</span>(<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"https://lpdaacsvc.cr.usgs.gov/services/gedifinder"</span>,</span>
-<span id="cb5-5">                 <span class="st" style="color: #20794D;
+<span id="cb4-5">                 <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"?product=GEDI04_A&amp;version=002"</span>,</span>
-<span id="cb5-6">                 <span class="st" style="color: #20794D;
+<span id="cb4-6">                 <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"&amp;bbox="</span>, r<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -1522,7 +1437,7 @@ background-color: null;
 font-style: inherit;">","</span>, r<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>lat_min,</span>
-<span id="cb5-7">                 <span class="st" style="color: #20794D;
+<span id="cb4-7">                 <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">","</span>,      r<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -1531,7 +1446,7 @@ background-color: null;
 font-style: inherit;">","</span>, r<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>lat_max)</span>
-<span id="cb5-8">  <span class="fu" style="color: #4758AB;
+<span id="cb4-8">  <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">fromJSON</span>(<span class="fu" style="color: #4758AB;
 background-color: null;
@@ -1542,20 +1457,20 @@ background-color: null;
 font-style: inherit;">"text"</span>))<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>data</span>
-<span id="cb5-9">}</span>
-<span id="cb5-10"></span>
-<span id="cb5-11">scbi_granules <span class="ot" style="color: #003B4F;
+<span id="cb4-9">}</span>
+<span id="cb4-10"></span>
+<span id="cb4-11">scbi_granules <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">gedi_finder</span>(scbi)</span>
-<span id="cb5-12">nyc_granules  <span class="ot" style="color: #003B4F;
+<span id="cb4-12">nyc_granules  <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">gedi_finder</span>(nyc)</span>
-<span id="cb5-13"></span>
-<span id="cb5-14"><span class="fu" style="color: #4758AB;
+<span id="cb4-13"></span>
+<span id="cb4-14"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">cat</span>(<span class="st" style="color: #20794D;
 background-color: null;
@@ -1568,7 +1483,7 @@ background-color: null;
 font-style: inherit;">\n</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"</span>)</span>
-<span id="cb5-15"><span class="fu" style="color: #4758AB;
+<span id="cb4-15"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">cat</span>(<span class="st" style="color: #20794D;
 background-color: null;
@@ -1588,10 +1503,10 @@ font-style: inherit;">"</span>)</span></code></pre></div></div>
 <h2 class="anchored" data-anchor-id="step-3-download-granules">Step 3 — Download Granules</h2>
 <p>Requires a free <strong>NASA EarthData</strong> account (<a href="https://urs.earthdata.nasa.gov">urs.earthdata.nasa.gov</a>).</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><span class="fu" style="color: #4758AB;
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">library</span>(rGEDI)</span>
-<span id="cb6-2"><span class="fu" style="color: #4758AB;
+<span id="cb5-2"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">gediDownload</span>(<span class="at" style="color: #657422;
 background-color: null;
@@ -1600,7 +1515,7 @@ background-color: null;
 font-style: inherit;">outdir =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"data/gedi_scbi"</span>)</span>
-<span id="cb6-3"><span class="fu" style="color: #4758AB;
+<span id="cb5-3"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">gediDownload</span>(<span class="at" style="color: #657422;
 background-color: null;
@@ -1619,13 +1534,13 @@ font-style: inherit;">"data/gedi_nyc"</span>)</span></code></pre></div></div>
 <h2 class="anchored" data-anchor-id="step-4-read-and-extract-agbd-from-hdf5">Step 4 — Read and Extract AGBD from HDF5</h2>
 <p>GEDI L4A files are HDF5 with 8 beam groups. This function loops all beams and clips to the bounding box:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1">extract_gedi_l4a <span class="ot" style="color: #003B4F;
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1">extract_gedi_l4a <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">function</span>(h5_path, region) {</span>
-<span id="cb7-2">  h5    <span class="ot" style="color: #003B4F;
+<span id="cb6-2">  h5    <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> H5File<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -1636,7 +1551,7 @@ background-color: null;
 font-style: inherit;">mode =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"r"</span>)</span>
-<span id="cb7-3">  beams <span class="ot" style="color: #003B4F;
+<span id="cb6-3">  beams <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -1649,7 +1564,7 @@ background-color: null;
 font-style: inherit;">"BEAM0010"</span>,<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"BEAM0011"</span>,</span>
-<span id="cb7-4">             <span class="st" style="color: #20794D;
+<span id="cb6-4">             <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"BEAM0101"</span>,<span class="st" style="color: #20794D;
 background-color: null;
@@ -1658,8 +1573,8 @@ background-color: null;
 font-style: inherit;">"BEAM1000"</span>,<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"BEAM1011"</span>)</span>
-<span id="cb7-5"></span>
-<span id="cb7-6">  results <span class="ot" style="color: #003B4F;
+<span id="cb6-5"></span>
+<span id="cb6-6">  results <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -1667,7 +1582,7 @@ font-style: inherit;">lapply</span>(beams, <span class="cf" style="color: #003B4
 background-color: null;
 font-weight: bold;
 font-style: inherit;">function</span>(beam) {</span>
-<span id="cb7-7">    <span class="cf" style="color: #003B4F;
+<span id="cb6-7">    <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">if</span> (<span class="sc" style="color: #5E5E5E;
@@ -1681,55 +1596,55 @@ background-color: null;
 font-style: inherit;">return</span>(<span class="cn" style="color: #8f5902;
 background-color: null;
 font-style: inherit;">NULL</span>)</span>
-<span id="cb7-8">    <span class="fu" style="color: #4758AB;
+<span id="cb6-8">    <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">tryCatch</span>({</span>
-<span id="cb7-9">      b <span class="ot" style="color: #003B4F;
+<span id="cb6-9">      b <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> h5[[beam]]</span>
-<span id="cb7-10">      <span class="fu" style="color: #4758AB;
+<span id="cb6-10">      <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">data.frame</span>(</span>
-<span id="cb7-11">        <span class="at" style="color: #657422;
+<span id="cb6-11">        <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">lon        =</span> b[[<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"lon_lowestmode"</span>]][],</span>
-<span id="cb7-12">        <span class="at" style="color: #657422;
+<span id="cb6-12">        <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">lat        =</span> b[[<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"lat_lowestmode"</span>]][],</span>
-<span id="cb7-13">        <span class="at" style="color: #657422;
+<span id="cb6-13">        <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">agbd       =</span> b[[<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"agbd"</span>]][],</span>
-<span id="cb7-14">        <span class="at" style="color: #657422;
+<span id="cb6-14">        <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">agbd_lower =</span> b[[<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"agbd_pi_lower"</span>]][],</span>
-<span id="cb7-15">        <span class="at" style="color: #657422;
+<span id="cb6-15">        <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">agbd_upper =</span> b[[<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"agbd_pi_upper"</span>]][],</span>
-<span id="cb7-16">        <span class="at" style="color: #657422;
+<span id="cb6-16">        <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">quality    =</span> b[[<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"l4_quality_flag"</span>]][],</span>
-<span id="cb7-17">        <span class="at" style="color: #657422;
+<span id="cb6-17">        <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">degrade    =</span> b[[<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"degrade_flag"</span>]][],</span>
-<span id="cb7-18">        <span class="at" style="color: #657422;
+<span id="cb6-18">        <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">beam       =</span> beam</span>
-<span id="cb7-19">      )</span>
-<span id="cb7-20">    }, <span class="at" style="color: #657422;
+<span id="cb6-19">      )</span>
+<span id="cb6-20">    }, <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">error =</span> <span class="cf" style="color: #003B4F;
 background-color: null;
@@ -1737,19 +1652,19 @@ font-weight: bold;
 font-style: inherit;">function</span>(e) <span class="cn" style="color: #8f5902;
 background-color: null;
 font-style: inherit;">NULL</span>)</span>
-<span id="cb7-21">  })</span>
-<span id="cb7-22">  h5<span class="sc" style="color: #5E5E5E;
+<span id="cb6-21">  })</span>
+<span id="cb6-22">  h5<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">close_all</span>()</span>
-<span id="cb7-23"></span>
-<span id="cb7-24">  <span class="fu" style="color: #4758AB;
+<span id="cb6-23"></span>
+<span id="cb6-24">  <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">bind_rows</span>(results) <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">|&gt;</span></span>
-<span id="cb7-25">    <span class="fu" style="color: #4758AB;
+<span id="cb6-25">    <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">filter</span>(lon <span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -1760,7 +1675,7 @@ background-color: null;
 font-style: inherit;">&lt;=</span> region<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>lon_max,</span>
-<span id="cb7-26">           lat <span class="sc" style="color: #5E5E5E;
+<span id="cb6-26">           lat <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">&gt;=</span> region<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -1769,9 +1684,9 @@ background-color: null;
 font-style: inherit;">&lt;=</span> region<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>lat_max)</span>
-<span id="cb7-27">}</span>
-<span id="cb7-28"></span>
-<span id="cb7-29">scbi_raw <span class="ot" style="color: #003B4F;
+<span id="cb6-27">}</span>
+<span id="cb6-28"></span>
+<span id="cb6-29">scbi_raw <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -1790,7 +1705,7 @@ background-color: null;
 font-style: inherit;">TRUE</span>) <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">|&gt;</span></span>
-<span id="cb7-30">  <span class="fu" style="color: #4758AB;
+<span id="cb6-30">  <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">lapply</span>(extract_gedi_l4a, <span class="at" style="color: #657422;
 background-color: null;
@@ -1799,8 +1714,8 @@ background-color: null;
 font-style: inherit;">|&gt;</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">bind_rows</span>()</span>
-<span id="cb7-31"></span>
-<span id="cb7-32">nyc_raw  <span class="ot" style="color: #003B4F;
+<span id="cb6-31"></span>
+<span id="cb6-32">nyc_raw  <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -1819,7 +1734,7 @@ background-color: null;
 font-style: inherit;">TRUE</span>) <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">|&gt;</span></span>
-<span id="cb7-33">  <span class="fu" style="color: #4758AB;
+<span id="cb6-33">  <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">lapply</span>(extract_gedi_l4a, <span class="at" style="color: #657422;
 background-color: null;
@@ -1834,13 +1749,13 @@ font-style: inherit;">bind_rows</span>()</span></code></pre></div></div>
 <section id="step-5-quality-filtering" class="level2">
 <h2 class="anchored" data-anchor-id="step-5-quality-filtering">Step 5 — Quality Filtering</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1">quality_filter <span class="ot" style="color: #003B4F;
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1">quality_filter <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">function</span>(df) {</span>
-<span id="cb8-2">  df <span class="sc" style="color: #5E5E5E;
+<span id="cb7-2">  df <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">|&gt;</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -1861,14 +1776,14 @@ background-color: null;
 font-style: inherit;">&lt;</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1000</span>)</span>
-<span id="cb8-3">}</span>
-<span id="cb8-4"></span>
-<span id="cb8-5">scbi_clean <span class="ot" style="color: #003B4F;
+<span id="cb7-3">}</span>
+<span id="cb7-4"></span>
+<span id="cb7-5">scbi_clean <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">quality_filter</span>(scbi_raw)</span>
-<span id="cb8-6">nyc_clean  <span class="ot" style="color: #003B4F;
+<span id="cb7-6">nyc_clean  <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -1927,19 +1842,19 @@ font-style: inherit;">quality_filter</span>(nyc_raw)</span></code></pre></div></
 <h3 class="anchored" data-anchor-id="nyc-detail-central-park-vs-urban-surroundings">NYC Detail — Central Park vs Urban Surroundings</h3>
 <p>GEDI footprints are classified by whether they fall inside the Central Park boundary (~-73.981 to -73.949 lon, 40.764 to 40.800 lat):</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1">nyc_labeled <span class="ot" style="color: #003B4F;
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1">nyc_labeled <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> nyc_clean <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">|&gt;</span></span>
-<span id="cb9-2">  <span class="fu" style="color: #4758AB;
+<span id="cb8-2">  <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">mutate</span>(<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">land_type =</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">ifelse</span>(</span>
-<span id="cb9-3">    lon <span class="sc" style="color: #5E5E5E;
+<span id="cb8-3">    lon <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">&gt;=</span> <span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -1966,12 +1881,12 @@ background-color: null;
 font-style: inherit;">&lt;=</span> <span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">40.800</span>,</span>
-<span id="cb9-4">    <span class="st" style="color: #20794D;
+<span id="cb8-4">    <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"Central Park (Green Space)"</span>, <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"Urban Surroundings"</span></span>
-<span id="cb9-5">  ))</span></code></pre></div></div>
+<span id="cb8-5">  ))</span></code></pre></div></div>
 </div>
 <img src="https://Programmer112321.github.io/dingjin/posts/gedi-l4a/fig_nyc_detail.png" style="width:100%; border-radius:6px; margin: 0.5rem 0;">
 <hr>
@@ -2048,7 +1963,7 @@ font-style: inherit;">"Urban Surroundings"</span></span>
 <section id="step-6-rasterize-to-500-m-grid" class="level2">
 <h2 class="anchored" data-anchor-id="step-6-rasterize-to-500-m-grid">Step 6 — Rasterize to 500 m Grid</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1">rasterize_agbd <span class="ot" style="color: #003B4F;
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1">rasterize_agbd <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
 background-color: null;
@@ -2058,7 +1973,7 @@ background-color: null;
 font-style: inherit;">res =</span> <span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0.0045</span>) {</span>
-<span id="cb10-2">  r_tmpl <span class="ot" style="color: #003B4F;
+<span id="cb9-2">  r_tmpl <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -2071,7 +1986,7 @@ background-color: null;
 font-style: inherit;">xmax =</span> region<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>lon_max,</span>
-<span id="cb10-3">                 <span class="at" style="color: #657422;
+<span id="cb9-3">                 <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">ymin =</span> region<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -2080,14 +1995,14 @@ background-color: null;
 font-style: inherit;">ymax =</span> region<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>lat_max,</span>
-<span id="cb10-4">                 <span class="at" style="color: #657422;
+<span id="cb9-4">                 <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">resolution =</span> res, <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">crs =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"EPSG:4326"</span>)</span>
-<span id="cb10-5">  <span class="fu" style="color: #4758AB;
+<span id="cb9-5">  <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">vect</span>(df, <span class="at" style="color: #657422;
 background-color: null;
@@ -2104,7 +2019,7 @@ background-color: null;
 font-style: inherit;">"EPSG:4326"</span>) <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">|&gt;</span></span>
-<span id="cb10-6">    <span class="fu" style="color: #4758AB;
+<span id="cb9-6">    <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">rasterize</span>(r_tmpl, <span class="at" style="color: #657422;
 background-color: null;
@@ -2115,20 +2030,20 @@ background-color: null;
 font-style: inherit;">fun =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"mean"</span>)</span>
-<span id="cb10-7">}</span>
-<span id="cb10-8"></span>
-<span id="cb10-9">r_scbi <span class="ot" style="color: #003B4F;
+<span id="cb9-7">}</span>
+<span id="cb9-8"></span>
+<span id="cb9-9">r_scbi <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">rasterize_agbd</span>(scbi_clean, scbi)</span>
-<span id="cb10-10">r_nyc  <span class="ot" style="color: #003B4F;
+<span id="cb9-10">r_nyc  <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">rasterize_agbd</span>(nyc_clean,  nyc)</span>
-<span id="cb10-11"></span>
-<span id="cb10-12"><span class="fu" style="color: #4758AB;
+<span id="cb9-11"></span>
+<span id="cb9-12"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">par</span>(<span class="at" style="color: #657422;
 background-color: null;
@@ -2139,7 +2054,7 @@ background-color: null;
 font-style: inherit;">1</span>, <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">2</span>))</span>
-<span id="cb10-13"><span class="fu" style="color: #4758AB;
+<span id="cb9-13"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">plot</span>(r_scbi, <span class="at" style="color: #657422;
 background-color: null;
@@ -2150,7 +2065,7 @@ background-color: null;
 font-style: inherit;">100</span>, <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"viridis"</span>),</span>
-<span id="cb10-14">     <span class="at" style="color: #657422;
+<span id="cb9-14">     <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">main =</span> <span class="st" style="color: #20794D;
 background-color: null;
@@ -2163,7 +2078,7 @@ background-color: null;
 font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">400</span>))</span>
-<span id="cb10-15"><span class="fu" style="color: #4758AB;
+<span id="cb9-15"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">plot</span>(r_nyc,  <span class="at" style="color: #657422;
 background-color: null;
@@ -2174,7 +2089,7 @@ background-color: null;
 font-style: inherit;">100</span>, <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"viridis"</span>),</span>
-<span id="cb10-16">     <span class="at" style="color: #657422;
+<span id="cb9-16">     <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">main =</span> <span class="st" style="color: #20794D;
 background-color: null;
@@ -2187,7 +2102,7 @@ background-color: null;
 font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">200</span>))</span>
-<span id="cb10-17"><span class="fu" style="color: #4758AB;
+<span id="cb9-17"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">par</span>(<span class="at" style="color: #657422;
 background-color: null;
