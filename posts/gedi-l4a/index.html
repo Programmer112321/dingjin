@@ -368,7 +368,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <!-- margin-sidebar -->
     
 <!-- main -->
-<main class="content" id="quarto-document-content">
+<main class="content page-columns page-full" id="quarto-document-content">
 
 
 <header id="title-block-header" class="quarto-title-block default">
@@ -454,7 +454,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <hr>
 </section>
-<section id="step-1-define-two-study-areas" class="level2">
+<section id="step-1-define-two-study-areas" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="step-1-define-two-study-areas">Step 1 — Define Two Study Areas</h2>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ── Region 1: NEON SCBI, Front Royal, VA ─────────────────────────────────</span></span>
@@ -476,6 +476,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>            <span class="at">xmax =</span> r<span class="sc">$</span>lon_max, <span class="at">ymax =</span> r<span class="sc">$</span>lat_max),</span>
 <span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>          <span class="at">crs =</span> <span class="dv">4326</span>) <span class="sc">|&gt;</span> <span class="fu">st_as_sfc</span>() <span class="sc">|&gt;</span> <span class="fu">st_as_sf</span>()</span>
 <span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>The map below shows the actual GEDI orbital track coverage (green lines) over both study areas (red bounding boxes). Each line represents one ISS orbital pass; ascending (SW→NE) and descending (NW→SE) passes cross each other due to the ISS orbital inclination of ~51.6°.</p>
+<div class="column-page">
+<iframe src="fig_track_map.html" width="100%" height="500px" style="border: 1px solid #dee2e6; border-radius: 6px; margin: 0.5rem 0;" frameborder="0">
+</iframe>
 </div>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Interactive overview map</span></span>

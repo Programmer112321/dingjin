@@ -106,7 +106,7 @@ font-style: inherit;">library</span>(scales)</span></code></pre></div></div>
 </div>
 <hr>
 </section>
-<section id="step-1-define-two-study-areas" class="level2">
+<section id="step-1-define-two-study-areas" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="step-1-define-two-study-areas">Step 1 — Define Two Study Areas</h2>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><span class="co" style="color: #5E5E5E;
@@ -225,6 +225,11 @@ font-style: inherit;">|&gt;</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">st_as_sf</span>()</span>
 <span id="cb3-19">}</span></code></pre></div></div>
+</div>
+<p>The map below shows the actual GEDI orbital track coverage (green lines) over both study areas (red bounding boxes). Each line represents one ISS orbital pass; ascending (SW→NE) and descending (NW→SE) passes cross each other due to the ISS orbital inclination of ~51.6°.</p>
+<div class="column-page">
+<iframe src="fig_track_map.html" width="100%" height="500px" style="border: 1px solid #dee2e6; border-radius: 6px; margin: 0.5rem 0;" frameborder="0">
+</iframe>
 </div>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><span class="co" style="color: #5E5E5E;
