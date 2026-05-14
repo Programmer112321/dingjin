@@ -95,35 +95,35 @@ font-style: inherit;">library</span>(viridis)</span></code></pre></div></div>
 </section>
 <section id="step-1-define-study-area" class="level2">
 <h2 class="anchored" data-anchor-id="step-1-define-study-area">Step 1 — Define Study Area</h2>
-<p>We use a small bounding box over the <strong>Ouachita National Forest</strong> in Arkansas/Oklahoma — a mixed pine-hardwood forest with substantial biomass.</p>
+<p>We use a small bounding box over the <strong>NEON SCBI site</strong> (Smithsonian Conservation Biology Institute) in Front Royal, Virginia — a temperate deciduous forest dominated by tulip poplar, oak, and hickory with high above-ground biomass stocks. SCBI is one of NEON’s core terrestrial sites and has extensive co-located field inventory data, making it ideal for GEDI validation.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;"># Bounding box: Ouachita National Forest, AR/OK</span></span>
+font-style: inherit;"># Bounding box: NEON SCBI — Smithsonian Conservation Biology Institute, VA</span></span>
 <span id="cb3-2">lon_min <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
 background-color: null;
-font-style: inherit;">94.5</span></span>
+font-style: inherit;">78.20</span></span>
 <span id="cb3-3">lat_min <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fl" style="color: #AD0000;
 background-color: null;
-font-style: inherit;">34.5</span></span>
+font-style: inherit;">38.85</span></span>
 <span id="cb3-4">lon_max <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
 background-color: null;
-font-style: inherit;">94.0</span></span>
+font-style: inherit;">78.10</span></span>
 <span id="cb3-5">lat_max <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fl" style="color: #AD0000;
 background-color: null;
-font-style: inherit;">35.0</span></span>
+font-style: inherit;">38.95</span></span>
 <span id="cb3-6"></span>
 <span id="cb3-7">bbox <span class="ot" style="color: #003B4F;
 background-color: null;
@@ -796,7 +796,7 @@ font-style: inherit;">"Distribution of GEDI L4A AGBD"</span>,</span>
 background-color: null;
 font-style: inherit;">subtitle =</span> <span class="st" style="color: #20794D;
 background-color: null;
-font-style: inherit;">"Ouachita National Forest, AR/OK"</span>,</span>
+font-style: inherit;">"NEON SCBI — Smithsonian Conservation Biology Institute, VA"</span>,</span>
 <span id="cb9-9">    <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">x     =</span> <span class="st" style="color: #20794D;
@@ -902,7 +902,7 @@ font-style: inherit;">"GEDI L4A Above-Ground Biomass Density"</span>,</span>
 background-color: null;
 font-style: inherit;">subtitle =</span> <span class="st" style="color: #20794D;
 background-color: null;
-font-style: inherit;">"Ouachita National Forest"</span>,</span>
+font-style: inherit;">"NEON SCBI — Front Royal, Virginia"</span>,</span>
 <span id="cb10-13">    <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">x =</span> <span class="st" style="color: #20794D;
