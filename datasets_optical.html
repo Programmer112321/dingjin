@@ -410,6 +410,38 @@ Note
 <p>MODIS data are freely available through <a href="https://earthdata.nasa.gov">NASA EarthData</a> and <a href="https://earthengine.google.com">Google Earth Engine</a>.</p>
 </div>
 </div>
+<hr>
+</section>
+<section id="naip-national-agriculture-imagery-program-usda" class="level2">
+<h2 class="anchored" data-anchor-id="naip-national-agriculture-imagery-program-usda">NAIP — National Agriculture Imagery Program (USDA)</h2>
+<p><strong>NAIP</strong> (National Agriculture Imagery Program) is a high-resolution aerial imagery program operated by the USDA Farm Service Agency (FSA). It acquires leaf-on orthorectified imagery across the contiguous United States (CONUS) during agricultural growing seasons, making it one of the highest-resolution freely available datasets for land surface analysis in the US.</p>
+<p><strong>Agency:</strong> USDA Farm Service Agency (FSA) <strong>Spatial resolution:</strong> 1 m (standard) · 0.6 m (select states and years) <strong>Temporal resolution:</strong> State-level acquisition cycles, typically every 2–3 years per state <strong>Spectral bands:</strong> Red, Green, Blue (RGB) · Near-Infrared (NIR) added since 2007; some products include a 5th band (Red Edge, select years) <strong>Coverage:</strong> Contiguous United States (CONUS); acquired during peak growing season (leaf-on conditions) <strong>Format:</strong> Cloud Optimized GeoTIFF (COG); also available as tiled web services <strong>Key applications:</strong> Land cover and land use mapping, crop type identification, urban tree canopy assessment, riparian vegetation monitoring, change detection at local scale, training data for machine learning models</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Because NAIP is acquired leaf-on and at ~1 m resolution, it is widely used as high-resolution ground truth or training data for coarser satellite products (Landsat, Sentinel-2). NDVI derived from NAIP’s NIR band can resolve individual tree crowns.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>NAIP imagery is freely available through <a href="https://earthexplorer.usgs.gov">USGS EarthExplorer</a>, <a href="https://nrcs.app.box.com/v/naip">USDA Box</a>, and <a href="https://earthengine.google.com">Google Earth Engine</a> (<code>USDA/NAIP/DOQQ</code>).</p>
+</div>
+</div>
 
 
 </section>
