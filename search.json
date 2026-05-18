@@ -273,18 +273,81 @@
     "text": "Terrestrial LiDAR\nGround-based Terrestrial Laser Scanning (TLS) instruments measure three-dimensional forest or ecosystem structure at millimeter-to-centimeter resolution from fixed scan positions. TLS is the only approach that resolves individual trunk geometry, branch architecture, and leaf-level canopy structure within a plot, making it the gold standard for validating airborne and spaceborne biomass estimates.\n\n\nNEON Terrestrial LiDAR Scanning (TLS)\nNEON deploys a tripod-mounted terrestrial laser scanner at field sites across the United States as part of its standardized ecological observatory program. TLS scans are co-located with NEON woody plant vegetation structure plots and NEON AOP airborne collections, enabling direct multi-scale comparisons from individual stems to landscape.\nAgency: National Ecological Observatory Network (NEON / Battelle) Product code: DP1.10098.001 — Terrestrial Lidar Scanning Sensor: RIEGL VZ-400 or equivalent phase-based/time-of-flight scanner Scan density: Typically &gt;1,000 pts/m² within 30–50 m of scan position Coverage: 47 NEON terrestrial field sites across 20 eco-climatic domains (CONUS, Alaska, Hawaii, Puerto Rico) Temporal coverage: Ongoing from ~2017; most sites have ≥3 annual scan campaigns Key variables: 3D point cloud of plot-level forest structure; co-registered multiple scan positions per plot Key applications: Individual tree volume estimation, allometric model calibration, canopy gap fraction, validation of GEDI/ICESat-2/airborne AGB estimates, 4D change detection of tree growth and mortality\n\n\n\n\n\n\nNote\n\n\n\nNEON TLS data (DP1.10098.001) are freely available through the NEON Data Portal. The neonUtilities R package and neonstore simplify bulk download and processing.\n\n\n\n\n\nCommunity TLS Forest Benchmark Datasets\nA growing body of research groups have deposited open TLS forest datasets on Zenodo and PANGAEA as community benchmarks for testing biomass estimation, tree segmentation, and canopy modeling methods. These range from single-site campaigns to multi-continent compilations.\nNotable public deposits include:\n\n\n\n\n\n\n\n\n\nDataset\nCoverage\nResolution\nRepository\n\n\n\n\nGlobal TLS forest dataset (Brede et al.)\nTemperate & tropical plots, Europe/tropics\n~5–50 pts/cm²\nZenodo\n\n\nForestScan benchmark plots (UCL)\nUK broadleaf and conifer plots\nHigh-density multi-scan\nZenodo\n\n\nEstonian TLS forest plots\nBoreal hemi-boreal plots, 20+ sites\n~10 pts/cm²\nPANGAEA\n\n\nTERN Supersite TLS (Australia)\nTropical savanna and eucalypt forest\nMulti-scan mosaic\nTERN Data Portal\n\n\n\nTypical variables available: 3D point cloud (LAS/LAZ format), co-registered multi-scan mosaic, plot-level metadata (species, DBH, height), sometimes co-located destructive biomass measurements for allometric validation.\nKey applications: Allometric model validation, non-destructive biomass estimation, tree segmentation algorithm testing, leaf-on/leaf-off structure comparison, plant area index retrieval\n\n\n\n\n\n\nTip\n\n\n\nThe lidR (R) and laspy/open3d (Python) libraries are the standard tools for processing TLS point clouds. The RQSM (R) and TreeQSM (MATLAB) packages reconstruct quantitative structural models (QSM) of individual trees from TLS data, enabling non-destructive volume and biomass estimation.\n\n\n\n\n\n\n\n\nNote\n\n\n\nSearch Zenodo.org with keywords “terrestrial lidar forest” or “TLS forest point cloud” to discover community benchmark deposits. PANGAEA also hosts TLS datasets from research expeditions. Australian TLS data are available via the TERN Data Portal."
   },
   {
-    "objectID": "datasets_lidar.html#derived-products",
-    "href": "datasets_lidar.html#derived-products",
-    "title": "LiDAR Datasets",
-    "section": "Derived Products",
-    "text": "Derived Products\nGridded canopy or biomass products derived by combining multiple LiDAR observation types with satellite imagery, providing spatially continuous wall-to-wall coverage beyond what raw sensor footprints offer.\n\n\nGlobal Canopy Height Map — ETH Zurich / Meta AI Research (2020)\nThe Global Canopy Height Map is a wall-to-wall 10 m resolution forest canopy height product covering the entire vegetated land surface. It was produced by fusing spaceborne GEDI full-waveform LiDAR observations with Sentinel-2 multispectral imagery using a large-scale deep learning framework trained at global scale. This dataset is one of the first openly available global canopy height products at meter-scale spatial resolution, enabling landscape-level forest structure analysis without airborne surveys.\nSource: ETH Zurich (Institut für Kartographie und Geoinformation) + Meta AI Research Year: 2020 (released 2023) Spatial resolution: 10 m Coverage: Global vegetated land surface Method: GEDI L2A canopy height as training labels + Sentinel-2 multispectral imagery as input features, trained via deep learning (CNN regression) Accuracy: RMSE ~2.8 m (global), variable by biome and canopy closure Key applications: Global forest biomass estimation, carbon stock mapping, global tree height benchmarking, habitat connectivity analysis, biodiversity modeling, training/validation for other canopy height models\n\n\n\n\n\n\nTip\n\n\n\nCompared to GEDI alone (discrete footprints at ~600 m cross-track spacing), this product provides spatially continuous canopy height globally at 10 m — useful for connecting plot-scale field measurements to regional and global analyses.\n\n\n\n\n\n\n\n\nNote\n\n\n\nThe Global Canopy Height Map is freely available on Google Earth Engine (users/nlang/ETH_GlobalCanopyHeight_2020_10m_v1) and for direct download via ETH Research Collection."
-  },
-  {
     "objectID": "datasets_lidar.html#data-portals",
     "href": "datasets_lidar.html#data-portals",
     "title": "LiDAR Datasets",
     "section": "Data Portals",
     "text": "Data Portals\nMulti-source aggregation platforms that host and serve LiDAR point clouds and DEMs from many independent campaigns through a single discovery and download interface.\n\n\nOpenTopography — Multi-Source LiDAR and DEM Portal\nOpenTopography is an NSF-funded data portal that provides free, open access to high-resolution LiDAR point clouds, DEMs, and derived products from dozens of airborne LiDAR campaigns and global raster elevation datasets. It serves as a one-stop discovery and processing platform for a wide variety of LiDAR archives.\nOperator: San Diego Supercomputer Center (SDSC), UNAVCO, and Arizona State University (NSF-funded) Data types available: - Airborne LiDAR point clouds — NCALM, B4 Fault Zone, EarthScope campaigns, CoastalDEM collections - Global DEMs — SRTM (30 m/90 m), ALOS World 3D (30 m), CopDEM (30 m/90 m), TanDEM-X (90 m public release) - Community-contributed datasets — Research-grade campaigns from universities and agencies worldwide Spatial resolution: Ranges from ~0.25 m (high-density airborne LiDAR) to 30–90 m (global DEMs) On-demand processing: Users can request point cloud derivatives (bare-earth DEM, DSM, slope, hillshade) processed directly in the cloud without local downloads Key applications: Geomorphology, fault mapping, forest structure, urban morphology, coastal change, landslide monitoring\n\n\n\n\n\n\nNote\n\n\n\nOpenTopography datasets are freely accessible at OpenTopography.org. Many datasets also offer direct API access for programmatic download.\n\n\n\n\n\n\n\n\n\nNote\n\n\n\nUSGS 3DEP data are available via the USGS National Map. NEON AOP data are available via the NEON Data Portal. Visualizations produced with lidR, plotly, and leaflet in R."
+  },
+  {
+    "objectID": "datasets_derived.html",
+    "href": "datasets_derived.html",
+    "title": "Derived Products",
+    "section": "",
+    "text": "Gridded analysis-ready products derived by fusing multiple sensor types — LiDAR, optical, radar, and model outputs — into spatially continuous, wall-to-wall datasets. These products go beyond what any single sensor can observe, combining the measurement strengths of several data streams to produce ready-to-use maps of forest structure, vegetation function, and ecosystem state."
+  },
+  {
+    "objectID": "datasets_derived.html#global-canopy-height-map-eth-zurich-meta-ai-research-2020",
+    "href": "datasets_derived.html#global-canopy-height-map-eth-zurich-meta-ai-research-2020",
+    "title": "Derived Products",
+    "section": "Global Canopy Height Map — ETH Zurich / Meta AI Research (2020)",
+    "text": "Global Canopy Height Map — ETH Zurich / Meta AI Research (2020)\nThe Global Canopy Height Map is a wall-to-wall 10 m resolution forest canopy height product covering the entire vegetated land surface. It was produced by fusing spaceborne GEDI full-waveform LiDAR observations with Sentinel-2 multispectral imagery using a large-scale deep learning framework trained at global scale. This dataset is one of the first openly available global canopy height products at meter-scale spatial resolution, enabling landscape-level forest structure analysis without airborne surveys.\nSource: ETH Zurich (Institut für Kartographie und Geoinformation) + Meta AI Research Input sensors: GEDI L2A (spaceborne LiDAR) + Sentinel-2 MSI (optical) Year: 2020 (released 2023) Spatial resolution: 10 m Coverage: Global vegetated land surface Method: GEDI L2A canopy height used as training labels; Sentinel-2 multispectral imagery used as input features; trained via deep learning (CNN regression) at global scale Accuracy: RMSE ~2.8 m (global), variable by biome and canopy closure Key applications: Global forest biomass estimation, carbon stock mapping, global tree height benchmarking, habitat connectivity analysis, biodiversity modeling, training/validation for other canopy height models\n\n\n\n\n\n\nTip\n\n\n\nCompared to GEDI alone (discrete footprints at ~600 m cross-track spacing), this product provides spatially continuous canopy height globally at 10 m — useful for connecting plot-scale field measurements to regional and global analyses without requiring airborne LiDAR coverage.\n\n\n\n\n\n\n\n\nNote\n\n\n\nThe Global Canopy Height Map is freely available on Google Earth Engine (users/nlang/ETH_GlobalCanopyHeight_2020_10m_v1) and for direct download via ETH Research Collection."
+  },
+  {
+    "objectID": "datasets_derived.html#global-forest-canopy-height-nasa-gedi-landsat-lang-et-al.-2023",
+    "href": "datasets_derived.html#global-forest-canopy-height-nasa-gedi-landsat-lang-et-al.-2023",
+    "title": "Derived Products",
+    "section": "Global Forest Canopy Height — NASA / GEDI + Landsat (Lang et al. 2023)",
+    "text": "Global Forest Canopy Height — NASA / GEDI + Landsat (Lang et al. 2023)\nA complementary 30 m global canopy height product produced by NASA in collaboration with ETH Zurich, using GEDI L4B aggregated canopy height paired with Landsat spectral-temporal metrics. The coarser resolution makes it more compatible with Landsat-era time series analyses and global forest inventory cross-walks.\nSource: NASA Goddard Space Flight Center + ETH Zurich Input sensors: GEDI L4B (spaceborne LiDAR) + Landsat 8 OLI (optical) Spatial resolution: 30 m Coverage: ~51.6°N to 51.6°S (GEDI orbital coverage) Year: ~2019–2021 composite Key applications: Global biomass mapping, carbon accounting, compatibility with Landsat-era change detection products\n\n\n\n\n\n\nNote\n\n\n\nAvailable on Google Earth Engine (NASA/GEDI04_B_002) and NASA EarthData."
+  },
+  {
+    "objectID": "datasets_derived.html#hansen-global-forest-change-university-of-maryland-google",
+    "href": "datasets_derived.html#hansen-global-forest-change-university-of-maryland-google",
+    "title": "Derived Products",
+    "section": "Hansen Global Forest Change — University of Maryland / Google",
+    "text": "Hansen Global Forest Change — University of Maryland / Google\nHansen Global Forest Change (GFC) is the most widely used global forest cover and loss product. It maps tree cover extent in the year 2000 and tracks annual tree cover loss and gain from 2001 to the present at 30 m resolution using dense Landsat time series. The product is the primary global benchmark for deforestation monitoring, carbon accounting under REDD+, and forest policy assessment.\nSource: University of Maryland (Matthew Hansen et al.) + Google Input sensors: Landsat 5/7/8 TM/ETM+/OLI time series Spatial resolution: 30 m Coverage: Global (80°N to 80°S) Temporal range: 2000 baseline; annual loss layers 2001–present Key layers: - treecover2000 — Percent tree canopy cover in year 2000 - loss — Binary annual tree cover loss (1 = loss event in that year) - lossyear — Year of first detected loss (2001–present) - gain — Tree cover gain 2000–2012 (binary) - datamask — Land/water/no-data mask Key applications: Deforestation monitoring, REDD+ carbon accounting, forest fragmentation analysis, tropical forest dynamics, fire-driven forest loss, legal compliance monitoring\n\n\n\n\n\n\nNote\n\n\n\nHansen GFC is freely available on Google Earth Engine (UMD/hansen/global_forest_change_YYYY_vX) and for direct download from the Global Forest Watch platform."
+  },
+  {
+    "objectID": "datasets_derived.html#modis-vegetation-continuous-fields-mod44b-nasa",
+    "href": "datasets_derived.html#modis-vegetation-continuous-fields-mod44b-nasa",
+    "title": "Derived Products",
+    "section": "MODIS Vegetation Continuous Fields (MOD44B) — NASA",
+    "text": "MODIS Vegetation Continuous Fields (MOD44B) — NASA\nMOD44B is an annual sub-pixel tree cover product derived from MODIS spectral bands and trained against high-resolution reference data. It provides proportional estimates (0–100%) of tree canopy, non-tree vegetation, and bare ground per 250 m pixel — useful for global vegetation cover fractions, ecosystem boundary delineation, and land surface model parameterization.\nSource: NASA Goddard Space Flight Center Input sensors: MODIS Terra (MOD) and Aqua (MYD) Spatial resolution: 250 m Temporal resolution: Annual composites Temporal range: 2000–present Key layers: Percent tree cover · Percent non-tree vegetation · Percent bare ground · Quality assessment flags Key applications: Global land surface parameterization, forest/non-forest fraction, savanna and dryland vegetation cover, multi-decadal tree cover trends\n\n\n\n\n\n\nNote\n\n\n\nMOD44B is freely available through NASA EarthData (LP DAAC) and Google Earth Engine (MODIS/006/MOD44B)."
+  },
+  {
+    "objectID": "cv.html",
+    "href": "cv.html",
+    "title": "About Me",
+    "section": "",
+    "text": "Download CV (PDF)"
+  },
+  {
+    "objectID": "cv.html#photos",
+    "href": "cv.html#photos",
+    "title": "About Me",
+    "section": "Photos",
+    "text": "Photos"
+  },
+  {
+    "objectID": "blog.html",
+    "href": "blog.html",
+    "title": "Blog",
+    "section": "",
+    "text": "Multi-Source Urban Heights: GEDI L2A, 3DEP LiDAR, and OSM — New York City\n\n\n\nLiDAR\n\nGEDI\n\n3DEP\n\nUrban\n\nCanopy Height\n\nR\n\nTutorial\n\n\n\n\n\n\n\n\n\nMay 10, 2026\n\n\nDingjin Chu\n\n\n\n\n\n\n\n\n\n\n\n\nUrban GEDI: Separating Vegetation from Buildings in New York City\n\n\n\nLiDAR\n\nGEDI\n\nUrban\n\nCanopy Height\n\nR\n\nTutorial\n\n\n\n\n\n\n\n\n\nApr 19, 2026\n\n\nDingjin Chu\n\n\n\n\n\n\n\n\n\n\n\n\nGEDI L4A Above-Ground Biomass at NEON SCBI: Comparison with NEON AOP and 3DEP Allometric Estimates\n\n\n\nLiDAR\n\nGEDI\n\nNEON\n\n3DEP\n\nBiomass\n\nR\n\nTutorial\n\n\n\n\n\n\n\n\n\nApr 5, 2026\n\n\nDingjin Chu\n\n\n\n\n\n\n\n\n\n\n\n\nGEDI L2A Canopy Height at NEON SCBI: Comparison with NEON AOP and 3DEP LiDAR\n\n\n\nLiDAR\n\nGEDI\n\nNEON\n\n3DEP\n\nCanopy Height\n\nR\n\nTutorial\n\n\n\n\n\n\n\n\n\nMar 22, 2026\n\n\nDingjin Chu\n\n\n\n\n\n\n\n\n\n\n\n\nWelcome to My Blog\n\n\n\ngeneral\n\n\n\n\n\n\n\n\n\nMar 1, 2026\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "contact.html",
+    "href": "contact.html",
+    "title": "Contact Me",
+    "section": "",
+    "text": "Feel free to get in touch for any inquiries or opportunities. I am open to collaborations, scientific projects, and job opportunities where I can contribute my expertise in remote sensing, LiDAR, and environmental data science.\n    dingjinchu@gmail.com\n    Agricultural Hall, Department of Natural Resource Ecology & Management, Oklahoma State University, Stillwater, OK\n    \n      \n      \n      \n    \n  \n\n  \n  \n    \n      \n        Full Name *\n        \n      \n      \n        Email *\n        \n      \n      \n        Affiliation *\n        \n      \n      \n        Position *\n        \n      \n      \n        Message *\n        \n      \n      Submit"
+  },
+  {
+    "objectID": "contact.html#where-to-find-me",
+    "href": "contact.html#where-to-find-me",
+    "title": "Contact Me",
+    "section": "Where to Find Me",
+    "text": "Where to Find Me\nAgricultural Hall, Oklahoma State University Stillwater, Oklahoma, USA\n\n\nView larger map"
   },
   {
     "objectID": "datasets.html",
@@ -327,41 +390,6 @@
     "title": "Datasets",
     "section": "NEON — National Ecological Observatory Network",
     "text": "NEON — National Ecological Observatory Network\nThe NEON Terrestrial Observation System collects standardized, long-term ecological data across 81 field sites spanning major climate and vegetation domains in the United States. Vegetation structure data include woody plant cover and height surveys, distributed plot stem maps, and individual tree measurements, designed to align directly with NEON’s airborne LiDAR collections for multi-scale validation.\nSource: National Ecological Observatory Network Coverage: 81 sites across 20 eco-climatic domains in the U.S. Key variables: Woody plant percent cover, plant height, stem diameter, species identity, plant phenology\n\n\n\n\n\n\nNote\n\n\n\nNEON field data are freely available through the NEON Data Portal.\n\n\n\n\n\n\n\n\n\nNote\n\n\n\nUSGS 3DEP data are available via the USGS National Map. NEON AOP data are available via the NEON Data Portal. Visualizations produced with lidR, plotly, and leaflet in R."
-  },
-  {
-    "objectID": "contact.html",
-    "href": "contact.html",
-    "title": "Contact Me",
-    "section": "",
-    "text": "Feel free to get in touch for any inquiries or opportunities. I am open to collaborations, scientific projects, and job opportunities where I can contribute my expertise in remote sensing, LiDAR, and environmental data science.\n    dingjinchu@gmail.com\n    Agricultural Hall, Department of Natural Resource Ecology & Management, Oklahoma State University, Stillwater, OK\n    \n      \n      \n      \n    \n  \n\n  \n  \n    \n      \n        Full Name *\n        \n      \n      \n        Email *\n        \n      \n      \n        Affiliation *\n        \n      \n      \n        Position *\n        \n      \n      \n        Message *\n        \n      \n      Submit"
-  },
-  {
-    "objectID": "contact.html#where-to-find-me",
-    "href": "contact.html#where-to-find-me",
-    "title": "Contact Me",
-    "section": "Where to Find Me",
-    "text": "Where to Find Me\nAgricultural Hall, Oklahoma State University Stillwater, Oklahoma, USA\n\n\nView larger map"
-  },
-  {
-    "objectID": "blog.html",
-    "href": "blog.html",
-    "title": "Blog",
-    "section": "",
-    "text": "Multi-Source Urban Heights: GEDI L2A, 3DEP LiDAR, and OSM — New York City\n\n\n\nLiDAR\n\nGEDI\n\n3DEP\n\nUrban\n\nCanopy Height\n\nR\n\nTutorial\n\n\n\n\n\n\n\n\n\nMay 10, 2026\n\n\nDingjin Chu\n\n\n\n\n\n\n\n\n\n\n\n\nUrban GEDI: Separating Vegetation from Buildings in New York City\n\n\n\nLiDAR\n\nGEDI\n\nUrban\n\nCanopy Height\n\nR\n\nTutorial\n\n\n\n\n\n\n\n\n\nApr 19, 2026\n\n\nDingjin Chu\n\n\n\n\n\n\n\n\n\n\n\n\nGEDI L4A Above-Ground Biomass at NEON SCBI: Comparison with NEON AOP and 3DEP Allometric Estimates\n\n\n\nLiDAR\n\nGEDI\n\nNEON\n\n3DEP\n\nBiomass\n\nR\n\nTutorial\n\n\n\n\n\n\n\n\n\nApr 5, 2026\n\n\nDingjin Chu\n\n\n\n\n\n\n\n\n\n\n\n\nGEDI L2A Canopy Height at NEON SCBI: Comparison with NEON AOP and 3DEP LiDAR\n\n\n\nLiDAR\n\nGEDI\n\nNEON\n\n3DEP\n\nCanopy Height\n\nR\n\nTutorial\n\n\n\n\n\n\n\n\n\nMar 22, 2026\n\n\nDingjin Chu\n\n\n\n\n\n\n\n\n\n\n\n\nWelcome to My Blog\n\n\n\ngeneral\n\n\n\n\n\n\n\n\n\nMar 1, 2026\n\n\n\n\n\nNo matching items"
-  },
-  {
-    "objectID": "cv.html",
-    "href": "cv.html",
-    "title": "About Me",
-    "section": "",
-    "text": "Download CV (PDF)"
-  },
-  {
-    "objectID": "cv.html#photos",
-    "href": "cv.html#photos",
-    "title": "About Me",
-    "section": "Photos",
-    "text": "Photos"
   },
   {
     "objectID": "datasets_field.html",

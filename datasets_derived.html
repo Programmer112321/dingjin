@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Radar Datasets – Dingjin Chu</title>
+<title>Derived Products – Dingjin Chu</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -340,7 +340,7 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Radar Datasets</h1>
+<h1 class="title">Derived Products</h1>
 </div>
 
 
@@ -357,145 +357,12 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>Microwave radar remote sensing datasets for soil moisture, vegetation structure, and surface deformation monitoring.</p>
+<p>Gridded analysis-ready products derived by fusing multiple sensor types — LiDAR, optical, radar, and model outputs — into spatially continuous, wall-to-wall datasets. These products go beyond what any single sensor can observe, combining the measurement strengths of several data streams to produce ready-to-use maps of forest structure, vegetation function, and ecosystem state.</p>
 <hr>
-<section id="sentinel-1-esa-copernicus" class="level2">
-<h2 class="anchored" data-anchor-id="sentinel-1-esa-copernicus">Sentinel-1 — ESA Copernicus</h2>
-<p><strong>Sentinel-1</strong> provides C-band Synthetic Aperture Radar (SAR) imagery, enabling cloud-penetrating, day-and-night observations of land and ocean surfaces.</p>
-<p><strong>Agency:</strong> European Space Agency (ESA) — Copernicus Programme <strong>Sensor:</strong> C-band SAR (5.405 GHz · 5.55 cm wavelength) <strong>Spatial resolution:</strong> ~5 × 20 m single-look resolution (~10 m processed GRD products) <strong>Temporal resolution:</strong> 6–12 days depending on satellite availability and latitude <strong>Common polarizations:</strong> VV+VH (most land observations) or HH+HV depending on acquisition mode and region <strong>Key applications:</strong> Forest above-ground biomass, flood mapping, soil moisture, ice monitoring, subsidence detection</p>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Sentinel-1 data are freely available through the <a href="https://dataspace.copernicus.eu">Copernicus Data Space</a> and <a href="https://earthengine.google.com">Google Earth Engine</a>.</p>
-</div>
-</div>
-<hr>
-</section>
-<section id="smap-soil-moisture-active-passive-nasa" class="level2">
-<h2 class="anchored" data-anchor-id="smap-soil-moisture-active-passive-nasa">SMAP — Soil Moisture Active Passive (NASA)</h2>
-<p><strong>SMAP</strong> is a NASA satellite mission designed to measure the moisture content of Earth’s soil surface globally and repeatedly. Its L-band radiometer provides one of the most widely validated global soil moisture products available from space, and is widely used in hydrology, agriculture, climate modeling, and ecosystem studies.</p>
-<p><strong>Agency:</strong> NASA Jet Propulsion Laboratory (JPL) <strong>Sensor:</strong> L-band passive radiometer (1.41 GHz · 21.3 cm wavelength); active radar ceased operation in July 2015 <strong>Spatial resolution:</strong> ~36 km (radiometer) · 9 km (enhanced product) <strong>Temporal resolution:</strong> 2–3 day global revisit <strong>Launch:</strong> January 2015 <strong>Key products:</strong> - <strong>SPL3SMP</strong> — Daily global soil moisture (36 km) - <strong>SPL3SMP_E</strong> — Enhanced daily soil moisture (9 km) - <strong>SPL4SMGP</strong> — Surface and root-zone soil moisture (9 km, model-assimilated) <strong>Key applications:</strong> Drought monitoring, flood forecasting, agricultural water use, carbon flux modeling, forest moisture stress</p>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>SMAP data are freely available through <a href="https://earthdata.nasa.gov">NASA EarthData</a> and <a href="https://earthengine.google.com">Google Earth Engine</a>.</p>
-</div>
-</div>
-<hr>
-</section>
-<section id="alos-2-palsar-2-jaxa" class="level2">
-<h2 class="anchored" data-anchor-id="alos-2-palsar-2-jaxa">ALOS-2 PALSAR-2 — JAXA</h2>
-<p><strong>ALOS-2 PALSAR-2</strong> is a Japanese L-band SAR satellite operated by JAXA. L-band radar penetrates forest canopy more effectively than C-band, making it particularly valuable for above-ground biomass estimation and forest structure retrieval.</p>
-<p><strong>Agency:</strong> Japan Aerospace Exploration Agency (JAXA) <strong>Sensor:</strong> L-band SAR (1.2575 GHz · 23.8 cm wavelength) <strong>Spatial resolution:</strong> 3 m (Spotlight) · 6–10 m (Stripmap) · 60–100 m (ScanSAR), mode dependent <strong>Temporal resolution:</strong> 14-day repeat cycle <strong>Polarizations:</strong> Single-, dual-, and quad-polarization modes (HH, HV, VV, VH depending on acquisition mode) <strong>Key applications:</strong> Forest biomass estimation, forest/non-forest mapping, disaster monitoring, wetland mapping</p>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>ALOS-2 PALSAR-2 global mosaic data are freely available through <a href="https://www.eorc.jaxa.jp/ALOS/en/dataset/fnf_e.htm">JAXA EORC</a>.</p>
-</div>
-</div>
-<hr>
-</section>
-<section id="tandem-x-dlr" class="level2">
-<h2 class="anchored" data-anchor-id="tandem-x-dlr">TanDEM-X — DLR</h2>
-<p><strong>TanDEM-X</strong> is a German radar mission that produced a highly accurate global Digital Elevation Model (DEM) using X-band bistatic InSAR, flying in close formation with TerraSAR-X. The global DEM is widely used in canopy height estimation workflows and as a terrain correction layer.</p>
-<p><strong>Agency:</strong> German Aerospace Center (DLR) <strong>Sensor:</strong> X-band SAR (9.65 GHz · 3.1 cm wavelength), bistatic InSAR <strong>Spatial resolution:</strong> 12 m (global DEM posting) <strong>Vertical accuracy:</strong> Relative accuracy ~2 m (flat open terrain); absolute accuracy typically &lt;10 m globally <strong>Key applications:</strong> Global DEM generation, canopy height estimation workflows, glacier monitoring, terrain analysis</p>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>TanDEM-X global DEM data are available through <a href="https://www.dlr.de/de/eoc/competences/remote-sensing-technology-institute/sar-signal-processing/tandem-x-science-service-system">DLR</a>.</p>
-</div>
-</div>
-<hr>
-</section>
-<section id="nisar-nasa-isro-initial-operations-2025" class="level2">
-<h2 class="anchored" data-anchor-id="nisar-nasa-isro-initial-operations-2025">NISAR — NASA / ISRO <em>(Initial operations 2025)</em></h2>
-<p><strong>NISAR</strong> (NASA-ISRO Synthetic Aperture Radar) is a joint Earth observation mission between NASA and the Indian Space Research Organisation (ISRO). It is the first spaceborne SAR mission combining fully operational L-band and S-band imaging radars, designed to measure ecosystem disturbances, ice-sheet dynamics, natural hazards, and sea-level change. For forest research, NISAR’s L-band radar is expected to provide global above-ground biomass and forest disturbance data at high spatial resolution and frequent revisit.</p>
-<p><strong>Agency:</strong> NASA (Jet Propulsion Laboratory) + ISRO <strong>Launch:</strong> March 2025; initial science operations beginning 2025 <strong>Sensors:</strong> L-band SAR (1.25 GHz · 24.0 cm wavelength, NASA) + S-band SAR (3.2 GHz · 9.4 cm wavelength, ISRO) <strong>Spatial resolution:</strong> 3–10 m depending on observation mode <strong>Temporal resolution:</strong> 12-day repeat cycle <strong>Swath width:</strong> 240 km <strong>Key applications:</strong> Forest above-ground biomass, deforestation and disturbance mapping, wetland dynamics, earthquake and landslide monitoring, glacier flow, sea-level change</p>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>NISAR data will be freely available through <a href="https://earthdata.nasa.gov">NASA EarthData</a> and <a href="https://www.nrsc.gov.in">ISRO’s NRSC portal</a>.</p>
-</div>
-</div>
-<hr>
-</section>
-<section id="biomass-esa-launched-april-2025" class="level2">
-<h2 class="anchored" data-anchor-id="biomass-esa-launched-april-2025">BIOMASS — ESA <em>(Launched April 2025)</em></h2>
-<p><strong>BIOMASS</strong> is ESA’s first P-band SAR satellite, specifically designed to produce the first global maps of forest above-ground biomass. P-band radar (~69 cm wavelength) penetrates deep into forest canopy and is sensitive to the woody structure of trunks and large branches — the components that store most carbon in forests. BIOMASS is a state-of-the-art mission for global carbon cycle science and is expected to directly support international carbon accounting and climate policy.</p>
-<p><strong>Agency:</strong> European Space Agency (ESA) — Earth Explorer Mission <strong>Launch:</strong> April 2025 <strong>Sensor:</strong> P-band SAR (435 MHz · 69 cm wavelength), fully polarimetric <strong>Spatial resolution:</strong> ~50–200 m (standard biomass products); finer native SAR image resolution available <strong>Temporal resolution:</strong> ~25-day repeat cycle; multiple observation passes used for tomographic forest structure retrieval <strong>Mission phases:</strong> - <strong>Tomographic phase</strong> (Years 1–3): 3D forest structure mapping using SAR tomography - <strong>Interferometric phase</strong> (Years 4–5): Change detection and biomass updating <strong>Key products:</strong> Global forest above-ground biomass density, forest height, forest disturbance <strong>Key applications:</strong> Forest carbon stock estimation, deforestation monitoring, carbon flux modeling, climate change assessment</p>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>BIOMASS data will be freely available through <a href="https://earth.esa.int/eogateway/missions/biomass">ESA’s Earth Online portal</a>.</p>
-</div>
-</div>
-<hr>
-</section>
-<section id="cygnss-cyclone-global-navigation-satellite-system-nasa" class="level2">
-<h2 class="anchored" data-anchor-id="cygnss-cyclone-global-navigation-satellite-system-nasa">CYGNSS — Cyclone Global Navigation Satellite System (NASA)</h2>
-<p><strong>CYGNSS</strong> is a constellation of eight microsatellites that use GPS signals reflected off Earth’s surface (GNSS-R) to measure wind speed over the ocean and soil moisture over land. Unlike traditional active radar satellites, CYGNSS is a passive bistatic radar system that exploits signals of opportunity from GPS — enabling rapid, global coverage at low cost.</p>
-<p><strong>Agency:</strong> NASA Goddard Space Flight Center <strong>Launched:</strong> December 2016 <strong>Technique:</strong> GNSS-Reflectometry (GNSS-R) — passive bistatic radar using reflected GPS L1 (1.575 GHz · 19.0 cm wavelength) signals <strong>Spatial resolution:</strong> ~25 km (nominal ocean wind product) · varies for land soil moisture retrievals <strong>Temporal resolution:</strong> Median revisit ~7 hours globally; ~2-day revisit at mid-latitudes <strong>Coverage:</strong> ±35° latitude (tropical belt) <strong>Key products:</strong> - <strong>CYGNSS L2</strong> — Ocean surface wind speed - <strong>CYGNSS L3</strong> — Gridded wind speed and soil moisture (25 km) <strong>Key applications:</strong> Tropical cyclone intensity monitoring, soil moisture in densely vegetated tropical forests (regions where L-band retrievals are attenuated), inland flood inundation, wetland dynamics</p>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>CYGNSS data are freely available through <a href="https://earthdata.nasa.gov">NASA EarthData</a> (Physical Oceanography DAAC, PO.DAAC) and <a href="https://earthengine.google.com">Google Earth Engine</a>.</p>
-</div>
-</div>
-<hr>
-</section>
-<section id="grace-fo-gravity-recovery-and-climate-experiment-follow-on-nasa-gfz" class="level2">
-<h2 class="anchored" data-anchor-id="grace-fo-gravity-recovery-and-climate-experiment-follow-on-nasa-gfz">GRACE-FO — Gravity Recovery and Climate Experiment Follow-On (NASA / GFZ)</h2>
-<p><strong>GRACE-FO</strong> (and its predecessor GRACE, 2002–2017) measures subtle changes in Earth’s gravity field caused by large-scale mass redistribution — primarily changes in water storage. By tracking how the gravity field changes month to month, GRACE-FO provides unique observations of groundwater depletion, ice sheet mass loss, ocean mass change, and total water storage anomalies that are impossible to obtain from any other remote sensing approach.</p>
-<p><strong>Agency:</strong> NASA Jet Propulsion Laboratory (JPL) / GFZ German Research Centre for Geosciences <strong>Launched:</strong> May 2018 (GRACE-FO); predecessor GRACE operated 2002–2017 <strong>Technique:</strong> Dual-satellite microwave ranging (K/Ka-band, ~26 GHz) combined with GPS and accelerometers; not an imaging radar — gravity field inversion <strong>Spatial resolution:</strong> ~300 km (spherical harmonic truncation at degree/order 60–96) <strong>Temporal resolution:</strong> Monthly global gravity field solutions; some mascon products provide 10-day updates <strong>Key products:</strong> - <strong>GRACE-FO RL06</strong> — Monthly gravity field coefficients (CSR, JPL, GFZ) - <strong>JPL Mascon</strong> — Terrestrial Water Storage (TWS) anomalies on equal-area mascons - <strong>GSFC Mascon</strong> — High-resolution TWS solution <strong>Key applications:</strong> Groundwater depletion (aquifer monitoring), ice sheet and glacier mass balance, drought quantification, seasonal water cycle, sea level rise attribution, post-glacial rebound</p>
+<section id="global-canopy-height-map-eth-zurich-meta-ai-research-2020" class="level2">
+<h2 class="anchored" data-anchor-id="global-canopy-height-map-eth-zurich-meta-ai-research-2020">Global Canopy Height Map — ETH Zurich / Meta AI Research (2020)</h2>
+<p>The <strong>Global Canopy Height Map</strong> is a wall-to-wall 10 m resolution forest canopy height product covering the entire vegetated land surface. It was produced by fusing spaceborne GEDI full-waveform LiDAR observations with Sentinel-2 multispectral imagery using a large-scale deep learning framework trained at global scale. This dataset is one of the first openly available global canopy height products at meter-scale spatial resolution, enabling landscape-level forest structure analysis without airborne surveys.</p>
+<p><strong>Source:</strong> ETH Zurich (Institut für Kartographie und Geoinformation) + Meta AI Research <strong>Input sensors:</strong> GEDI L2A (spaceborne LiDAR) + Sentinel-2 MSI (optical) <strong>Year:</strong> 2020 (released 2023) <strong>Spatial resolution:</strong> 10 m <strong>Coverage:</strong> Global vegetated land surface <strong>Method:</strong> GEDI L2A canopy height used as training labels; Sentinel-2 multispectral imagery used as input features; trained via deep learning (CNN regression) at global scale <strong>Accuracy:</strong> RMSE ~2.8 m (global), variable by biome and canopy closure <strong>Key applications:</strong> Global forest biomass estimation, carbon stock mapping, global tree height benchmarking, habitat connectivity analysis, biodiversity modeling, training/validation for other canopy height models</p>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -506,7 +373,7 @@ Tip
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>GRACE/GRACE-FO is the only spaceborne tool capable of directly detecting groundwater changes at continental scale, making it uniquely valuable for drought early warning and water resource management in data-sparse regions.</p>
+<p>Compared to GEDI alone (discrete footprints at ~600 m cross-track spacing), this product provides spatially continuous canopy height globally at 10 m — useful for connecting plot-scale field measurements to regional and global analyses without requiring airborne LiDAR coverage.</p>
 </div>
 </div>
 <div class="callout callout-style-default callout-note callout-titled">
@@ -519,15 +386,15 @@ Note
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>GRACE-FO data are freely available through <a href="https://earthdata.nasa.gov">NASA EarthData</a> (PODAAC), <a href="https://grace.jpl.nasa.gov">JPL GRACE Tellus</a>, and <a href="https://earthengine.google.com">Google Earth Engine</a> (<code>NASA/GRACE/MASS_GRIDS</code>).</p>
+<p>The Global Canopy Height Map is freely available on <a href="https://earthengine.google.com">Google Earth Engine</a> (<code>users/nlang/ETH_GlobalCanopyHeight_2020_10m_v1</code>) and for direct download via <a href="https://doi.org/10.3929/ethz-b-000609802">ETH Research Collection</a>.</p>
 </div>
 </div>
 <hr>
 </section>
-<section id="sentinel-6-copernicus-esa-eumetsat-nasa" class="level2">
-<h2 class="anchored" data-anchor-id="sentinel-6-copernicus-esa-eumetsat-nasa">Sentinel-6 — Copernicus (ESA / EUMETSAT / NASA)</h2>
-<p><strong>Sentinel-6 Michael Freilich</strong> is a radar altimetry mission dedicated to measuring global sea surface height with millimeter-level precision. While primarily an oceanographic mission, its altimetric data also support inland water body monitoring (lake levels, river stages) and ice sheet surface elevation change.</p>
-<p><strong>Agency:</strong> ESA / EUMETSAT / European Commission Copernicus Programme; in partnership with NASA and NOAA <strong>Launched:</strong> November 2020 <strong>Sensor:</strong> Poseidon-4 dual-frequency radar altimeter (Ku-band: 13.575 GHz · 2.2 cm; C-band: 5.41 GHz · 5.5 cm) <strong>Orbital altitude:</strong> 1336 km, 10-day exact repeat cycle <strong>Spatial coverage:</strong> ±66° latitude <strong>Measurement accuracy:</strong> ~2–3 cm sea surface height precision <strong>Key products:</strong> - <strong>L2 Ocean Products</strong> — Significant wave height, wind speed, sea surface height anomaly - <strong>L2 Inland Water</strong> — Lake and reservoir water levels <strong>Key applications:</strong> Global sea level rise monitoring, ocean circulation, El Niño/La Niña dynamics, lake and reservoir water level changes, ice sheet surface height trends</p>
+<section id="global-forest-canopy-height-nasa-gedi-landsat-lang-et-al.-2023" class="level2">
+<h2 class="anchored" data-anchor-id="global-forest-canopy-height-nasa-gedi-landsat-lang-et-al.-2023">Global Forest Canopy Height — NASA / GEDI + Landsat (Lang et al.&nbsp;2023)</h2>
+<p>A complementary 30 m global canopy height product produced by NASA in collaboration with ETH Zurich, using GEDI L4B aggregated canopy height paired with Landsat spectral-temporal metrics. The coarser resolution makes it more compatible with Landsat-era time series analyses and global forest inventory cross-walks.</p>
+<p><strong>Source:</strong> NASA Goddard Space Flight Center + ETH Zurich <strong>Input sensors:</strong> GEDI L4B (spaceborne LiDAR) + Landsat 8 OLI (optical) <strong>Spatial resolution:</strong> 30 m <strong>Coverage:</strong> ~51.6°N to 51.6°S (GEDI orbital coverage) <strong>Year:</strong> ~2019–2021 composite <strong>Key applications:</strong> Global biomass mapping, carbon accounting, compatibility with Landsat-era change detection products</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -538,7 +405,45 @@ Note
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Sentinel-6 data are freely available through the <a href="https://dataspace.copernicus.eu">Copernicus Data Space</a> and <a href="https://data.eumetsat.int">EUMETSAT Data Store</a>.</p>
+<p>Available on <a href="https://earthengine.google.com">Google Earth Engine</a> (<code>NASA/GEDI04_B_002</code>) and <a href="https://earthdata.nasa.gov">NASA EarthData</a>.</p>
+</div>
+</div>
+<hr>
+</section>
+<section id="hansen-global-forest-change-university-of-maryland-google" class="level2">
+<h2 class="anchored" data-anchor-id="hansen-global-forest-change-university-of-maryland-google">Hansen Global Forest Change — University of Maryland / Google</h2>
+<p><strong>Hansen Global Forest Change</strong> (GFC) is the most widely used global forest cover and loss product. It maps tree cover extent in the year 2000 and tracks annual tree cover loss and gain from 2001 to the present at 30 m resolution using dense Landsat time series. The product is the primary global benchmark for deforestation monitoring, carbon accounting under REDD+, and forest policy assessment.</p>
+<p><strong>Source:</strong> University of Maryland (Matthew Hansen et al.) + Google <strong>Input sensors:</strong> Landsat 5/7/8 TM/ETM+/OLI time series <strong>Spatial resolution:</strong> 30 m <strong>Coverage:</strong> Global (80°N to 80°S) <strong>Temporal range:</strong> 2000 baseline; annual loss layers 2001–present <strong>Key layers:</strong> - <strong>treecover2000</strong> — Percent tree canopy cover in year 2000 - <strong>loss</strong> — Binary annual tree cover loss (1 = loss event in that year) - <strong>lossyear</strong> — Year of first detected loss (2001–present) - <strong>gain</strong> — Tree cover gain 2000–2012 (binary) - <strong>datamask</strong> — Land/water/no-data mask <strong>Key applications:</strong> Deforestation monitoring, REDD+ carbon accounting, forest fragmentation analysis, tropical forest dynamics, fire-driven forest loss, legal compliance monitoring</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Hansen GFC is freely available on <a href="https://earthengine.google.com">Google Earth Engine</a> (<code>UMD/hansen/global_forest_change_YYYY_vX</code>) and for direct download from the <a href="https://www.globalforestwatch.org">Global Forest Watch platform</a>.</p>
+</div>
+</div>
+<hr>
+</section>
+<section id="modis-vegetation-continuous-fields-mod44b-nasa" class="level2">
+<h2 class="anchored" data-anchor-id="modis-vegetation-continuous-fields-mod44b-nasa">MODIS Vegetation Continuous Fields (MOD44B) — NASA</h2>
+<p><strong>MOD44B</strong> is an annual sub-pixel tree cover product derived from MODIS spectral bands and trained against high-resolution reference data. It provides proportional estimates (0–100%) of tree canopy, non-tree vegetation, and bare ground per 250 m pixel — useful for global vegetation cover fractions, ecosystem boundary delineation, and land surface model parameterization.</p>
+<p><strong>Source:</strong> NASA Goddard Space Flight Center <strong>Input sensors:</strong> MODIS Terra (MOD) and Aqua (MYD) <strong>Spatial resolution:</strong> 250 m <strong>Temporal resolution:</strong> Annual composites <strong>Temporal range:</strong> 2000–present <strong>Key layers:</strong> Percent tree cover · Percent non-tree vegetation · Percent bare ground · Quality assessment flags <strong>Key applications:</strong> Global land surface parameterization, forest/non-forest fraction, savanna and dryland vegetation cover, multi-decadal tree cover trends</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>MOD44B is freely available through <a href="https://earthdata.nasa.gov">NASA EarthData</a> (LP DAAC) and <a href="https://earthengine.google.com">Google Earth Engine</a> (<code>MODIS/006/MOD44B</code>).</p>
 </div>
 </div>
 
