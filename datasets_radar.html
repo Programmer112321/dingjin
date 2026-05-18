@@ -467,6 +467,76 @@ Note
 <p>BIOMASS data will be freely available through <a href="https://earth.esa.int/eogateway/missions/biomass">ESA’s Earth Online portal</a>.</p>
 </div>
 </div>
+<hr>
+</section>
+<section id="cygnss-cyclone-global-navigation-satellite-system-nasa" class="level2">
+<h2 class="anchored" data-anchor-id="cygnss-cyclone-global-navigation-satellite-system-nasa">CYGNSS — Cyclone Global Navigation Satellite System (NASA)</h2>
+<p><strong>CYGNSS</strong> is a constellation of eight microsatellites that use GPS signals reflected off Earth’s surface (GNSS-R) to measure wind speed over the ocean and soil moisture over land. Unlike traditional active radar satellites, CYGNSS is a passive bistatic radar system that exploits signals of opportunity from GPS — enabling rapid, global coverage at low cost.</p>
+<p><strong>Agency:</strong> NASA Goddard Space Flight Center <strong>Launched:</strong> December 2016 <strong>Technique:</strong> GNSS-Reflectometry (GNSS-R) — passive bistatic radar using reflected GPS L1 (1.575 GHz · 19.0 cm wavelength) signals <strong>Spatial resolution:</strong> ~25 km (nominal ocean wind product) · varies for land soil moisture retrievals <strong>Temporal resolution:</strong> Median revisit ~7 hours globally; ~2-day revisit at mid-latitudes <strong>Coverage:</strong> ±35° latitude (tropical belt) <strong>Key products:</strong> - <strong>CYGNSS L2</strong> — Ocean surface wind speed - <strong>CYGNSS L3</strong> — Gridded wind speed and soil moisture (25 km) <strong>Key applications:</strong> Tropical cyclone intensity monitoring, soil moisture in densely vegetated tropical forests (regions where L-band retrievals are attenuated), inland flood inundation, wetland dynamics</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>CYGNSS data are freely available through <a href="https://earthdata.nasa.gov">NASA EarthData</a> (Physical Oceanography DAAC, PO.DAAC) and <a href="https://earthengine.google.com">Google Earth Engine</a>.</p>
+</div>
+</div>
+<hr>
+</section>
+<section id="grace-fo-gravity-recovery-and-climate-experiment-follow-on-nasa-gfz" class="level2">
+<h2 class="anchored" data-anchor-id="grace-fo-gravity-recovery-and-climate-experiment-follow-on-nasa-gfz">GRACE-FO — Gravity Recovery and Climate Experiment Follow-On (NASA / GFZ)</h2>
+<p><strong>GRACE-FO</strong> (and its predecessor GRACE, 2002–2017) measures subtle changes in Earth’s gravity field caused by large-scale mass redistribution — primarily changes in water storage. By tracking how the gravity field changes month to month, GRACE-FO provides unique observations of groundwater depletion, ice sheet mass loss, ocean mass change, and total water storage anomalies that are impossible to obtain from any other remote sensing approach.</p>
+<p><strong>Agency:</strong> NASA Jet Propulsion Laboratory (JPL) / GFZ German Research Centre for Geosciences <strong>Launched:</strong> May 2018 (GRACE-FO); predecessor GRACE operated 2002–2017 <strong>Technique:</strong> Dual-satellite microwave ranging (K/Ka-band, ~26 GHz) combined with GPS and accelerometers; not an imaging radar — gravity field inversion <strong>Spatial resolution:</strong> ~300 km (spherical harmonic truncation at degree/order 60–96) <strong>Temporal resolution:</strong> Monthly global gravity field solutions; some mascon products provide 10-day updates <strong>Key products:</strong> - <strong>GRACE-FO RL06</strong> — Monthly gravity field coefficients (CSR, JPL, GFZ) - <strong>JPL Mascon</strong> — Terrestrial Water Storage (TWS) anomalies on equal-area mascons - <strong>GSFC Mascon</strong> — High-resolution TWS solution <strong>Key applications:</strong> Groundwater depletion (aquifer monitoring), ice sheet and glacier mass balance, drought quantification, seasonal water cycle, sea level rise attribution, post-glacial rebound</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>GRACE/GRACE-FO is the only spaceborne tool capable of directly detecting groundwater changes at continental scale, making it uniquely valuable for drought early warning and water resource management in data-sparse regions.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>GRACE-FO data are freely available through <a href="https://earthdata.nasa.gov">NASA EarthData</a> (PODAAC), <a href="https://grace.jpl.nasa.gov">JPL GRACE Tellus</a>, and <a href="https://earthengine.google.com">Google Earth Engine</a> (<code>NASA/GRACE/MASS_GRIDS</code>).</p>
+</div>
+</div>
+<hr>
+</section>
+<section id="sentinel-6-copernicus-esa-eumetsat-nasa" class="level2">
+<h2 class="anchored" data-anchor-id="sentinel-6-copernicus-esa-eumetsat-nasa">Sentinel-6 — Copernicus (ESA / EUMETSAT / NASA)</h2>
+<p><strong>Sentinel-6 Michael Freilich</strong> is a radar altimetry mission dedicated to measuring global sea surface height with millimeter-level precision. While primarily an oceanographic mission, its altimetric data also support inland water body monitoring (lake levels, river stages) and ice sheet surface elevation change.</p>
+<p><strong>Agency:</strong> ESA / EUMETSAT / European Commission Copernicus Programme; in partnership with NASA and NOAA <strong>Launched:</strong> November 2020 <strong>Sensor:</strong> Poseidon-4 dual-frequency radar altimeter (Ku-band: 13.575 GHz · 2.2 cm; C-band: 5.41 GHz · 5.5 cm) <strong>Orbital altitude:</strong> 1336 km, 10-day exact repeat cycle <strong>Spatial coverage:</strong> ±66° latitude <strong>Measurement accuracy:</strong> ~2–3 cm sea surface height precision <strong>Key products:</strong> - <strong>L2 Ocean Products</strong> — Significant wave height, wind speed, sea surface height anomaly - <strong>L2 Inland Water</strong> — Lake and reservoir water levels <strong>Key applications:</strong> Global sea level rise monitoring, ocean circulation, El Niño/La Niña dynamics, lake and reservoir water level changes, ice sheet surface height trends</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Sentinel-6 data are freely available through the <a href="https://dataspace.copernicus.eu">Copernicus Data Space</a> and <a href="https://data.eumetsat.int">EUMETSAT Data Store</a>.</p>
+</div>
+</div>
 
 
 </section>

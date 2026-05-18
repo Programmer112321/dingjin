@@ -431,6 +431,76 @@ Note
 <p>USGS 3DEP data are available via the <a href="https://www.usgs.gov/3d-elevation-program">USGS National Map</a>. NEON AOP data are available via the <a href="https://data.neonscience.org">NEON Data Portal</a>. Visualizations produced with <code>lidR</code>, <code>plotly</code>, and <code>leaflet</code> in R.</p>
 </div>
 </div>
+<hr>
+</section>
+<section id="global-canopy-height-map-eth-zurich-meta-ai-research-2020" class="level2">
+<h2 class="anchored" data-anchor-id="global-canopy-height-map-eth-zurich-meta-ai-research-2020">Global Canopy Height Map — ETH Zurich / Meta AI Research (2020)</h2>
+<p>The <strong>Global Canopy Height Map</strong> is a wall-to-wall 10 m resolution forest canopy height product covering the entire vegetated land surface. It was produced by fusing spaceborne GEDI full-waveform LiDAR observations with Sentinel-2 multispectral imagery using a large-scale deep learning framework trained at global scale. This dataset is one of the first openly available global canopy height products at meter-scale spatial resolution, enabling landscape-level forest structure analysis without airborne surveys.</p>
+<p><strong>Source:</strong> ETH Zurich (Institut für Kartographie und Geoinformation) + Meta AI Research <strong>Year:</strong> 2020 (released 2023) <strong>Spatial resolution:</strong> 10 m <strong>Coverage:</strong> Global vegetated land surface <strong>Method:</strong> GEDI L2A canopy height as training labels + Sentinel-2 multispectral imagery as input features, trained via deep learning (CNN regression) <strong>Accuracy:</strong> RMSE ~2.8 m (global), variable by biome and canopy closure <strong>Key applications:</strong> Global forest biomass estimation, carbon stock mapping, global tree height benchmarking, habitat connectivity analysis, biodiversity modeling, training/validation for other canopy height models</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Compared to GEDI alone (discrete footprints at ~600 m cross-track spacing), this product provides spatially continuous canopy height globally at 10 m — useful for connecting plot-scale field measurements to regional and global analyses.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The Global Canopy Height Map is freely available on <a href="https://earthengine.google.com">Google Earth Engine</a> (<code>users/nlang/ETH_GlobalCanopyHeight_2020_10m_v1</code>) and for direct download via <a href="https://doi.org/10.3929/ethz-b-000609802">ETH Research Collection</a>.</p>
+</div>
+</div>
+<hr>
+</section>
+<section id="opentopography-multi-source-lidar-and-dem-portal" class="level2">
+<h2 class="anchored" data-anchor-id="opentopography-multi-source-lidar-and-dem-portal">OpenTopography — Multi-Source LiDAR and DEM Portal</h2>
+<p><strong>OpenTopography</strong> is an NSF-funded data portal that provides free, open access to high-resolution LiDAR point clouds, DEMs, and derived products from dozens of airborne LiDAR campaigns and global raster elevation datasets. It serves as a one-stop discovery and processing platform for a wide variety of LiDAR archives.</p>
+<p><strong>Operator:</strong> San Diego Supercomputer Center (SDSC), UNAVCO, and Arizona State University (NSF-funded) <strong>Data types available:</strong> - <strong>Airborne LiDAR point clouds</strong> — NCALM, B4 Fault Zone, EarthScope campaigns, CoastalDEM collections - <strong>Global DEMs</strong> — SRTM (30 m/90 m), ALOS World 3D (30 m), CopDEM (30 m/90 m), TanDEM-X (90 m public release) - <strong>Community-contributed datasets</strong> — Research-grade campaigns from universities and agencies worldwide <strong>Spatial resolution:</strong> Ranges from ~0.25 m (high-density airborne LiDAR) to 30–90 m (global DEMs) <strong>On-demand processing:</strong> Users can request point cloud derivatives (bare-earth DEM, DSM, slope, hillshade) processed directly in the cloud without local downloads <strong>Key applications:</strong> Geomorphology, fault mapping, forest structure, urban morphology, coastal change, landslide monitoring</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>OpenTopography datasets are freely accessible at <a href="https://opentopography.org">OpenTopography.org</a>. Many datasets also offer direct API access for programmatic download.</p>
+</div>
+</div>
+<hr>
+</section>
+<section id="lvis-land-vegetation-and-ice-sensor-nasa" class="level2">
+<h2 class="anchored" data-anchor-id="lvis-land-vegetation-and-ice-sensor-nasa">LVIS — Land, Vegetation, and Ice Sensor (NASA)</h2>
+<p><strong>LVIS</strong> is a NASA airborne full-waveform LiDAR system designed for high-sensitivity vegetation and ice surface profiling. Unlike discrete-return systems, LVIS records the complete waveform of each laser return, enabling retrieval of canopy vertical structure (plant area index, foliage profiles) and ground elevation simultaneously — similar to GEDI but from airborne campaigns with higher density.</p>
+<p><strong>Agency:</strong> NASA Goddard Space Flight Center <strong>Sensor:</strong> Full-waveform 1064 nm LiDAR (airborne) <strong>Footprint size:</strong> ~10–25 m diameter (varies with aircraft altitude) <strong>Along-track density:</strong> Variable; typically higher than spaceborne systems (~1–5 footprints/m along-track) <strong>Coverage:</strong> Campaign-based; missions include Amazon, Congo, boreal forests (Canada/Alaska), Greenland Ice Sheet, Antarctic Peninsula, African savannas <strong>Key products:</strong> Ground elevation, canopy top height, waveform-derived plant area density profiles, RH metrics comparable to GEDI <strong>Key applications:</strong> Forest biomass calibration/validation, tropical and boreal canopy structure, ice surface change, comparison studies with GEDI and ICESat-2</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>LVIS data are freely available through <a href="https://earthdata.nasa.gov">NASA EarthData</a> and the <a href="https://lvis.gsfc.nasa.gov">LVIS project website</a>.</p>
+</div>
+</div>
 
 
 </section>
