@@ -267,6 +267,10 @@ ul.task-list li input[type="checkbox"] {
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-datasets">    
         <li>
+    <a class="dropdown-item" href="./datasets_intro.html">
+ <span class="dropdown-text">Introduction</span></a>
+  </li>  
+        <li>
     <a class="dropdown-item" href="./datasets_lidar.html">
  <span class="dropdown-text">LiDAR</span></a>
   </li>  
@@ -361,24 +365,169 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>This page summarizes the methodological framework used across my research, integrating machine learning, statistical modeling, and process-based approaches to quantify and understand key ecological and environmental processes.</p>
+<p>This page outlines the methodological framework underlying my research. Four complementary approaches — statistical modeling, machine learning, causal inference, and process-based modeling — are combined to characterize ecosystem structure and function, quantify environmental drivers, and project future ecosystem dynamics under climate change. Each method has distinct mechanisms, strengths, and limitations; their integration provides analytical robustness that no single approach can achieve alone.</p>
 <hr>
-<section id="machine-learning" class="level2">
-<h2 class="anchored" data-anchor-id="machine-learning">Machine Learning</h2>
-<p>Machine learning methods are applied to predict and map ecosystem properties across large spatial extents where direct measurements are sparse. Approaches include ensemble tree-based models (Random Forest, XGBoost, LightGBM) and stacked model ensembles for above-ground biomass estimation and land surface temperature prediction. Model interpretation relies on SHAP (SHapley Additive exPlanations) values to attribute variable importance and quantify individual predictor contributions in a physically interpretable way. Spatial cross-validation strategies (grouped k-fold, leave-one-site-out) are used to evaluate generalization beyond training locations.</p>
-<p><strong>Key applications:</strong> Forest above-ground biomass estimation · Urban cooling effect modeling · Land cover classification</p>
-<hr>
-</section>
 <section id="statistical-modeling" class="level2">
 <h2 class="anchored" data-anchor-id="statistical-modeling">Statistical Modeling</h2>
-<p>Statistical modeling is used to quantify relationships between ecosystem responses and environmental drivers, and to characterize variability and uncertainty across temporal and spatial scales. Methods include linear and nonlinear regression, mixed-effects models for hierarchical ecological data, time-series decomposition and detrending, and extreme value analysis for identifying and attributing anomalous ecosystem states. Multi-model ensemble approaches are applied to CMIP6 climate projections to propagate inter-model uncertainty through downstream ecological analyses.</p>
-<p><strong>Key applications:</strong> Climate–NPP sensitivity and attribution · Interannual variability decomposition · Urban green space structure–temperature relationships</p>
+<section id="basic-mechanisms" class="level3">
+<h3 class="anchored" data-anchor-id="basic-mechanisms">Basic Mechanisms</h3>
+<p>Statistical modeling describes the probabilistic relationship between a response variable and one or more predictors through a mathematical framework that explicitly characterizes data-generating processes and uncertainty. Core approaches range from classical linear and generalized linear models (GLMs) to hierarchical mixed-effects models, Bayesian inference, and time-series methods.</p>
+<p><strong>Linear and generalized linear models</strong> assume that the response is a (possibly transformed) linear function of predictors plus random error drawn from a specified distribution (Gaussian, Poisson, binomial, gamma). <strong>Mixed-effects models</strong> extend this by partitioning variance into fixed effects (population-level relationships) and random effects (site-, species-, or plot-level deviations), making them well-suited to nested ecological data structures. <strong>Bayesian inference</strong> frames parameter estimation as updating prior beliefs with observed data via Bayes’ theorem, producing full posterior distributions rather than point estimates. <strong>Time-series methods</strong> — including autoregressive models, spectral decomposition, and change-point detection algorithms such as LandTrendr and CCDC — characterize temporal trends, seasonality, and abrupt shifts in remote sensing records.</p>
+</section>
+<section id="advantages" class="level3">
+<h3 class="anchored" data-anchor-id="advantages">Advantages</h3>
+<ul>
+<li><strong>Interpretability</strong> — model coefficients have direct physical or ecological meaning (e.g., sensitivity of NPP to temperature)</li>
+<li><strong>Formal uncertainty quantification</strong> — confidence intervals and posterior distributions propagate parameter uncertainty into predictions</li>
+<li><strong>Well-established theory</strong> — decades of methodological literature support robust diagnostics and assumption testing</li>
+<li><strong>Efficient with small samples</strong> — parametric assumptions reduce the data needed relative to flexible ML approaches</li>
+<li><strong>Handles structured data</strong> — mixed-effects and hierarchical models naturally accommodate repeated measures, nested designs, and spatial autocorrelation</li>
+</ul>
+</section>
+<section id="disadvantages" class="level3">
+<h3 class="anchored" data-anchor-id="disadvantages">Disadvantages</h3>
+<ul>
+<li><strong>Distributional assumptions</strong> — misspecified error distributions or link functions produce biased inference</li>
+<li><strong>Limited nonlinearity</strong> — polynomial and spline extensions help, but classical regression struggles with highly complex, high-dimensional response surfaces</li>
+<li><strong>Sensitivity to outliers</strong> — least-squares estimation is strongly influenced by extreme observations</li>
+<li><strong>Collinearity</strong> — correlated predictors inflate variance inflation factors and destabilize coefficient estimates</li>
+<li><strong>Stationarity assumptions</strong> — many time-series methods assume stationary relationships that may not hold under climate non-stationarity</li>
+</ul>
+</section>
+<section id="applications-in-ecosystem-research" class="level3">
+<h3 class="anchored" data-anchor-id="applications-in-ecosystem-research">Applications in Ecosystem Research</h3>
+<ul>
+<li>Quantifying climate sensitivity of net primary production (NPP) across models and scenarios</li>
+<li>Allometric regression linking tree diameter and height to above-ground biomass</li>
+<li>Mixed-effects models for urban cooling intensity as a function of canopy structure across cities</li>
+<li>LandTrendr / CCDC for detecting and dating forest disturbance from Landsat time series</li>
+<li>Bayesian hierarchical models for integrating multi-source biomass observations with uncertainty</li>
+</ul>
 <hr>
+</section>
+</section>
+<section id="machine-learning" class="level2">
+<h2 class="anchored" data-anchor-id="machine-learning">Machine Learning</h2>
+<section id="basic-mechanisms-1" class="level3">
+<h3 class="anchored" data-anchor-id="basic-mechanisms-1">Basic Mechanisms</h3>
+<p>Machine learning (ML) algorithms learn predictive mappings from data without being explicitly programmed with domain equations. <strong>Supervised learning</strong> algorithms are trained on labeled input–output pairs to minimize a loss function; <strong>unsupervised learning</strong> identifies structure in unlabeled data. For ecological remote sensing, the dominant approaches are ensemble tree-based methods and deep learning.</p>
+<p><strong>Random Forest</strong> constructs many decorrelated decision trees (via bootstrap sampling of training data and random feature subsets at each split) and averages their predictions, producing both strong predictive accuracy and built-in variable importance estimates. <strong>Gradient boosting methods</strong> (XGBoost, LightGBM) build trees sequentially, with each tree correcting residuals of the prior ensemble using gradient descent on the loss function — typically outperforming Random Forest on tabular data with enough training samples. <strong>Convolutional Neural Networks (CNNs)</strong> apply learned spatial filters across image grids, capturing local spatial patterns in raster remote sensing data without hand-crafted feature engineering. <strong>SHAP (SHapley Additive exPlanations)</strong> values provide post-hoc interpretability by attributing each prediction to individual feature contributions, enabling physically meaningful analysis of black-box models.</p>
+</section>
+<section id="advantages-1" class="level3">
+<h3 class="anchored" data-anchor-id="advantages-1">Advantages</h3>
+<ul>
+<li><strong>Captures complex nonlinearity</strong> — no assumption of linearity, monotonicity, or specific functional form</li>
+<li><strong>Handles high-dimensional inputs</strong> — spectral bands, LiDAR metrics, topographic derivatives, and climate variables can all enter jointly</li>
+<li><strong>State-of-the-art predictive performance</strong> — consistently outperforms classical regression on large, heterogeneous datasets</li>
+<li><strong>Built-in variable importance</strong> — tree ensemble methods naturally rank predictor relevance</li>
+<li><strong>Scalable</strong> — tree-based methods scale to millions of training samples; GPU-accelerated deep learning scales further</li>
+<li><strong>Flexible output</strong> — regression, classification, object detection, and segmentation all handled by different architectures</li>
+</ul>
+</section>
+<section id="disadvantages-1" class="level3">
+<h3 class="anchored" data-anchor-id="disadvantages-1">Disadvantages</h3>
+<ul>
+<li><strong>Black-box behavior</strong> — without SHAP or similar tools, decision logic is opaque and hard to interpret mechanistically</li>
+<li><strong>Data hungry</strong> — deep learning in particular requires large labeled datasets that are expensive to produce in remote sensing</li>
+<li><strong>Poor extrapolation</strong> — ML models are unreliable outside the feature space of training data; projecting to novel climate conditions is risky without domain adaptation</li>
+<li><strong>Overfitting</strong> — without careful spatial cross-validation, accuracy metrics are inflated by spatial autocorrelation between training and test sets</li>
+<li><strong>No inherent uncertainty</strong> — point predictions from most ML methods require additional frameworks (conformal prediction, Monte Carlo Dropout, quantile regression forests) for uncertainty intervals</li>
+<li><strong>Stationarity assumption</strong> — trained on current conditions, models may fail under non-stationary climate or disturbance regimes</li>
+</ul>
+</section>
+<section id="applications-in-ecosystem-research-1" class="level3">
+<h3 class="anchored" data-anchor-id="applications-in-ecosystem-research-1">Applications in Ecosystem Research</h3>
+<ul>
+<li>Above-ground biomass estimation from multi-source LiDAR and spectral features using stacked Random Forest / XGBoost ensembles</li>
+<li>Land cover and forest type classification from Sentinel-2 and Landsat time-series features</li>
+<li>Global canopy height mapping by fusing GEDI waveforms with Sentinel-2 imagery via deep learning (ETH/Meta)</li>
+<li>Urban land surface temperature prediction from LiDAR-derived canopy structure and impervious surface metrics</li>
+<li>Deforestation alert systems using dense Landsat / Sentinel-2 time series</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="causal-inference" class="level2">
+<h2 class="anchored" data-anchor-id="causal-inference">Causal Inference</h2>
+<section id="basic-mechanisms-2" class="level3">
+<h3 class="anchored" data-anchor-id="basic-mechanisms-2">Basic Mechanisms</h3>
+<p>Causal inference provides a rigorous framework for identifying the <em>independent causal effect</em> of one variable on another — going beyond the correlational relationships that regression and machine learning describe. The foundational distinction is between association (<em>X</em> and <em>Y</em> covary) and causation (<em>X</em> produces <em>Y</em> when manipulated), formalized through two complementary traditions: the <strong>potential outcomes framework</strong> (Rubin, Neyman) and <strong>structural causal models</strong> (Pearl).</p>
+<p><strong>Directed Acyclic Graphs (DAGs)</strong> represent causal structures as graphs where nodes are variables and directed edges encode assumed causal directions. DAGs identify which variables must be conditioned on (confounders) or must <em>not</em> be conditioned on (mediators, colliders) to estimate an unconfounded causal effect — a process called <strong>backdoor adjustment</strong>. <strong>Pearl’s do-calculus</strong> formalizes interventional distributions P(Y | do(X)), distinguishing observational conditioning from hypothetical manipulation.</p>
+<p><strong>Instrumental Variables (IV)</strong> identify causal effects when unmeasured confounders exist, by leveraging a third variable (the instrument) that affects the treatment but influences the outcome only through the treatment pathway. <strong>Difference-in-Differences (DiD)</strong> compares changes over time between treated and control groups, removing time-invariant confounding under a parallel-trends assumption. <strong>Propensity Score Matching</strong> reweights or matches observational units to mimic a randomized experiment. <strong>Granger Causality</strong> tests whether past values of <em>X</em> improve forecasts of <em>Y</em> beyond <em>Y</em>’s own history in time series. <strong>Convergent Cross Mapping (CCM)</strong> detects causal coupling in nonlinear dynamical systems using the attractor manifold structure of time-series embeddings — particularly suited to ecological systems exhibiting chaotic dynamics.</p>
+</section>
+<section id="advantages-2" class="level3">
+<h3 class="anchored" data-anchor-id="advantages-2">Advantages</h3>
+<ul>
+<li><strong>Identifies mechanisms, not just associations</strong> — enables attribution of ecosystem responses to specific environmental drivers</li>
+<li><strong>Handles confounding explicitly</strong> — DAG-based analysis identifies and adjusts for confounders that bias observational regression</li>
+<li><strong>Applicable to observational data</strong> — no experiment needed when design choices (IV, DiD, natural experiments) are available</li>
+<li><strong>Quantifies counterfactual scenarios</strong> — answers “what would NPP have been without this extreme event?” — essential for climate impact attribution</li>
+<li><strong>Connects to policy</strong> — causal estimates of disturbance effects support management decisions (e.g., effect of fire suppression on forest carbon)</li>
+<li><strong>Integrates with ML</strong> — causal ML (double ML, causal forests) combines the flexibility of machine learning with the rigor of causal identification</li>
+</ul>
+</section>
+<section id="disadvantages-2" class="level3">
+<h3 class="anchored" data-anchor-id="disadvantages-2">Disadvantages</h3>
+<ul>
+<li><strong>Strong untestable assumptions</strong> — causal identification requires assumptions (no unmeasured confounding, instrument validity, parallel trends) that cannot be fully verified from data</li>
+<li><strong>Weak instruments</strong> — IV estimates become unreliable when the instrument is weakly correlated with the treatment, inflating standard errors</li>
+<li><strong>Complex ecological systems</strong> — ecosystems involve bidirectional feedbacks, lagged responses, and non-stationarity that challenge standard causal frameworks</li>
+<li><strong>Limited to identified effects</strong> — DAG-based inference requires specifying the full causal graph, which may be uncertain or contested</li>
+<li><strong>Granger causality is not true causality</strong> — predictive improvement in time series does not guarantee mechanistic causation; spurious Granger relationships arise from shared drivers</li>
+<li><strong>Data requirements</strong> — DiD requires long pre-treatment baselines; CCM requires long time series to reconstruct attractor manifolds</li>
+</ul>
+</section>
+<section id="applications-in-ecosystem-research-2" class="level3">
+<h3 class="anchored" data-anchor-id="applications-in-ecosystem-research-2">Applications in Ecosystem Research</h3>
+<ul>
+<li><strong>Climate–NPP attribution</strong> — isolating the causal effect of compound dry–hot events on NPP variability from confounding trends in CO₂ fertilization and land use change</li>
+<li><strong>Disturbance impact estimation</strong> — causal effect of bark beetle outbreaks on forest carbon stocks using IV or DiD with spatially varying infestation spread</li>
+<li><strong>Urban cooling attribution</strong> — separating the causal effect of canopy cover from correlated socioeconomic and land use variables on urban heat islands</li>
+<li><strong>Fire–vegetation feedbacks</strong> — CCM to detect bidirectional causal coupling between fire frequency and vegetation greenness in savanna systems</li>
+<li><strong>Remote sensing–based attribution</strong> — double ML combining satellite time series with meteorological drivers to causally attribute land surface temperature trends</li>
+</ul>
+<hr>
+</section>
 </section>
 <section id="process-based-models" class="level2">
 <h2 class="anchored" data-anchor-id="process-based-models">Process-Based Models</h2>
-<p>Process-based models provide mechanistic understanding of ecosystem dynamics that purely data-driven approaches cannot capture. These include allometric models linking tree structure (canopy height, diameter) to above-ground biomass, energy balance frameworks for urban surface temperature regulation, and carbon cycle models for net primary production estimation under changing climate forcings. Model parameterization draws on field inventory data (FIA, NEON) and high-resolution remote sensing observations.</p>
-<p><strong>Key applications:</strong> Allometric biomass estimation from LiDAR · NPP modeling under climate extremes · Surface energy balance partitioning in urban environments</p>
+<section id="basic-mechanisms-3" class="level3">
+<h3 class="anchored" data-anchor-id="basic-mechanisms-3">Basic Mechanisms</h3>
+<p>Process-based models (PBMs) — also called mechanistic or simulation models — represent ecosystem behavior through explicit mathematical formulations of physical, chemical, and biological processes. Rather than fitting empirical relationships to observed data, PBMs encode our understanding of <em>how</em> and <em>why</em> ecosystems function, using differential equations and energy/mass balance constraints derived from first principles.</p>
+<p><strong>Carbon and water cycling</strong> is typically represented through a coupled system: photosynthesis (GPP) is modeled using the Farquhar–von Caemmerer–Berry (FvCB) biochemical scheme, which relates CO₂ assimilation to rubisco kinetics, electron transport capacity, and stomatal conductance (Ball–Berry or Medlyn models). GPP minus autotrophic respiration yields net primary production (NPP); NPP minus heterotrophic decomposition yields net ecosystem exchange (NEE). <strong>Soil carbon</strong> pools are represented as first-order decay compartments with temperature and moisture scalar modifiers (e.g., CENTURY, RothC). <strong>Water balance</strong> links potential evapotranspiration (Penman–Monteith) to soil moisture dynamics and runoff generation.</p>
+<p><strong>Dynamic Global Vegetation Models (DGVMs)</strong> — such as LPJ-GUESS, CLM-FATES, ED2, ORCHIDEE, and JULES — simulate vegetation composition, carbon allocation, growth, mortality, and disturbance (fire, wind, insects) on a gridded domain, enabling climate–vegetation feedbacks at regional to global scales. <strong>Forest gap models</strong> (SORTIE, FORMIND) simulate individual tree birth, growth, competition, and death within small plots, capturing successional dynamics and size-structured competition. <strong>3-PG</strong> (Physiological Principles Predicting Growth) is a simpler process-based model widely used in plantation forestry, driven by monthly climate inputs and parameterized from field measurements.</p>
+</section>
+<section id="advantages-3" class="level3">
+<h3 class="anchored" data-anchor-id="advantages-3">Advantages</h3>
+<ul>
+<li><strong>Mechanistic interpretability</strong> — processes and parameters correspond directly to measurable biological quantities (Vcmax, wood density, decomposition rates)</li>
+<li><strong>Extrapolation to novel conditions</strong> — mechanistic constraints prevent unrealistic predictions under climate regimes outside the training data range, unlike empirical ML models</li>
+<li><strong>Captures feedbacks</strong> — vegetation–climate–soil feedbacks and their transient dynamics cannot be recovered from static empirical relationships</li>
+<li><strong>No labeled training data required</strong> — parameters are derived from physiological measurements and field experiments rather than large labeled observational datasets</li>
+<li><strong>Enables scenario analysis</strong> — consistent simulation framework allows comparison of SSP126 vs.&nbsp;SSP585, management interventions, or disturbance regimes under controlled conditions</li>
+<li><strong>Links scales</strong> — sub-daily physiological processes scale up to annual ecosystem carbon budgets through explicit mass balance bookkeeping</li>
+</ul>
+</section>
+<section id="disadvantages-3" class="level3">
+<h3 class="anchored" data-anchor-id="disadvantages-3">Disadvantages</h3>
+<ul>
+<li><strong>Parameter uncertainty</strong> — many parameters (e.g., maximum carboxylation rate Vcmax, turnover times, allocation fractions) are poorly constrained globally and vary by species and climate</li>
+<li><strong>Structural uncertainty</strong> — different process formulations (e.g., stomatal models, mortality algorithms, fire modules) produce divergent predictions even when driven with identical inputs — a major source of inter-model spread in CMIP6</li>
+<li><strong>Computational cost</strong> — global DGVMs at fine resolution (0.5°–1°) require substantial computing resources; individual-based forest models become prohibitive at landscape scales</li>
+<li><strong>Validation challenges</strong> — process-level validation (e.g., leaf-scale photosynthesis vs.&nbsp;tower-scale NEE) is difficult; models may produce correct outputs for wrong reasons</li>
+<li><strong>Static species traits</strong> — most DGVMs use fixed plant functional type (PFT) parameterizations that do not capture intraspecific trait variability or evolutionary adaptation</li>
+<li><strong>Missing processes</strong> — nutrient cycling (especially phosphorus in tropics), mycorrhizal networks, insect herbivory, and hydraulic failure under drought are poorly represented in many models</li>
+</ul>
+</section>
+<section id="applications-in-ecosystem-research-3" class="level3">
+<h3 class="anchored" data-anchor-id="applications-in-ecosystem-research-3">Applications in Ecosystem Research</h3>
+<ul>
+<li><strong>NPP projection under climate change</strong> — CMIP6 land surface models (CLM, JSBACH, ORCHIDEE) simulate future NPP trajectories under SSP126/SSP585 for attribution of IAV amplification</li>
+<li><strong>Forest carbon accounting</strong> — 3-PG and ED2 simulate plantation and natural forest growth and mortality for national greenhouse gas inventories</li>
+<li><strong>Post-disturbance succession</strong> — gap models simulate forest recovery trajectories after fire, logging, or insect outbreak over decadal to centennial time horizons</li>
+<li><strong>Water balance and drought stress</strong> — coupled water–carbon models (VIC, CLM) simulate soil moisture depletion, stomatal closure, and carbon assimilation decline during compound hot–dry events</li>
+<li><strong>Biomass estimation benchmarking</strong> — PBM-derived biomass maps serve as independent validation targets for remote sensing-based above-ground biomass products</li>
+</ul>
 <hr>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -390,11 +539,12 @@ Note
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>More methodological details and reproducible code are available in the <a href="./blog.html">Blog/Notes</a> section and linked directly from individual <a href="./projects.html">Research</a> projects.</p>
+<p>Reproducible code implementing these methods is available in the <a href="./blog.html">Blog/Notes</a> section and linked from individual <a href="./projects.html">Research</a> projects.</p>
 </div>
 </div>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->
