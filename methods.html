@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Research – Dingjin Chu</title>
+<title>Methods – Dingjin Chu</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -258,7 +258,7 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="./projects.html" aria-current="page"> 
+    <a class="nav-link" href="./projects.html"> 
 <span class="menu-text">Research</span></a>
   </li>  
   <li class="nav-item dropdown ">
@@ -289,7 +289,7 @@ ul.task-list li input[type="checkbox"] {
     </ul>
   </li>
   <li class="nav-item">
-    <a class="nav-link" href="./methods.html"> 
+    <a class="nav-link active" href="./methods.html" aria-current="page"> 
 <span class="menu-text">Methods</span></a>
   </li>  
   <li class="nav-item">
@@ -344,7 +344,7 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Research</h1>
+<h1 class="title">Methods</h1>
 </div>
 
 
@@ -361,36 +361,24 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<section id="aims" class="level1">
-<h1>Aims:</h1>
-<p>Integrate field investigations, remote sensing, and modeling to reveal cross-scale mechanisms, thereby supporting the development of robust models for understanding ecosystems — particularly forests — and improving forest management to enhance human well-being.</p>
-</section>
-<section id="forest-above-ground-biomass-estimation" class="level1">
-<h1>Forest above ground biomass estimation</h1>
-<p><strong>How to estimate forest AGB across large spatial scale?</strong></p>
-<p><img src="photo/AGB_estimation.png" class="img-fluid" style="border-radius: 6px; margin-bottom: 0.75rem;;width:100.0%"></p>
-<p>LiDAR-based modeling of forest above-ground biomass (AGB) using USGS 3DEP and NEON airborne point clouds, integrated with GEDI spaceborne LiDAR footprints and ESA CCI Biomass products for cross-scale validation. Built a large-scale processing pipeline that derives canopy structure metrics (height percentiles, density, rumple index) and predicts plot-level AGB with Random Forest, XGBoost, LightGBM, and stacked ensemble models, evaluated with grouped cross-validation and SHAP-based interpretation.</p>
-<p><strong>Tools:</strong> R (lidR, lasR, terra, sf), Python (scikit-learn, XGBoost, LightGBM, SHAP)</p>
+<p>This page summarizes the methodological framework used across my research, integrating machine learning, statistical modeling, and process-based approaches to quantify and understand key ecological and environmental processes.</p>
+<hr>
+<section id="machine-learning" class="level2">
+<h2 class="anchored" data-anchor-id="machine-learning">Machine Learning</h2>
+<p>Machine learning methods are applied to predict and map ecosystem properties across large spatial extents where direct measurements are sparse. Approaches include ensemble tree-based models (Random Forest, XGBoost, LightGBM) and stacked model ensembles for above-ground biomass estimation and land surface temperature prediction. Model interpretation relies on SHAP (SHapley Additive exPlanations) values to attribute variable importance and quantify individual predictor contributions in a physically interpretable way. Spatial cross-validation strategies (grouped k-fold, leave-one-site-out) are used to evaluate generalization beyond training locations.</p>
+<p><strong>Key applications:</strong> Forest above-ground biomass estimation · Urban cooling effect modeling · Land cover classification</p>
 <hr>
 </section>
-<section id="ecosystem-response-to-disturbances" class="level1">
-<h1>Ecosystem response to disturbances</h1>
-<p><strong>How do disturbances regulate ecosystem functioning?</strong></p>
-<p><img src="photo/climate_extremes_merged_ecosystem.png" class="img-fluid" style="border-radius: 6px; margin-bottom: 0.75rem;;width:100.0%"></p>
-<p>Climate extremes are projected to become more frequent and intense in the future, posing potentially severe yet poorly understood consequences for ecosystem functioning and carbon cycling.</p>
-<p><strong>Publication:</strong> Chu, D., Zhang, L., Wu, H., He, H., &amp; Ren, X. (2026). Future climate extremes enhance interannual variability of net primary production in Central Asia. <em>Environmental Research Letters.</em> <a href="https://doi.org/10.1088/1748-9326/ae6dd4" class="uri">https://doi.org/10.1088/1748-9326/ae6dd4</a></p>
-<p><strong>How do disturbances drive forest loss and its succession?</strong></p>
-<p><img src="photo/tree_mortality.jpg" class="img-fluid" style="border-radius: 6px; margin-bottom: 0.75rem;;width:100.0%"></p>
-<p>Quantifying forest loss trends and drivers across large spatial extents using time-series satellite imagery. The workflow integrates Hansen Global Forest Change data with climate and topographic covariates to attribute disturbance to fire, harvest, and insect outbreak.</p>
-<p><strong>Tools:</strong> R, Python, GEE</p>
+<section id="statistical-modeling" class="level2">
+<h2 class="anchored" data-anchor-id="statistical-modeling">Statistical Modeling</h2>
+<p>Statistical modeling is used to quantify relationships between ecosystem responses and environmental drivers, and to characterize variability and uncertainty across temporal and spatial scales. Methods include linear and nonlinear regression, mixed-effects models for hierarchical ecological data, time-series decomposition and detrending, and extreme value analysis for identifying and attributing anomalous ecosystem states. Multi-model ensemble approaches are applied to CMIP6 climate projections to propagate inter-model uncertainty through downstream ecological analyses.</p>
+<p><strong>Key applications:</strong> Climate–NPP sensitivity and attribution · Interannual variability decomposition · Urban green space structure–temperature relationships</p>
 <hr>
 </section>
-<section id="cooling-effect-of-urban-green-space" class="level1">
-<h1>Cooling effect of urban green space</h1>
-<p><strong>How does the urban green space regulate the temperature?</strong></p>
-<p><img src="photo/urban_green_space_cooling_effect.png" class="img-fluid" style="border-radius: 6px; margin-bottom: 0.75rem;;width:100.0%"></p>
-<p>Quantifying how the structure and composition of urban green spaces moderate land surface temperature across cities. Integrates USGS 3DEP airborne LiDAR-derived canopy metrics (height, cover, vertical complexity) with land cover and satellite-derived LST to model cooling magnitude as a function of canopy structure, patch geometry, and surrounding impervious context.</p>
-<p><strong>Tools:</strong> R (lidR, terra, sf, lme4), Python (xarray, rasterio, scikit-learn)</p>
+<section id="process-based-models" class="level2">
+<h2 class="anchored" data-anchor-id="process-based-models">Process-Based Models</h2>
+<p>Process-based models provide mechanistic understanding of ecosystem dynamics that purely data-driven approaches cannot capture. These include allometric models linking tree structure (canopy height, diameter) to above-ground biomass, energy balance frameworks for urban surface temperature regulation, and carbon cycle models for net primary production estimation under changing climate forcings. Model parameterization draws on field inventory data (FIA, NEON) and high-resolution remote sensing observations.</p>
+<p><strong>Key applications:</strong> Allometric biomass estimation from LiDAR · NPP modeling under climate extremes · Surface energy balance partitioning in urban environments</p>
 <hr>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -402,7 +390,7 @@ Note
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>More projects and reproducible notebooks will be added here over time.</p>
+<p>More methodological details and reproducible code are available in the <a href="./blog.html">Blog/Notes</a> section and linked directly from individual <a href="./projects.html">Research</a> projects.</p>
 </div>
 </div>
 
