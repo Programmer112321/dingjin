@@ -480,6 +480,29 @@ ul.task-list li input[type="checkbox"] {
 <p><strong>Applications:</strong> City-scale urban heat island intensity under current and future climates; regional cooling effect of large urban forests and parks; urban planning scenarios (e.g., greening 10% of impervious surfaces) at city scale; heat wave amplification in urban areas</p>
 <hr>
 </section>
+<section id="clmu-community-land-model-urban-within-clm5-cesm" class="level3">
+<h3 class="anchored" data-anchor-id="clmu-community-land-model-urban-within-clm5-cesm">CLMU — Community Land Model Urban (within CLM5 / CESM)</h3>
+<p><strong>CLMU</strong> (Community Land Model Urban) is the urban land surface scheme embedded within <strong>CLM5</strong>, the land component of the Community Earth System Model (CESM). Developed by Keith Oleson and colleagues at NCAR, CLMU represents urban areas as a simplified <strong>canyon geometry</strong> — a repeating unit of building roofs, sunlit and shaded walls, impervious road, and pervious ground (soil + vegetation) — and solves the full energy, water, and radiation balance for each surface type explicitly.</p>
+<p><strong>Developer:</strong> Keith Oleson et al., National Center for Atmospheric Research (NCAR) <strong>Scale:</strong> Global / regional (grid resolution of CLM5: typically 0.5°–1°; urban fraction per grid cell) <strong>Canyon geometry representation:</strong> - <strong>Roof</strong> — building top surface with conduction through layers of construction material - <strong>Sunlit wall / shaded wall</strong> — vertical building facades with diurnal radiation cycling - <strong>Impervious road</strong> — paved canyon floor with heat storage in pavement layers - <strong>Pervious ground</strong> — soil and vegetated fraction within the canyon (grass, trees) - <strong>Anthropogenic heat flux</strong> — waste heat from traffic, HVAC, and metabolism added to canyon energy balance</p>
+<p><strong>Key processes simulated:</strong> - Multi-layer shortwave and longwave radiation exchange between canyon surfaces (multiple reflections between walls, road, and sky) - Sensible and latent heat fluxes from each urban surface type using separate resistance networks - Heat conduction through multi-layer building walls and roofs (urban thermal mass) - Snow accumulation and melt on roofs and roads - Runoff from impervious surfaces and infiltration into pervious ground - Vegetation transpiration within the canyon (Penman–Monteith, coupled to CLM5 plant hydraulics) - Urban–rural temperature contrast (UHI) emergent from coupled land–atmosphere simulation</p>
+<p><strong>Advantages:</strong> - Fully coupled to the CLM5 land surface and CESM atmosphere, enabling urban–climate feedbacks at regional and global scale - Physically consistent with the same carbon, water, and energy cycle representation as vegetated land in CLM5 - Can simulate future urban climate under CMIP6 SSP scenarios, including urban heat island amplification under warming - Multi-layer wall/roof thermal mass realistically captures the nocturnal heat release that drives nighttime UHI - Open-source and freely available as part of CESM</p>
+<p><strong>Disadvantages:</strong> - Canyon geometry is a strong simplification — does not resolve within-city spatial heterogeneity, tree crown geometry, or street orientation effects - Urban parameters (height-to-width ratio, roof fraction, wall/roof albedo and thermal properties) must be prescribed per city and are often uncertain - Coarse spatial resolution limits applicability to local-scale urban design or individual-park cooling analyses - Vegetation within the canyon uses simplified LAI prescriptions rather than dynamic growth</p>
+<p><strong>Applications:</strong> - Simulating global and regional urban heat island intensity under historical and future climate scenarios (SSP1-2.6 to SSP5-8.5) - Quantifying the contribution of urban green cover fraction to canyon latent heat flux and surface cooling within CESM - Benchmarking against flux tower observations in cities (e.g., ICOS urban sites) to evaluate urban energy balance closure - Assessing urban warming amplification beyond background climate change at continental scale</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>CLMU is described in detail in <a href="https://doi.org/10.5065/D6FB50WS">Oleson et al.&nbsp;(2010)</a> and updated for CLM5 in <a href="https://doi.org/10.1029/2018MS001583">Lawrence et al.&nbsp;(2019)</a>. The model is freely available as part of <a href="https://www.cesm.ucar.edu">CESM</a>.</p>
+</div>
+</div>
+<hr>
+</section>
 <section id="i-tree-eco-urban-forest-ecosystem-services-model" class="level3">
 <h3 class="anchored" data-anchor-id="i-tree-eco-urban-forest-ecosystem-services-model">i-Tree Eco — Urban Forest Ecosystem Services Model</h3>
 <p><strong>i-Tree Eco</strong> is a peer-reviewed urban forestry modeling tool developed by the USDA Forest Service that quantifies the ecosystem services provided by urban trees — including air temperature reduction, air pollution removal, stormwater interception, and carbon storage — using field inventory data combined with local climate and pollution data.</p>
