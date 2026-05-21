@@ -448,6 +448,45 @@ ul.task-list li input[type="checkbox"] {
 <li><strong>Water balance and drought stress</strong> — coupled water–carbon models (VIC, CLM) simulate soil moisture depletion, stomatal closure, and carbon assimilation decline during compound hot–dry events</li>
 <li><strong>Biomass estimation benchmarking</strong> — PBM-derived biomass maps serve as independent validation targets for remote sensing-based above-ground biomass products</li>
 </ul>
+<hr>
+</section>
+<section id="process-based-models-for-urban-cooling-effect-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="process-based-models-for-urban-cooling-effect-analysis">Process-Based Models for Urban Cooling Effect Analysis</h2>
+<p>Urban green spaces regulate the thermal environment through several interacting physical mechanisms: <strong>evapotranspiration</strong> (latent heat flux that converts solar energy into water vapor rather than sensible heat), <strong>shading</strong> (reduction of shortwave radiation reaching the surface), <strong>albedo modification</strong> (vegetation albedo differs from impervious surfaces), and <strong>longwave radiation trapping</strong> (sky view factor effects within urban canyons). Process-based models simulate these mechanisms explicitly through coupled energy, water, and radiation balance equations, providing physically consistent estimates of cooling magnitude that complement empirical remote sensing analyses.</p>
+<section id="envi-met" class="level3">
+<h3 class="anchored" data-anchor-id="envi-met">ENVI-met</h3>
+<p><strong>ENVI-met</strong> is a three-dimensional microclimate simulation model designed specifically for the urban outdoor environment. It solves coupled atmospheric, radiative, and soil–vegetation equations at fine spatial scales (0.5–5 m), resolving the thermal interactions between buildings, paved surfaces, soil, and vegetation at the pedestrian level.</p>
+<p><strong>Developer:</strong> Michael Bruse / ENVI-met GmbH (University of Mainz origin) <strong>Scale:</strong> Microscale — individual streets, courtyards, parks (domain typically 100 m – 2 km) <strong>Key processes simulated:</strong> - Shortwave and longwave radiation (including shadowing by buildings and trees) - Sensible and latent heat fluxes from vegetated and impervious surfaces - Leaf-level transpiration and stomatal resistance - Turbulent wind flow and thermal plumes within the urban canopy - Mean Radiant Temperature (MRT) and outdoor thermal comfort indices (PET, UTCI)</p>
+<p><strong>Advantages:</strong> Physically rigorous 3D radiation and turbulence; resolves individual tree crown geometry; widely validated for outdoor thermal comfort studies</p>
+<p><strong>Disadvantages:</strong> Computationally intensive for large domains; requires detailed 3D building and vegetation input data; not suited for city-wide or regional analysis</p>
+<p><strong>Applications:</strong> Quantifying cooling effect of street trees and parks at pedestrian scale; optimizing urban green infrastructure design; assessing outdoor heat stress under climate change scenarios</p>
+<hr>
+</section>
+<section id="suews-surface-urban-energy-and-water-balance-scheme" class="level3">
+<h3 class="anchored" data-anchor-id="suews-surface-urban-energy-and-water-balance-scheme">SUEWS — Surface Urban Energy and Water Balance Scheme</h3>
+<p><strong>SUEWS</strong> is a neighborhood- to city-scale surface energy balance model that simulates the exchange of energy, water, and carbon between the urban surface and the atmosphere. It is designed to run over long time periods (years to decades) using standard meteorological inputs, making it well-suited for multi-year urban heat island analysis and green space cooling assessments.</p>
+<p><strong>Developer:</strong> Sue Grimmond’s group, King’s College London / University of Reading <strong>Scale:</strong> Neighborhood to city (~100 m – 1 km grid resolution) <strong>Key processes simulated:</strong> - Net radiation partitioning into sensible heat (Q<sub>H</sub>), latent heat (Q<sub>E</sub>), storage heat (ΔQ<sub>S</sub>), and anthropogenic heat (Q<sub>F</sub>) - Evapotranspiration from vegetated, paved, and water surfaces using a Penman–Monteith approach - Surface water balance (interception, soil moisture, runoff) - Urban morphology effects via sky view factor and plan area fractions of buildings, paving, vegetation, and water <strong>Key inputs:</strong> Meteorological forcing (air temperature, humidity, wind, radiation), land cover fractions, roughness parameters, vegetation LAI</p>
+<p><strong>Advantages:</strong> Long-term multi-year runs feasible; requires only standard meteorological inputs; open-source; handles mixed urban surface types; validated at dozens of flux tower sites globally</p>
+<p><strong>Disadvantages:</strong> Does not resolve within-grid spatial heterogeneity; no 3D radiative transfer; requires careful parameterization of urban morphology</p>
+<p><strong>Applications:</strong> Seasonal and interannual urban heat island magnitude; quantifying the evapotranspiration contribution of urban trees vs.&nbsp;grass; evaluating green roof and street tree cooling strategies over decadal timescales</p>
+<hr>
+</section>
+<section id="wrf-urban-weather-research-and-forecasting-model-with-urban-canopy-parameterization" class="level3">
+<h3 class="anchored" data-anchor-id="wrf-urban-weather-research-and-forecasting-model-with-urban-canopy-parameterization">WRF-Urban — Weather Research and Forecasting Model with Urban Canopy Parameterization</h3>
+<p><strong>WRF</strong> (Weather Research and Forecasting) is a mesoscale numerical weather prediction model widely used for regional climate simulation. Its urban physics options — including the <strong>Single-Layer Urban Canopy Model (SLUCM)</strong>, <strong>Multi-Layer Urban Canopy Model (BEP)</strong>, and <strong>Building Energy Model (BEM)</strong> — represent urban surface energy exchanges and enable simulation of urban heat island dynamics at city to regional scale.</p>
+<p><strong>Developer:</strong> NCAR / NOAA / university consortium; urban physics by Martilli, Salamanca, and others <strong>Scale:</strong> Mesoscale — city to regional (1–10 km grid; can nest down to ~100 m) <strong>Key processes simulated:</strong> - Urban surface energy balance with building geometry (canyon width/height ratio, roof fraction) - Anthropogenic heat release from traffic and buildings - Radiative trapping in street canyons - Green space fraction effects on latent heat flux and surface temperature - Coupled atmosphere–surface feedback (urban heat island circulation)</p>
+<p><strong>Advantages:</strong> Captures urban–rural circulation and mesoscale UHI dynamics; accounts for atmospheric feedbacks absent in local-scale models; can downscale regional climate projections for urban impact assessment</p>
+<p><strong>Disadvantages:</strong> Requires substantial computational resources; urban canopy parameterization is simplified relative to microscale models; uncertainty in anthropogenic heat flux inputs; coarse representation of individual trees</p>
+<p><strong>Applications:</strong> City-scale urban heat island intensity under current and future climates; regional cooling effect of large urban forests and parks; urban planning scenarios (e.g., greening 10% of impervious surfaces) at city scale; heat wave amplification in urban areas</p>
+<hr>
+</section>
+<section id="i-tree-eco-urban-forest-ecosystem-services-model" class="level3">
+<h3 class="anchored" data-anchor-id="i-tree-eco-urban-forest-ecosystem-services-model">i-Tree Eco — Urban Forest Ecosystem Services Model</h3>
+<p><strong>i-Tree Eco</strong> is a peer-reviewed urban forestry modeling tool developed by the USDA Forest Service that quantifies the ecosystem services provided by urban trees — including air temperature reduction, air pollution removal, stormwater interception, and carbon storage — using field inventory data combined with local climate and pollution data.</p>
+<p><strong>Developer:</strong> USDA Forest Service, Davey Tree Expert Company, and partners <strong>Scale:</strong> Plot to city (based on field-sampled urban tree inventory) <strong>Key processes simulated:</strong> - Transpiration-based cooling using a modified Penman–Monteith equation scaled to leaf area - Shading of buildings and pavement (reduction in building energy use) - Carbon storage and annual sequestration from tree growth - Air pollution deposition (O₃, NO₂, SO₂, PM₂.₅) to leaf surfaces - Stormwater interception by tree canopy</p>
+<p><strong>Advantages:</strong> Directly links field-measured tree attributes (DBH, height, species, crown dimensions) to ecosystem service estimates; outputs in monetary value (USD) for policy communication; free and well-documented; widely used by city governments and NGOs</p>
+<p><strong>Disadvantages:</strong> Cooling estimates are indirect (energy savings proxy rather than direct surface temperature simulation); does not simulate urban atmospheric dynamics or spatial temperature patterns; accuracy depends on quality of field inventory</p>
+<p><strong>Applications:</strong> Quantifying the economic value of urban tree cooling services; supporting urban forest management decisions; estimating cooling by species and size class; benchmarking remote sensing-derived cooling estimates against process-based tree-level calculations</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -463,6 +502,7 @@ Note
 </div>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->
