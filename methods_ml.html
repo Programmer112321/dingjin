@@ -407,46 +407,165 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>Machine learning (ML) algorithms learn predictive mappings from data without being explicitly programmed with domain equations. <strong>Supervised learning</strong> algorithms are trained on labeled input–output pairs to minimize a loss function; <strong>unsupervised learning</strong> identifies structure in unlabeled data. For ecological remote sensing, the dominant approaches are ensemble tree-based methods and deep learning.</p>
+<p>Machine learning (ML) algorithms learn predictive mappings from data without being explicitly programmed with domain equations. In ecological and remote sensing research, three broad families are in active use: <strong>interpretable / knowledge-guided machine learning</strong>, which prioritizes transparency and the integration of domain theory; <strong>deep learning</strong>, which leverages hierarchical neural architectures for high-dimensional inputs such as imagery and point clouds; and their joint application to <strong>3D LiDAR point cloud processing</strong>, where the geometry and density of millions of returns demand specialized architectures.</p>
 <hr>
-<section id="basic-mechanisms" class="level2">
-<h2 class="anchored" data-anchor-id="basic-mechanisms">Basic Mechanisms</h2>
-<p><strong>Random Forest</strong> constructs many decorrelated decision trees (via bootstrap sampling of training data and random feature subsets at each split) and averages their predictions, producing both strong predictive accuracy and built-in variable importance estimates. <strong>Gradient boosting methods</strong> (XGBoost, LightGBM) build trees sequentially, with each tree correcting residuals of the prior ensemble using gradient descent on the loss function — typically outperforming Random Forest on tabular data with enough training samples. <strong>Convolutional Neural Networks (CNNs)</strong> apply learned spatial filters across image grids, capturing local spatial patterns in raster remote sensing data without hand-crafted feature engineering. <strong>SHAP (SHapley Additive exPlanations)</strong> values provide post-hoc interpretability by attributing each prediction to individual feature contributions, enabling physically meaningful analysis of black-box models.</p>
+<section id="interpretable-knowledge-guided-machine-learning" class="level2">
+<h2 class="anchored" data-anchor-id="interpretable-knowledge-guided-machine-learning">1 · Interpretable &amp; Knowledge-Guided Machine Learning</h2>
+<section id="ensemble-tree-methods" class="level3">
+<h3 class="anchored" data-anchor-id="ensemble-tree-methods">Ensemble Tree Methods</h3>
+<p><strong>Random Forest</strong> constructs many decorrelated decision trees via bootstrap sampling and random feature subsets at each split, then averages predictions to achieve strong accuracy alongside built-in variable importance estimates. <strong>Gradient boosting methods</strong> (XGBoost, LightGBM) build trees sequentially so each tree corrects the residuals of the prior ensemble through gradient descent on the loss function — typically outperforming Random Forest on tabular ecological data with sufficient training samples.</p>
 <hr>
 </section>
-<section id="advantages" class="level2">
-<h2 class="anchored" data-anchor-id="advantages">Advantages</h2>
+<section id="interpretability-tools-shap" class="level3">
+<h3 class="anchored" data-anchor-id="interpretability-tools-shap">Interpretability Tools — SHAP</h3>
+<p><strong>SHAP (SHapley Additive exPlanations)</strong> provides post-hoc interpretability by decomposing each prediction into additive contributions from individual features, grounded in cooperative game theory. For ecological applications this means a Random Forest or XGBoost biomass estimate can be attributed to specific drivers — canopy height, VPD, soil moisture — with directional and magnitude information. SHAP interaction values further reveal how two predictors jointly modulate predictions, enabling physically meaningful analysis of black-box ensembles.</p>
+<hr>
+</section>
+<section id="knowledge-guided-physics-informed-ml" class="level3">
+<h3 class="anchored" data-anchor-id="knowledge-guided-physics-informed-ml">Knowledge-Guided / Physics-Informed ML</h3>
+<p>Purely data-driven models can violate physical laws (e.g., predicting negative biomass, or NPP that exceeds radiation limits) and fail outside training conditions. Knowledge-guided ML embeds domain constraints directly into the learning process:</p>
+<ul>
+<li><strong>Physics-informed loss functions</strong> — add penalty terms that penalize violations of energy balance, mass conservation, or known monotonic relationships (e.g., GPP must increase with radiation up to light saturation)</li>
+<li><strong>Feature engineering from process understanding</strong> — input features are constructed as physically meaningful compound variables (fAPAR × PAR, VPD × stomatal conductance proxy) rather than raw band reflectances</li>
+<li><strong>Hybrid PBM–ML models</strong> — a process-based model provides baseline predictions; ML corrects residuals arising from structural error or missing processes; the combined output respects physical bounds while capturing complex patterns</li>
+<li><strong>Transfer learning with domain adaptation</strong> — pre-trained models are fine-tuned on target ecosystems with physical consistency constraints, reducing the labeled data requirement</li>
+</ul>
+<p>These approaches improve generalization to novel climate or land-cover conditions where purely empirical models degrade.</p>
+<hr>
+</section>
+<section id="advantages" class="level3">
+<h3 class="anchored" data-anchor-id="advantages">Advantages</h3>
 <ul>
 <li><strong>Captures complex nonlinearity</strong> — no assumption of linearity, monotonicity, or specific functional form</li>
 <li><strong>Handles high-dimensional inputs</strong> — spectral bands, LiDAR metrics, topographic derivatives, and climate variables can all enter jointly</li>
-<li><strong>State-of-the-art predictive performance</strong> — consistently outperforms classical regression on large, heterogeneous datasets</li>
-<li><strong>Built-in variable importance</strong> — tree ensemble methods naturally rank predictor relevance</li>
-<li><strong>Scalable</strong> — tree-based methods scale to millions of training samples; GPU-accelerated deep learning scales further</li>
-<li><strong>Flexible output</strong> — regression, classification, object detection, and segmentation all handled by different architectures</li>
+<li><strong>Built-in variable importance</strong> — tree ensembles naturally rank predictor relevance; SHAP provides directional attribution</li>
+<li><strong>Physically consistent outputs</strong> — knowledge-guided constraints prevent ecologically implausible predictions</li>
+<li><strong>Scalable</strong> — scales to millions of training samples; GPU-accelerated variants scale further</li>
 </ul>
 <hr>
 </section>
-<section id="disadvantages" class="level2">
-<h2 class="anchored" data-anchor-id="disadvantages">Disadvantages</h2>
+<section id="disadvantages" class="level3">
+<h3 class="anchored" data-anchor-id="disadvantages">Disadvantages</h3>
 <ul>
-<li><strong>Black-box behavior</strong> — without SHAP or similar tools, decision logic is opaque and hard to interpret mechanistically</li>
-<li><strong>Data hungry</strong> — deep learning in particular requires large labeled datasets that are expensive to produce in remote sensing</li>
-<li><strong>Poor extrapolation</strong> — ML models are unreliable outside the feature space of training data; projecting to novel climate conditions is risky without domain adaptation</li>
-<li><strong>Overfitting</strong> — without careful spatial cross-validation, accuracy metrics are inflated by spatial autocorrelation between training and test sets</li>
-<li><strong>No inherent uncertainty</strong> — point predictions from most ML methods require additional frameworks (conformal prediction, Monte Carlo Dropout, quantile regression forests) for uncertainty intervals</li>
-<li><strong>Stationarity assumption</strong> — trained on current conditions, models may fail under non-stationary climate or disturbance regimes</li>
+<li><strong>Poor extrapolation without constraints</strong> — purely data-driven models are unreliable outside the feature space of training data</li>
+<li><strong>Overfitting</strong> — without careful spatial cross-validation, accuracy metrics are inflated by spatial autocorrelation</li>
+<li><strong>No inherent uncertainty</strong> — point predictions require additional frameworks (quantile regression forests, conformal prediction) for intervals</li>
+<li><strong>Stationarity assumption</strong> — models trained on current conditions may fail under non-stationary climate regimes</li>
 </ul>
 <hr>
 </section>
-<section id="applications-in-ecosystem-research" class="level2">
-<h2 class="anchored" data-anchor-id="applications-in-ecosystem-research">Applications in Ecosystem Research</h2>
+</section>
+<section id="deep-learning" class="level2">
+<h2 class="anchored" data-anchor-id="deep-learning">2 · Deep Learning</h2>
+<p>Deep learning (DL) uses multi-layer neural networks to learn hierarchical feature representations directly from raw data, bypassing hand-crafted feature engineering. For remote sensing and ecological research, four architectures dominate.</p>
+<hr>
+<section id="convolutional-neural-networks-cnns" class="level3">
+<h3 class="anchored" data-anchor-id="convolutional-neural-networks-cnns">Convolutional Neural Networks (CNNs)</h3>
+<p>CNNs apply learned spatial filters (kernels) across image grids in successive layers, progressively extracting local-to-global features. In remote sensing they are the standard architecture for land cover classification, tree crown delineation, and urban mapping from multispectral or hyperspectral raster data. Encoder–decoder variants (U-Net, DeepLab) produce pixel-wise segmentation outputs used for canopy and impervious surface mapping.</p>
+<hr>
+</section>
+<section id="recurrent-networks-transformers-for-time-series" class="level3">
+<h3 class="anchored" data-anchor-id="recurrent-networks-transformers-for-time-series">Recurrent Networks &amp; Transformers for Time Series</h3>
+<p><strong>LSTMs</strong> and <strong>GRUs</strong> capture temporal dependencies in satellite time-series (e.g., Landsat/Sentinel-2 EVI or LAI stacks) for phenology extraction, disturbance detection, and GPP estimation. <strong>Vision Transformers (ViT)</strong> and temporal attention mechanisms increasingly replace recurrent layers, using self-attention to weight the relative importance of observations across time and space — including irregular acquisition intervals from cloud masking.</p>
+<hr>
+</section>
+<section id="graph-neural-networks-gnns" class="level3">
+<h3 class="anchored" data-anchor-id="graph-neural-networks-gnns">Graph Neural Networks (GNNs)</h3>
+<p>GNNs operate on irregular graph-structured data rather than grids, making them naturally suited to ecological networks (species interaction graphs, plot connectivity) and, increasingly, to point cloud processing where each return is a node with spatial edges to neighbors.</p>
+<hr>
+</section>
+<section id="advantages-1" class="level3">
+<h3 class="anchored" data-anchor-id="advantages-1">Advantages</h3>
 <ul>
-<li>Above-ground biomass estimation from multi-source LiDAR and spectral features using stacked Random Forest / XGBoost ensembles</li>
-<li>Land cover and forest type classification from Sentinel-2 and Landsat time-series features</li>
-<li>Global canopy height mapping by fusing GEDI waveforms with Sentinel-2 imagery via deep learning (ETH/Meta)</li>
-<li>Urban land surface temperature prediction from LiDAR-derived canopy structure and impervious surface metrics</li>
-<li>Deforestation alert systems using dense Landsat / Sentinel-2 time series</li>
+<li><strong>State-of-the-art accuracy</strong> on image classification, segmentation, and time-series tasks</li>
+<li><strong>Automatic feature learning</strong> — no manual spectral index or texture feature engineering</li>
+<li><strong>Flexible architectures</strong> — can be adapted to multi-modal inputs (imagery + LiDAR + SAR)</li>
+<li><strong>Transfer learning</strong> — ImageNet- or Satlas-pretrained backbones require far less labeled ecological data for fine-tuning</li>
 </ul>
+<hr>
+</section>
+<section id="disadvantages-1" class="level3">
+<h3 class="anchored" data-anchor-id="disadvantages-1">Disadvantages</h3>
+<ul>
+<li><strong>Data hungry</strong> — requires large labeled datasets that are expensive to produce in remote sensing</li>
+<li><strong>Computationally intensive</strong> — GPU clusters required for training at scale</li>
+<li><strong>Black-box behavior</strong> — interpretability requires additional tools (GradCAM, attention visualization)</li>
+<li><strong>Spatial autocorrelation risk</strong> — geographic train/test splits essential to avoid inflated accuracy</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="machine-learning-for-lidar-point-cloud-processing" class="level2">
+<h2 class="anchored" data-anchor-id="machine-learning-for-lidar-point-cloud-processing">3 · Machine Learning for LiDAR Point Cloud Processing</h2>
+<p>Airborne, spaceborne, and terrestrial LiDAR systems produce point clouds — unordered sets of 3D returns (x, y, z) with optional intensity and return-number attributes. Extracting ecologically and structurally meaningful information from these clouds requires algorithms that handle irregular spatial sampling, variable density, and occlusion. ML and DL have transformed point cloud analysis across four core tasks.</p>
+<hr>
+<section id="point-cloud-classification-semantic-segmentation" class="level3">
+<h3 class="anchored" data-anchor-id="point-cloud-classification-semantic-segmentation">Point Cloud Classification &amp; Semantic Segmentation</h3>
+<p>Assigning each return a semantic label (ground, low/medium/high vegetation, building, noise) is the foundational step for any downstream analysis. Classical approaches (height-above-ground thresholds, normalized cut clustering) have been largely replaced by:</p>
+<ul>
+<li><strong>PointNet / PointNet++</strong> — pioneer architectures that process raw (x, y, z) point sets directly using shared MLP layers and local neighborhood aggregation (set abstraction), learning per-point and global features without voxelization. Widely applied to classify airborne LiDAR returns into ground, shrub, tree, and structure classes.</li>
+<li><strong>RandLA-Net</strong> — efficient random sampling with local feature aggregation, enabling semantic segmentation of large outdoor scenes with tens of millions of points at low memory cost.</li>
+<li><strong>KPConv (Kernel Point Convolution)</strong> — defines convolution kernels in 3D space anchored at kernel points, enabling spatially consistent feature learning without a regular grid; highly accurate for ALS forest classification.</li>
+</ul>
+<hr>
+</section>
+<section id="individual-tree-detection-crown-segmentation" class="level3">
+<h3 class="anchored" data-anchor-id="individual-tree-detection-crown-segmentation">Individual Tree Detection &amp; Crown Segmentation</h3>
+<ul>
+<li><strong>3D Instance Segmentation</strong> — models such as <strong>PointGroup</strong>, <strong>HAIS</strong>, and <strong>Mask3D</strong> extend semantic segmentation to individual instance delineation, separating adjacent tree crowns in dense forest canopy point clouds.</li>
+<li><strong>Deep Learning–Enhanced Watershed / Region Growing</strong> — CNN-predicted seed points or crown probability maps guide classical watershed segmentation on normalized canopy height models (nCHMs), combining the interpretability of raster-based methods with DL accuracy.</li>
+<li><strong>RANSAC + GNN</strong> — trunk detection via RANSAC cylinder fitting, followed by GNN-based crown-to-trunk association for individual tree isolation in terrestrial LiDAR (TLS) scenes.</li>
+</ul>
+<hr>
+</section>
+<section id="biomass-structural-attribute-estimation" class="level3">
+<h3 class="anchored" data-anchor-id="biomass-structural-attribute-estimation">Biomass &amp; Structural Attribute Estimation</h3>
+<p>Once point clouds are segmented, ML models translate 3D structural metrics into forest inventory attributes:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 47%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Target attribute</th>
+<th>Common ML approach</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Above-ground biomass (AGB)</td>
+<td>Random Forest / XGBoost from height percentiles, canopy cover, density metrics</td>
+</tr>
+<tr class="even">
+<td>Tree height &amp; crown volume</td>
+<td>Direct measurement from segmented point cloud; DL refinement for overlapping crowns</td>
+</tr>
+<tr class="odd">
+<td>Leaf area index (LAI)</td>
+<td>Gap fraction inversion from TLS hemispherical profiles; RF from ALS density layers</td>
+</tr>
+<tr class="even">
+<td>Stem diameter (DBH)</td>
+<td>RANSAC cylinder fitting on TLS trunk returns; CNN regression on cross-sectional slices</td>
+</tr>
+<tr class="odd">
+<td>Wood volume</td>
+<td>Quantitative Structure Models (QSM: TreeQSM, AdQSM) reconstructing branching geometry</td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+<section id="change-detection-forest-disturbance-mapping" class="level3">
+<h3 class="anchored" data-anchor-id="change-detection-forest-disturbance-mapping">Change Detection &amp; Forest Disturbance Mapping</h3>
+<p>Multi-temporal ALS or repeat GEDI acquisitions enable 3D change detection beyond what 2D imagery can resolve:</p>
+<ul>
+<li><strong>Siamese PointNet</strong> and <strong>3D U-Net change detection</strong> networks take paired pre/post point clouds as dual-branch inputs and predict per-point change labels (mortality, growth, windthrow, harvest)</li>
+<li><strong>Height difference rasters + RF classification</strong> — differencing normalized canopy height models between epochs, then classifying change magnitude and spatial pattern with Random Forest to distinguish disturbance type (fire scorch vs.&nbsp;mechanical harvest vs.&nbsp;wind damage)</li>
+<li><strong>GEDI L2A/L4A time series</strong> — footprint-level RH metrics (RH50, RH98) tracked across repeat acquisitions with anomaly detection (isolation forest, LSTM autoencoder) to flag canopy loss events at near-global scale</li>
+</ul>
+<hr>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -462,6 +581,7 @@ Note
 </div>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->
