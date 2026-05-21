@@ -1,5 +1,19 @@
 [
   {
+    "objectID": "projects_urban.html",
+    "href": "projects_urban.html",
+    "title": "Cooling Effect of Urban Green Space",
+    "section": "",
+    "text": "How does the urban green space regulate the temperature?\n\nQuantifying how the structure and composition of urban green spaces moderate land surface temperature across cities. Integrates USGS 3DEP airborne LiDAR-derived canopy metrics (height, cover, vertical complexity) with land cover and satellite-derived LST to model cooling magnitude as a function of canopy structure, patch geometry, and surrounding impervious context.\nTools: R (lidR, terra, sf, lme4), Python (xarray, rasterio, scikit-learn)\n\n\n\n\n\n\nNote\n\n\n\nReturn to Ecosystem Response to Disturbances or go back to Research Introduction."
+  },
+  {
+    "objectID": "projects_disturbance.html",
+    "href": "projects_disturbance.html",
+    "title": "Ecosystem Response to Disturbances",
+    "section": "",
+    "text": "How do disturbances regulate ecosystem functioning?\n\nClimate extremes are projected to become more frequent and intense in the future, posing potentially severe yet poorly understood consequences for ecosystem functioning and carbon cycling.\nPublication: Chu, D., Zhang, L., Wu, H., He, H., & Ren, X. (2026). Future climate extremes enhance interannual variability of net primary production in Central Asia. Environmental Research Letters. https://doi.org/10.1088/1748-9326/ae6dd4\n\nHow do disturbances drive forest loss and its succession?\n\nQuantifying forest loss trends and drivers across large spatial extents using time-series satellite imagery. The workflow integrates Hansen Global Forest Change data with climate and topographic covariates to attribute disturbance to fire, harvest, and insect outbreak.\nTools: R, Python, GEE\n\n\n\n\n\n\nNote\n\n\n\nReturn to Forest AGB Estimation or continue to Cooling Effect of Urban Green Space."
+  },
+  {
     "objectID": "projects.html",
     "href": "projects.html",
     "title": "Research",
@@ -943,5 +957,40 @@
     "title": "Welcome to My Blog",
     "section": "",
     "text": "This is the first post on my blog. I will use this space to share thoughts on remote sensing, LiDAR analysis, forest ecology, and my research journey as a PhD student at Oklahoma State University.\nStay tuned for updates on ongoing projects, field work, and data science tips."
+  },
+  {
+    "objectID": "projects_agb.html",
+    "href": "projects_agb.html",
+    "title": "Forest Above-Ground Biomass Estimation",
+    "section": "",
+    "text": "How to estimate forest AGB across large spatial scales?\n\nLiDAR-based modeling of forest above-ground biomass (AGB) using USGS 3DEP and NEON airborne point clouds, integrated with GEDI spaceborne LiDAR footprints and ESA CCI Biomass products for cross-scale validation. Built a large-scale processing pipeline that derives canopy structure metrics (height percentiles, density, rumple index) and predicts plot-level AGB with Random Forest, XGBoost, LightGBM, and stacked ensemble models, evaluated with grouped cross-validation and SHAP-based interpretation.\nTools: R (lidR, lasR, terra, sf), Python (scikit-learn, XGBoost, LightGBM, SHAP)\n\n\n\n\n\n\nNote\n\n\n\nReturn to Research Introduction or continue to Ecosystem Response to Disturbances."
+  },
+  {
+    "objectID": "projects_intro.html",
+    "href": "projects_intro.html",
+    "title": "Research — Introduction",
+    "section": "",
+    "text": "Integrate field investigations, remote sensing, and modeling to reveal cross-scale mechanisms, thereby supporting the development of robust models for understanding ecosystems — particularly forests — and improving forest management to enhance human well-being."
+  },
+  {
+    "objectID": "projects_intro.html#aims",
+    "href": "projects_intro.html#aims",
+    "title": "Research — Introduction",
+    "section": "",
+    "text": "Integrate field investigations, remote sensing, and modeling to reveal cross-scale mechanisms, thereby supporting the development of robust models for understanding ecosystems — particularly forests — and improving forest management to enhance human well-being."
+  },
+  {
+    "objectID": "projects_intro.html#research-topics",
+    "href": "projects_intro.html#research-topics",
+    "title": "Research — Introduction",
+    "section": "Research Topics",
+    "text": "Research Topics\n\n\n\nTopic\nCore question\n\n\n\n\nForest Above-Ground Biomass Estimation\nHow to estimate forest AGB across large spatial scales?\n\n\nEcosystem Response to Disturbances\nHow do disturbances regulate ecosystem functioning and drive forest loss?\n\n\nCooling Effect of Urban Green Space\nHow does urban green space regulate temperature?"
+  },
+  {
+    "objectID": "projects_intro.html#overarching-theme",
+    "href": "projects_intro.html#overarching-theme",
+    "title": "Research — Introduction",
+    "section": "Overarching Theme",
+    "text": "Overarching Theme\nForests and urban ecosystems are simultaneously shaped by climate variability, disturbance regimes, and human land management. Understanding how these forces interact — and quantifying their effects on carbon stocks, biodiversity, and human well-being — requires observations spanning from individual tree crowns to global scales, and methods ranging from empirical field measurements to process-based simulation.\nMy research integrates:\n\nMulti-platform remote sensing (airborne LiDAR, spaceborne LiDAR, optical, radar) to characterize ecosystem structure across spatial scales\nField inventory data (FIA, NEON) to calibrate and validate remote sensing-derived estimates\nStatistical and machine learning models to map ecosystem properties and detect change at landscape to continental scales\nCausal inference and process-based models to attribute observed changes to specific drivers and project future dynamics under climate change\n\n\n\n\n\n\n\nNote\n\n\n\nMore projects and reproducible notebooks will be added over time. See the Blog/Notes section for detailed methods and code."
   }
 ]

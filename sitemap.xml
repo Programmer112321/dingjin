@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://Programmer112321.github.io/dingjin/projects_urban.html</loc>
+    <lastmod>2026-05-21T01:11:59.884Z</lastmod>
+  </url>
+  <url>
+    <loc>https://Programmer112321.github.io/dingjin/projects_disturbance.html</loc>
+    <lastmod>2026-05-21T01:11:31.400Z</lastmod>
+  </url>
+  <url>
     <loc>https://Programmer112321.github.io/dingjin/projects.html</loc>
     <lastmod>2026-05-18T20:21:12.562Z</lastmod>
   </url>
@@ -95,5 +103,13 @@
   <url>
     <loc>https://Programmer112321.github.io/dingjin/posts/welcome/index.html</loc>
     <lastmod>2026-05-16T15:08:17.090Z</lastmod>
+  </url>
+  <url>
+    <loc>https://Programmer112321.github.io/dingjin/projects_agb.html</loc>
+    <lastmod>2026-05-21T01:11:23.438Z</lastmod>
+  </url>
+  <url>
+    <loc>https://Programmer112321.github.io/dingjin/projects_intro.html</loc>
+    <lastmod>2026-05-21T01:11:16.503Z</lastmod>
   </url>
 </urlset>

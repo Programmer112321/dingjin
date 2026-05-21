@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Process-Based Models – Dingjin Chu</title>
+<title>Forest Above-Ground Biomass Estimation – Dingjin Chu</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -390,7 +390,7 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Process-Based Models</h1>
+<h1 class="title">Forest Above-Ground Biomass Estimation</h1>
 </div>
 
 
@@ -407,47 +407,10 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>Process-based models (PBMs) — also called mechanistic or simulation models — represent ecosystem behavior through explicit mathematical formulations of physical, chemical, and biological processes. Rather than fitting empirical relationships to observed data, PBMs encode our understanding of <em>how</em> and <em>why</em> ecosystems function, using differential equations and energy/mass balance constraints derived from first principles.</p>
-<hr>
-<section id="basic-mechanisms" class="level2">
-<h2 class="anchored" data-anchor-id="basic-mechanisms">Basic Mechanisms</h2>
-<p><strong>Carbon and water cycling</strong> is typically represented through a coupled system: photosynthesis (GPP) is modeled using the Farquhar–von Caemmerer–Berry (FvCB) biochemical scheme, which relates CO₂ assimilation to rubisco kinetics, electron transport capacity, and stomatal conductance (Ball–Berry or Medlyn models). GPP minus autotrophic respiration yields net primary production (NPP); NPP minus heterotrophic decomposition yields net ecosystem exchange (NEE). <strong>Soil carbon</strong> pools are represented as first-order decay compartments with temperature and moisture scalar modifiers (e.g., CENTURY, RothC). <strong>Water balance</strong> links potential evapotranspiration (Penman–Monteith) to soil moisture dynamics and runoff generation.</p>
-<p><strong>Dynamic Global Vegetation Models (DGVMs)</strong> — such as LPJ-GUESS, CLM-FATES, ED2, ORCHIDEE, and JULES — simulate vegetation composition, carbon allocation, growth, mortality, and disturbance (fire, wind, insects) on a gridded domain, enabling climate–vegetation feedbacks at regional to global scales. <strong>Forest gap models</strong> (SORTIE, FORMIND) simulate individual tree birth, growth, competition, and death within small plots, capturing successional dynamics and size-structured competition. <strong>3-PG</strong> (Physiological Principles Predicting Growth) is a simpler process-based model widely used in plantation forestry, driven by monthly climate inputs and parameterized from field measurements.</p>
-<hr>
-</section>
-<section id="advantages" class="level2">
-<h2 class="anchored" data-anchor-id="advantages">Advantages</h2>
-<ul>
-<li><strong>Mechanistic interpretability</strong> — processes and parameters correspond directly to measurable biological quantities (Vcmax, wood density, decomposition rates)</li>
-<li><strong>Extrapolation to novel conditions</strong> — mechanistic constraints prevent unrealistic predictions under climate regimes outside the training data range, unlike empirical ML models</li>
-<li><strong>Captures feedbacks</strong> — vegetation–climate–soil feedbacks and their transient dynamics cannot be recovered from static empirical relationships</li>
-<li><strong>No labeled training data required</strong> — parameters are derived from physiological measurements and field experiments rather than large labeled observational datasets</li>
-<li><strong>Enables scenario analysis</strong> — consistent simulation framework allows comparison of SSP126 vs.&nbsp;SSP585, management interventions, or disturbance regimes under controlled conditions</li>
-<li><strong>Links scales</strong> — sub-daily physiological processes scale up to annual ecosystem carbon budgets through explicit mass balance bookkeeping</li>
-</ul>
-<hr>
-</section>
-<section id="disadvantages" class="level2">
-<h2 class="anchored" data-anchor-id="disadvantages">Disadvantages</h2>
-<ul>
-<li><strong>Parameter uncertainty</strong> — many parameters (e.g., maximum carboxylation rate Vcmax, turnover times, allocation fractions) are poorly constrained globally and vary by species and climate</li>
-<li><strong>Structural uncertainty</strong> — different process formulations (e.g., stomatal models, mortality algorithms, fire modules) produce divergent predictions even when driven with identical inputs — a major source of inter-model spread in CMIP6</li>
-<li><strong>Computational cost</strong> — global DGVMs at fine resolution (0.5°–1°) require substantial computing resources; individual-based forest models become prohibitive at landscape scales</li>
-<li><strong>Validation challenges</strong> — process-level validation (e.g., leaf-scale photosynthesis vs.&nbsp;tower-scale NEE) is difficult; models may produce correct outputs for wrong reasons</li>
-<li><strong>Static species traits</strong> — most DGVMs use fixed plant functional type (PFT) parameterizations that do not capture intraspecific trait variability or evolutionary adaptation</li>
-<li><strong>Missing processes</strong> — nutrient cycling (especially phosphorus in tropics), mycorrhizal networks, insect herbivory, and hydraulic failure under drought are poorly represented in many models</li>
-</ul>
-<hr>
-</section>
-<section id="applications-in-ecosystem-research" class="level2">
-<h2 class="anchored" data-anchor-id="applications-in-ecosystem-research">Applications in Ecosystem Research</h2>
-<ul>
-<li><strong>NPP projection under climate change</strong> — CMIP6 land surface models (CLM, JSBACH, ORCHIDEE) simulate future NPP trajectories under SSP126/SSP585 for attribution of IAV amplification</li>
-<li><strong>Forest carbon accounting</strong> — 3-PG and ED2 simulate plantation and natural forest growth and mortality for national greenhouse gas inventories</li>
-<li><strong>Post-disturbance succession</strong> — gap models simulate forest recovery trajectories after fire, logging, or insect outbreak over decadal to centennial time horizons</li>
-<li><strong>Water balance and drought stress</strong> — coupled water–carbon models (VIC, CLM) simulate soil moisture depletion, stomatal closure, and carbon assimilation decline during compound hot–dry events</li>
-<li><strong>Biomass estimation benchmarking</strong> — PBM-derived biomass maps serve as independent validation targets for remote sensing-based above-ground biomass products</li>
-</ul>
+<p><strong>How to estimate forest AGB across large spatial scales?</strong></p>
+<p><img src="photo/AGB_estimation.png" class="img-fluid" style="border-radius: 6px; margin-bottom: 0.75rem;;width:100.0%"></p>
+<p>LiDAR-based modeling of forest above-ground biomass (AGB) using USGS 3DEP and NEON airborne point clouds, integrated with GEDI spaceborne LiDAR footprints and ESA CCI Biomass products for cross-scale validation. Built a large-scale processing pipeline that derives canopy structure metrics (height percentiles, density, rumple index) and predicts plot-level AGB with Random Forest, XGBoost, LightGBM, and stacked ensemble models, evaluated with grouped cross-validation and SHAP-based interpretation.</p>
+<p><strong>Tools:</strong> R (lidR, lasR, terra, sf), Python (scikit-learn, XGBoost, LightGBM, SHAP)</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -458,12 +421,11 @@ Note
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Return to <a href="./methods_causal.html">Causal Inference</a> or go back to <a href="./methods_intro.html">Methods Introduction</a>.</p>
+<p>Return to <a href="./projects_intro.html">Research Introduction</a> or continue to <a href="./projects_disturbance.html">Ecosystem Response to Disturbances</a>.</p>
 </div>
 </div>
 
 
-</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
