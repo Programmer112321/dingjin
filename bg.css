@@ -1,0 +1,29 @@
+/* ── Full-page background image ──────────────────────────── */
+body {
+  background-image: url('photo/bakcgournd.jpg');
+  background-size: cover;
+  background-attachment: fixed;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+
+/* Keep main content areas readable with a frosted card look */
+#quarto-content,
+.quarto-about-jolla,
+.quarto-content {
+  background-color: rgba(255, 255, 255, 0.88);
+  border-radius: 10px;
+  padding: 2rem;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+/* Navbar stays solid */
+.navbar {
+  background-color: rgba(255, 255, 255, 0.97) !important;
+}
+
+/* Footer stays solid */
+.nav-footer {
+  background-color: rgba(255, 255, 255, 0.95);
+}
