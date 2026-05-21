@@ -74,6 +74,35 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -501,6 +530,57 @@ Note
 <p>CLMU is described in detail in <a href="https://doi.org/10.5065/D6FB50WS">Oleson et al.&nbsp;(2010)</a> and updated for CLM5 in <a href="https://doi.org/10.1029/2018MS001583">Lawrence et al.&nbsp;(2019)</a>. The model is freely available as part of <a href="https://www.cesm.ucar.edu">CESM</a>.</p>
 </div>
 </div>
+<hr>
+</section>
+<section id="trm-two-resistance-mechanistic-model" class="level3">
+<h3 class="anchored" data-anchor-id="trm-two-resistance-mechanistic-model">TRM — Two-Resistance Mechanistic Model</h3>
+<p>The <strong>Two-Resistance Mechanistic (TRM)</strong> model is a physically based framework for estimating the cooling effect of urban vegetation by explicitly representing the two resistances that govern heat and water vapour transfer between a vegetated surface and the overlying atmosphere: <strong>aerodynamic resistance</strong> (r<sub>a</sub>) and <strong>surface (stomatal) resistance</strong> (r<sub>s</sub>). It provides a process-level explanation of <em>why</em> and <em>how much</em> urban green spaces cool their surroundings, making it directly interpretable in terms of vegetation physiology and local micrometeorology.</p>
+<p><strong>Theoretical basis:</strong> Penman–Monteith evapotranspiration framework extended to urban canopy surfaces <strong>Scale:</strong> Leaf to canopy to urban patch (~1 m – 1 km, depending on parameterization) <strong>Developer:</strong> Widely applied framework derived from Monteith (1965); adapted to urban settings by multiple research groups in urban ecology and micrometeorology</p>
+<p><strong>Core mechanism — the two resistances:</strong></p>
+<p>The latent heat flux (evapotranspiration cooling) from urban vegetation is governed by:</p>
+<p><span class="math display">\[\lambda E = \frac{\rho c_p}{\gamma} \cdot \frac{e_s(T_s) - e_a}{r_a + r_s}\]</span></p>
+<p>And the sensible heat flux (warming of air) is:</p>
+<p><span class="math display">\[H = \rho c_p \cdot \frac{T_s - T_a}{r_a}\]</span></p>
+<p>Where:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Symbol</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>r<sub>a</sub></td>
+<td><strong>Aerodynamic resistance</strong> — governed by wind speed and surface roughness; controls turbulent transfer of heat and vapour between the canopy and reference height</td>
+</tr>
+<tr class="even">
+<td>r<sub>s</sub></td>
+<td><strong>Surface (stomatal) resistance</strong> — governed by leaf stomatal conductance, LAI, and vapour pressure deficit; controls how readily vegetation releases water vapour</td>
+</tr>
+<tr class="odd">
+<td>T<sub>s</sub>, T<sub>a</sub></td>
+<td>Surface and air temperature</td>
+</tr>
+<tr class="even">
+<td>e<sub>s</sub>(T<sub>s</sub>), e<sub>a</sub></td>
+<td>Saturation vapour pressure at surface temperature; actual vapour pressure of ambient air</td>
+</tr>
+<tr class="odd">
+<td>ρ, c<sub>p</sub>, γ</td>
+<td>Air density, specific heat, and psychrometric constant</td>
+</tr>
+</tbody>
+</table>
+<p><strong>The key insight:</strong> when r<sub>s</sub> is low (well-watered, open stomata, high LAI), most available energy is partitioned into latent heat (cooling); when r<sub>s</sub> is high (drought stress, low LAI), energy goes into sensible heat (warming). r<sub>a</sub> controls how efficiently that vapour escapes to the atmosphere — denser canopies and calm winds increase r<sub>a</sub>, limiting cooling even when stomata are open.</p>
+<p><strong>Key processes simulated:</strong> - Partitioning of net radiation into latent (Q<sub>E</sub>) and sensible (Q<sub>H</sub>) heat via resistance analogy - Stomatal response to vapour pressure deficit, air temperature, solar radiation, and soil moisture - Leaf area index (LAI) scaling from leaf-level to canopy-level resistance - Feedback between surface cooling and the vapour pressure gradient driving ET - Remote sensing integration — r<sub>a</sub> derived from wind profiles; T<sub>s</sub> from thermal infrared imagery (Landsat, MODIS, ECOSTRESS); LAI from NDVI/Sentinel-2</p>
+<p><strong>Advantages:</strong> - <strong>Mechanistically interpretable</strong> — cooling magnitude is directly linked to measurable biophysical quantities (LAI, stomatal conductance, wind speed, soil moisture) - <strong>Remote sensing compatible</strong> — surface temperature (T<sub>s</sub>) from thermal infrared satellites can drive or validate the model without requiring detailed meteorological tower networks - <strong>Computationally lightweight</strong> — analytical solution; runs at high spatial resolution over large cities without the computational cost of 3D CFD or mesoscale models - <strong>Applicable to species and structure differences</strong> — r<sub>s</sub> varies by tree species and drought status, enabling species-level cooling comparisons - <strong>Widely validated</strong> — extensive literature across tropical, temperate, and arid urban systems</p>
+<p><strong>Disadvantages:</strong> - <strong>Assumes well-mixed single layer</strong> — does not resolve vertical structure within the canopy or between-building airflow (no 3D radiative transfer or turbulence) - <strong>Requires accurate T<sub>s</sub> and meteorological inputs</strong> — errors in aerodynamic resistance estimation (particularly in low-wind or complex-terrain urban settings) propagate into ET estimates - <strong>Drought stress parameterization</strong> — soil moisture dependence of r<sub>s</sub> requires either in situ soil measurements or model-assimilated products - <strong>No building shading effects</strong> — pure resistance framework does not account for radiation reduction by adjacent structures, which must be handled separately</p>
+<p><strong>Applications in urban cooling research:</strong> - Quantifying the evapotranspiration component of park and street tree cooling separately from shading effects - Mapping spatial variation in urban tree cooling efficiency as a function of species composition, canopy cover, and water availability using thermal remote sensing (Landsat/ECOSTRESS) - Attributing observed park cool island intensity to stomatal vs.&nbsp;aerodynamic resistance controls under heat wave conditions - Evaluating the effect of drought stress on urban tree cooling capacity — when r<sub>s</sub> rises under water deficit, cooling potential declines even if canopy cover is maintained - Benchmarking against ENVI-met and SUEWS outputs to isolate the ET cooling signal from the total urban energy balance</p>
 <hr>
 </section>
 <section id="i-tree-eco-urban-forest-ecosystem-services-model" class="level3">
