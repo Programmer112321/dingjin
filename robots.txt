@@ -1,1 +1,58 @@
-Sitemap: https://Programmer112321.github.io/dingjin/sitemap.xml
+# robots.txt — Dingjin Chu personal website
+# Allow major search engines (for academic discoverability)
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+# Block common web scrapers and content copiers
+User-agent: HTTrack
+Disallow: /
+
+User-agent: WebCopier
+Disallow: /
+
+User-agent: SiteSucker
+Disallow: /
+
+User-agent: WebReaper
+Disallow: /
+
+User-agent: Teleport
+Disallow: /
+
+User-agent: wget
+Disallow: /
+
+User-agent: curl
+Disallow: /
+
+User-agent: python-requests
+Disallow: /
+
+User-agent: scrapy
+Disallow: /
+
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+# All other crawlers: browsing allowed, content directories protected
+User-agent: *
+Disallow: /site_libs/
+Disallow: /*.json$
