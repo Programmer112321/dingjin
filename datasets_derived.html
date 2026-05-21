@@ -696,8 +696,139 @@ Note
 <p>TRENDY model outputs are available upon request to the TRENDY coordinators via the <a href="https://sites.exeter.ac.uk/trendy/">TRENDY project page</a>. Annual Global Carbon Budget data (which include TRENDY ensemble summaries) are freely published at <a href="https://www.globalcarbonproject.org/carbonbudget/">Global Carbon Project</a> and archived on <a href="https://www.icos-cp.eu">ICOS Carbon Portal</a>.</p>
 </div>
 </div>
+<hr>
+</section>
+<section id="above-ground-biomass-agb-derived-products" class="level2">
+<h2 class="anchored" data-anchor-id="above-ground-biomass-agb-derived-products">Above-Ground Biomass (AGB) Derived Products</h2>
+<p>Global and regional maps of forest above-ground biomass (AGB, Mg ha⁻¹ dry weight) are critical for carbon accounting, REDD+ reporting, and benchmarking ecosystem models. These products are derived by fusing active sensors (LiDAR, SAR) with optical imagery and/or field inventory data, each with distinct spatial resolution, temporal coverage, and forest type strengths.</p>
+<hr>
+<section id="gedi-l4b-global-gridded-aboveground-biomass-density-nasa-ornl-daac" class="level3">
+<h3 class="anchored" data-anchor-id="gedi-l4b-global-gridded-aboveground-biomass-density-nasa-ornl-daac">GEDI L4B — Global Gridded Aboveground Biomass Density (NASA / ORNL DAAC)</h3>
+<p><strong>GEDI L4B</strong> is a 1 km global gridded aboveground biomass density (AGBD, Mg ha⁻¹) product derived from GEDI Level 4A footprint-level AGB estimates using a hybrid model-based geostatistical (HMB) estimator. L4A footprint AGBD is predicted from GEDI L2A relative height metrics (RH50, RH98, etc.) using continent- and biome-specific allometric models calibrated against ~10,000 forest inventory plots globally. Version 2.1 covers 2019–2023.</p>
+<p><strong>Source:</strong> NASA / ORNL DAAC (Ralph Dubayah et al.) <strong>Input sensors:</strong> GEDI full-waveform spaceborne LiDAR <strong>Spatial resolution:</strong> 1 km (gridded from ~25 m footprints at ~600 m cross-track spacing) <strong>Coverage:</strong> ~51.6°N to 51.6°S <strong>Temporal coverage:</strong> 2019–2023 <strong>Key outputs:</strong> Mean AGBD · Standard error · Sample count · Quality flags <strong>Key applications:</strong> Global forest carbon stock assessment, IPCC Tier 1 reporting, benchmarking SAR- and optical-based biomass products, calibrating DGVMs</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>GEDI L4B Version 2.1 is freely available through <a href="https://daac.ornl.gov/cgi-bin/dsviewer.pl?ds_id=2299">NASA EarthData / ORNL DAAC</a> and <a href="https://earthengine.google.com">Google Earth Engine</a> (<code>LARSE/GEDI/GEDI04_B_002</code>).</p>
+</div>
+</div>
+<hr>
+</section>
+<section id="esa-cci-agb-global-forest-biomass-at-100-m-santoro-et-al." class="level3">
+<h3 class="anchored" data-anchor-id="esa-cci-agb-global-forest-biomass-at-100-m-santoro-et-al.">ESA CCI AGB — Global Forest Biomass at 100 m (Santoro et al.)</h3>
+<p>The <strong>ESA Climate Change Initiative AGB</strong> product provides global AGB maps at 100 m resolution for multiple epochs (2010, 2017, 2018, 2019, 2020), produced by fusing multi-source SAR — ALOS PALSAR, ALOS-2 PALSAR-2, Sentinel-1, JERS-1 — with optical ancillary data. The retrieval uses a Water Cloud Model (WCM) combined with an empirical lookup-table inversion, constrained by global forest inventory data. The multi-epoch design makes it uniquely suited for detecting decadal biomass change in both tropical and boreal forests.</p>
+<p><strong>Source:</strong> ESA Climate Change Initiative (Maurizio Santoro, Oliver Cartus et al.) <strong>Input sensors:</strong> ALOS PALSAR / ALOS-2 PALSAR-2 (L-band SAR) · Sentinel-1 (C-band SAR) · JERS-1 (L-band SAR) <strong>Spatial resolution:</strong> 100 m <strong>Coverage:</strong> Global (land) <strong>Epochs available:</strong> 2010 · 2017 · 2018 · 2019 · 2020 <strong>Uncertainty layers:</strong> Per-pixel standard deviation included <strong>Key applications:</strong> Multi-decadal forest carbon change, SAR-based biomass retrieval benchmarking, REDD+ baseline mapping, tropical and boreal forest carbon stocks</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>ESA CCI AGB is freely available through the <a href="https://climate.esa.int/en/projects/biomass/data/">ESA CCI Open Data Portal</a> and the <a href="https://catalogue.ceda.ac.uk">CEDA Archive</a>.</p>
+</div>
+</div>
+<hr>
+</section>
+<section id="landtrendr-biomass-annual-forest-carbon-maps-emapr-oregon-state" class="level3">
+<h3 class="anchored" data-anchor-id="landtrendr-biomass-annual-forest-carbon-maps-emapr-oregon-state">LandTrendr Biomass — Annual Forest Carbon Maps (eMapR / Oregon State)</h3>
+<p>The <strong>eMapR LandTrendr Biomass</strong> product applies the LandTrendr (Landsat-based Detection of Trends in Disturbance and Recovery) spectral-temporal segmentation algorithm to dense Landsat time series (1986–present) to produce annual 30 m maps of forest carbon stocks and carbon change across the western United States and Pacific Northwest. Carbon estimates are linked to FIA plot data via gradient nearest-neighbor imputation, yielding stand-level above-ground live carbon (Mg C ha⁻¹) with annual disturbance and recovery trajectories.</p>
+<p><strong>Source:</strong> eMapR Lab, Oregon State University (Robert Kennedy et al.) <strong>Input sensors:</strong> Landsat TM / ETM+ / OLI annual composites <strong>Algorithm:</strong> LandTrendr spectral segmentation + FIA GNN imputation <strong>Spatial resolution:</strong> 30 m <strong>Temporal coverage:</strong> Annual, 1986–present <strong>Coverage:</strong> Western United States (Pacific Northwest focus); GEE implementation extensible <strong>Key outputs:</strong> Above-ground live carbon (Mg C ha⁻¹) · Annual carbon change · Disturbance year and magnitude <strong>Key applications:</strong> Annual forest carbon flux tracking, disturbance attribution (fire, harvest, drought), post-disturbance recovery monitoring, regional REDD+ assessments</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>LandTrendr Biomass outputs and the LandTrendr GEE API are available through the <a href="https://github.com/eMapR/LT-GEE">eMapR Lab GitHub</a> and <a href="https://earthengine.google.com">Google Earth Engine</a>. The LT-GEE guide provides full documentation for reproducing annual biomass maps in any Landsat-covered region.</p>
+</div>
+</div>
+<hr>
+</section>
+<section id="chloris-vegetation-monitor-tropical-agb-carbon-change" class="level3">
+<h3 class="anchored" data-anchor-id="chloris-vegetation-monitor-tropical-agb-carbon-change">Chloris Vegetation Monitor — Tropical AGB &amp; Carbon Change</h3>
+<p><strong>Chloris</strong> is a cloud-based vegetation monitoring platform developed to track above-ground carbon stocks and annual carbon fluxes in tropical and subtropical forests using dense Landsat and Sentinel-2 time series. It produces annual wall-to-wall AGB and carbon change maps at 30 m resolution, applying Random Forest models calibrated with field plots and GEDI footprints. Chloris is particularly designed for national-scale REDD+ monitoring, reporting, and verification (MRV) systems in tropical countries where AGB data have historically been sparse.</p>
+<p><strong>Source:</strong> Chloris Geospatial (David Lagomasino et al.) <strong>Input sensors:</strong> Landsat 8/9 OLI + Sentinel-2 MSI + GEDI (calibration) <strong>Spatial resolution:</strong> 30 m <strong>Coverage:</strong> Tropics and subtropics (expandable to any forested region) <strong>Temporal coverage:</strong> Annual, ~2016–present <strong>Key outputs:</strong> AGB (Mg ha⁻¹) · Annual AGB change · Carbon stock and flux <strong>Key applications:</strong> National REDD+ MRV, tropical deforestation carbon emissions, forest degradation mapping, carbon credit project monitoring</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Chloris is accessible via the <a href="https://www.chlorisgeospatial.com">Chloris Geospatial platform</a> and select outputs are available through partner data portals.</p>
+</div>
+</div>
+<hr>
+</section>
+<section id="ctrees-global-forest-carbon-monitoring" class="level3">
+<h3 class="anchored" data-anchor-id="ctrees-global-forest-carbon-monitoring">CTrees — Global Forest Carbon Monitoring</h3>
+<p><strong>CTrees</strong> is an independent non-profit organization that produces globally consistent, high-resolution (≤30 m) forest carbon maps by integrating GEDI spaceborne LiDAR, Sentinel-1 SAR, Sentinel-2 optical, and Landsat imagery with machine learning models trained on field inventory data. CTrees provides both tree-cover-level AGB estimates and country-level carbon accounting products aligned with IPCC guidelines, supporting national forest inventories and voluntary carbon market projects.</p>
+<p><strong>Source:</strong> CTrees (Sassan Saatchi et al.) <strong>Input sensors:</strong> GEDI · Sentinel-1 SAR · Sentinel-2 MSI · Landsat OLI <strong>Spatial resolution:</strong> ≤30 m <strong>Coverage:</strong> Global tropical and temperate forests <strong>Temporal coverage:</strong> Annual updates <strong>Key outputs:</strong> AGB (Mg ha⁻¹) · Carbon stock · Annual deforestation and degradation emissions <strong>Key applications:</strong> Country-level REDD+ accounting, voluntary carbon market (VCM) project baseline and monitoring, global tropical forest carbon benchmarking</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>CTrees data and country profiles are accessible through the <a href="https://ctrees.org/data">CTrees Data Hub</a>.</p>
+</div>
+</div>
+<hr>
+</section>
+<section id="terrapulse-gedi-based-global-biomass-products" class="level3">
+<h3 class="anchored" data-anchor-id="terrapulse-gedi-based-global-biomass-products">terraPulse — GEDI-Based Global Biomass Products</h3>
+<p><strong>terraPulse</strong> develops commercial-grade global forest biomass and ecosystem carbon products anchored to GEDI spaceborne LiDAR, founded by the GEDI principal investigator team (Ralph Dubayah, University of Maryland). terraPulse’s products bridge the gap between NASA open-access GEDI data and operational forest carbon monitoring by providing higher-level, analysis-ready AGB layers calibrated with extensive field data and compatible with IPCC carbon reporting frameworks.</p>
+<p><strong>Source:</strong> terraPulse, Inc.&nbsp;(Ralph Dubayah et al., University of Maryland lineage) <strong>Input sensors:</strong> GEDI full-waveform LiDAR + multisource optical / SAR fusion <strong>Spatial resolution:</strong> 25 m (footprint) to 1 km (gridded) <strong>Coverage:</strong> Global (GEDI orbital range, ~51.6°N–S) <strong>Key applications:</strong> Operational forest carbon inventory, carbon credit MRV, national biomass baselines, ecosystem service valuation</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>terraPulse products are available through <a href="https://terrapulse.com">terraPulse, Inc.</a>. Methodological details are described in publications from the GEDI science team at the University of Maryland.</p>
+</div>
+</div>
+<hr>
+</section>
+<section id="saatchi-et-al.-pan-tropical-forest-biomass-benchmark" class="level3">
+<h3 class="anchored" data-anchor-id="saatchi-et-al.-pan-tropical-forest-biomass-benchmark">Saatchi et al.&nbsp;— Pan-Tropical Forest Biomass Benchmark</h3>
+<p><strong>Saatchi et al.&nbsp;(2011)</strong> produced the first pantropical AGB map at 1 km resolution, covering the three major tropical forest regions (Amazon, Congo, Southeast Asia) by fusing ICESAT GLAS lidar, MODIS vegetation indices, and field inventory data via a maximum entropy (MaxEnt) approach. This benchmark map remains widely used for cross-validation, historical baselines, and as a reference for subsequent higher-resolution products.</p>
+<p><strong>Source:</strong> Jet Propulsion Laboratory / NASA (Sassan Saatchi et al.) <strong>Input sensors:</strong> ICESAT GLAS (spaceborne LiDAR) · MODIS · SRTM · QuikSCAT <strong>Spatial resolution:</strong> 1 km <strong>Coverage:</strong> Pan-tropical forests (lat 23°N–23°S) <strong>Reference year:</strong> ~2000–2006 <strong>Citation:</strong> Saatchi et al.&nbsp;(2011), <em>PNAS</em>, <a href="https://doi.org/10.1073/pnas.1019576108">DOI: 10.1073/pnas.1019576108</a> <strong>Key applications:</strong> Historical pan-tropical carbon stock baseline, cross-validation of newer products, tropical deforestation carbon emission estimates</p>
+<hr>
+</section>
+<section id="wang-et-al.-global-30-m-forest-agb-via-deep-learning" class="level3">
+<h3 class="anchored" data-anchor-id="wang-et-al.-global-30-m-forest-agb-via-deep-learning">Wang et al.&nbsp;— Global 30 m Forest AGB via Deep Learning</h3>
+<p><strong>Wang et al.&nbsp;(2022)</strong> produced a global 30 m AGB map by training a deep learning model (combining CNNs and gradient boosting) on GEDI L4A footprint-level AGB labels fused with Landsat spectral metrics, Sentinel-1 SAR backscatter, Sentinel-2 vegetation indices, and SRTM topography. This product extends spatial continuity from GEDI’s sparse footprint sampling to wall-to-wall global coverage at 30 m — compatible with Hansen GFC, NLCD, and other Landsat-resolution products.</p>
+<p><strong>Source:</strong> Beijing Normal University / CAS (Wang et al.) <strong>Input sensors:</strong> GEDI L4A · Landsat OLI · Sentinel-1 SAR · Sentinel-2 MSI · SRTM <strong>Spatial resolution:</strong> 30 m <strong>Coverage:</strong> Global forests <strong>Reference year:</strong> ~2019–2020 <strong>Method:</strong> Deep learning (CNN + gradient boosting) with GEDI L4A as training labels <strong>Key applications:</strong> Global forest AGB mapping at Landsat resolution, cross-sensor biomass product comparison, carbon stock and flux integration with 30 m change detection products</p>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->
