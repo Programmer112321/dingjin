@@ -7,15 +7,15 @@ body {
   background-repeat: no-repeat;
 }
 
-/* Keep main content areas readable with a frosted card look */
+/* Keep main content areas readable with a light frosted card */
 #quarto-content,
 .quarto-about-jolla,
 .quarto-content {
-  background-color: rgba(255, 255, 255, 0.88);
+  background-color: rgba(255, 255, 255, 0.55);
   border-radius: 10px;
   padding: 2rem;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
 }
 
 /* Navbar stays solid */
