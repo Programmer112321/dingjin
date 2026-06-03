@@ -605,6 +605,73 @@ Note
 <p>The deadtrees.earth platform, interactive map, and data downloads are freely accessible at <a href="https://deadtrees.earth">deadtrees.earth</a>.</p>
 </div>
 </div>
+<hr>
+</section>
+<section id="ecostress-ecosystem-spaceborne-thermal-radiometer-experiment-on-space-station-nasa-jpl" class="level2">
+<h2 class="anchored" data-anchor-id="ecostress-ecosystem-spaceborne-thermal-radiometer-experiment-on-space-station-nasa-jpl">ECOSTRESS — ECOsystem Spaceborne Thermal Radiometer Experiment on Space Station (NASA / JPL)</h2>
+<p><strong>ECOSTRESS</strong> is a NASA thermal infrared multispectral radiometer mounted on the International Space Station (ISS), designed to measure land surface temperature (LST) and evapotranspiration (ET) at fine spatial resolution (~70 m). Unlike sun-synchronous satellites that always acquire data at the same local time, ECOSTRESS benefits from the ISS’s precessing orbit — sampling a given location at varying times of day across repeated overpasses, enabling the capture of diurnal LST and ET cycles invisible to Landsat or Sentinel-based thermal products. This makes it uniquely suited for studying plant water stress responses, urban heat island dynamics, and irrigation water use across diverse ecosystems.</p>
+<p><strong>Agency:</strong> NASA Jet Propulsion Laboratory (JPL) — Principal Investigators: Josh Fisher, Simon Hook <strong>Platform:</strong> International Space Station (ISS), orbit inclination ~51.6° <strong>Launch:</strong> June 2018 <strong>Sensor:</strong> 5-band thermal infrared radiometer (TIR), 8.0–12.0 μm <strong>Spatial resolution:</strong> ~70 m (resampled from native ~38 m × 69 m instantaneous field of view) <strong>Temporal resolution:</strong> Irregular (~4-day average revisit); ISS precession provides diurnal sampling diversity <strong>Coverage:</strong> ±51.6° latitude (ISS orbital limit) <strong>Key data products:</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 40%">
+<col style="width: 59%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Product</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>ECO2LSTE</strong></td>
+<td>Land Surface Temperature &amp; Emissivity (70 m)</td>
+</tr>
+<tr class="even">
+<td><strong>ECO3ETPTJPL</strong></td>
+<td>Evapotranspiration — PT-JPL model (70 m)</td>
+</tr>
+<tr class="odd">
+<td><strong>ECO3ETALEXI</strong></td>
+<td>ET — Atmosphere-Land Exchange Inverse (ALEXI) model</td>
+</tr>
+<tr class="even">
+<td><strong>ECO4ESIPTJPL</strong></td>
+<td>Evaporative Stress Index (ESI) — plant water stress indicator</td>
+</tr>
+<tr class="odd">
+<td><strong>ECO4WUE</strong></td>
+<td>Water Use Efficiency (GPP / ET)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Key applications:</strong> - <strong>Urban heat island analysis</strong> — 70 m LST resolves individual city blocks, parks, and street canyons far better than Landsat’s 100 m thermal band; ideal for quantifying the cooling effect of urban green space - <strong>Drought and plant water stress</strong> — Evaporative Stress Index (ESI) detects early-onset drought stress before visible spectral changes occur - <strong>Agricultural ET and irrigation mapping</strong> — field-scale ET products compatible with crop water use models - <strong>Ecosystem carbon–water coupling</strong> — Water Use Efficiency (WUE) links carbon assimilation to transpiration demand across biomes</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>ECOSTRESS’s ~70 m thermal resolution is the finest available from a spaceborne platform, making it the preferred dataset for city-scale LST studies where Landsat’s 100 m thermal product cannot resolve the spatial heterogeneity of urban green space patches, impervious surfaces, and building rooftops.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>ECOSTRESS data are freely available through <a href="https://lpdaac.usgs.gov/product_search/?collections=ECOSTRESS">NASA EarthData / LP DAAC</a> and <a href="https://earthengine.google.com">Google Earth Engine</a> (<code>NASA/ECOSTRESS/ETinst</code>). The full product suite is documented at the <a href="https://ecostress.jpl.nasa.gov">ECOSTRESS mission page</a>.</p>
+</div>
+</div>
 
 
 </section>
