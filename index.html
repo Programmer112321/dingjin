@@ -413,6 +413,81 @@ ul.task-list li input[type="checkbox"] {
 <p>The datasets employed in this work integrate in situ field observations with multi-platform remote sensing products across diverse spatial scales and long-term temporal domains, enabling consistent and multi-decadal analyses. A comprehensive description of these datasets is available in the <a href="./datasets_intro.html">Datasets</a> section.</p>
 <p>Methodologically, I combine machine learning approaches, statistical modeling, and process-based models to elucidate and quantify key ecological and environmental processes. The overall methodological framework is summarized in the <a href="./methods_intro.html">Methods</a> section.</p>
 <hr>
+<div style="display:flex; flex-direction:column; align-items:center; margin:1.5rem 0;">
+  <div id="globe-container" style="width:100%; max-width:720px; height:440px; border-radius:12px; overflow:hidden; background:#000d1a; box-shadow:0 8px 32px rgba(0,80,160,0.25);"></div>
+  <p style="font-size:0.78rem; color:#888; margin-top:0.5rem; text-align:center;">
+    Real-time 3D Earth — satellite orbits visualized using <a href="https://github.com/vasturiano/globe.gl" target="_blank" style="color:#888;">Globe.gl</a> · Earth imagery © NASA Blue Marble
+  </p>
+</div>
+<script src="https://unpkg.com/globe.gl@2.27.2/dist/globe.gl.min.js"></script>
+<script>
+(function () {
+  var el = document.getElementById('globe-container');
+  if (!el) return;
+  /* ── Satellite arc data (representative orbits) ───────── */
+  var arcs = (function () {
+    var list = [];
+    /* Sun-synchronous / polar orbits (GEDI, ICESat-2, Landsat, Sentinel) */
+    var polar = [
+      { lon0: -80, lat0: 85, lon1:  80, lat1: -85, color: '#00cfff' },
+      { lon0:  20, lat0: 85, lon1: -60, lat1: -85, color: '#00cfff' },
+      { lon0: 140, lat0: 82, lon1: -20, lat1: -82, color: '#4dd0ff' },
+      { lon0: -40, lat0: 80, lon1: 120, lat1: -80, color: '#4dd0ff' },
+    ];
+    /* Mid-inclination ISS orbits (GEDI, ECOSTRESS) */
+    var iss = [
+      { lon0: -100, lat0: 51, lon1:  80, lat1: -51, color: '#ffb347' },
+      { lon0:   30, lat0: 51, lon1:-150, lat1: -51, color: '#ffb347' },
+    ];
+    /* Geostationary arcs (GOES) */
+    var geo = [
+      { lon0: -75, lat0: 0, lon1: -75, lat1:  0, color: '#aaffaa' },
+    ];
+    return polar.concat(iss).concat(geo).map(function (a) {
+      return {
+        startLat: a.lat0, startLng: a.lon0,
+        endLat:   a.lat1, endLng:   a.lon1,
+        color:    a.color
+      };
+    });
+  })();
+  /* ── Sensor label points ──────────────────────────────── */
+  var labels = [
+    { lat:  51.6, lng:  -80, label: 'GEDI / ECOSTRESS (ISS)' },
+    { lat:  98.0, lng:   10, label: 'Landsat 9 (SSO)' },
+    { lat: -51.6, lng:  140, label: 'Sentinel-2 (SSO)' },
+    { lat:   0,   lng:  -75, label: 'GOES-16 (GEO)' },
+  ];
+  var globe = Globe()
+    .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
+    .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
+    .backgroundImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png')
+    .atmosphereColor('#1a6aff')
+    .atmosphereAltitude(0.18)
+    .arcsData(arcs)
+    .arcColor('color')
+    .arcAltitude(0.25)
+    .arcStroke(0.6)
+    .arcDashLength(0.35)
+    .arcDashGap(0.15)
+    .arcDashAnimateTime(3000)
+    .arcOpacity(0.85)
+    .width(el.clientWidth)
+    .height(el.clientHeight)
+    (el);
+  /* ── Auto-rotate ──────────────────────────────────────── */
+  globe.controls().autoRotate = true;
+  globe.controls().autoRotateSpeed = 0.6;
+  globe.controls().enableZoom = false;
+  /* ── Initial camera tilt ──────────────────────────────── */
+  globe.pointOfView({ lat: 20, lng: 10, altitude: 2.2 });
+  /* ── Resize handler ───────────────────────────────────── */
+  window.addEventListener('resize', function () {
+    globe.width(el.clientWidth);
+  });
+})();
+</script>
+<hr>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="photo/Bottom_photo_created_by_yourname_landsat.png" class="img-fluid figure-img" style="width:100.0%"></p>
