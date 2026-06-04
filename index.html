@@ -414,76 +414,161 @@ ul.task-list li input[type="checkbox"] {
 <p>Methodologically, I combine machine learning approaches, statistical modeling, and process-based models to elucidate and quantify key ecological and environmental processes. The overall methodological framework is summarized in the <a href="./methods_intro.html">Methods</a> section.</p>
 <hr>
 <div style="display:flex; flex-direction:column; align-items:center; margin:1.5rem 0;">
-  <div id="globe-container" style="width:100%; max-width:720px; height:440px; border-radius:12px; overflow:hidden; background:#000d1a; box-shadow:0 8px 32px rgba(0,80,160,0.25);"></div>
-  <p style="font-size:0.78rem; color:#888; margin-top:0.5rem; text-align:center;">
-    Real-time 3D Earth — satellite orbits visualized using <a href="https://github.com/vasturiano/globe.gl" target="_blank" style="color:#888;">Globe.gl</a> · Earth imagery © NASA Blue Marble
+  <canvas id="earth-canvas" style="width:100%; max-width:680px; height:420px; border-radius:12px; display:block; margin:0 auto; box-shadow:0 8px 32px rgba(0,60,140,0.3);"></canvas>
+  <p style="font-size:0.78rem; color:#888; margin-top:0.6rem; text-align:center;">
+    Interactive 3D Earth — satellite orbit tracks · drag to rotate
   </p>
 </div>
-<script src="https://unpkg.com/globe.gl@2.27.2/dist/globe.gl.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 <script>
 (function () {
-  var el = document.getElementById('globe-container');
-  if (!el) return;
-  /* ── Satellite arc data (representative orbits) ───────── */
-  var arcs = (function () {
-    var list = [];
-    /* Sun-synchronous / polar orbits (GEDI, ICESat-2, Landsat, Sentinel) */
-    var polar = [
-      { lon0: -80, lat0: 85, lon1:  80, lat1: -85, color: '#00cfff' },
-      { lon0:  20, lat0: 85, lon1: -60, lat1: -85, color: '#00cfff' },
-      { lon0: 140, lat0: 82, lon1: -20, lat1: -82, color: '#4dd0ff' },
-      { lon0: -40, lat0: 80, lon1: 120, lat1: -80, color: '#4dd0ff' },
-    ];
-    /* Mid-inclination ISS orbits (GEDI, ECOSTRESS) */
-    var iss = [
-      { lon0: -100, lat0: 51, lon1:  80, lat1: -51, color: '#ffb347' },
-      { lon0:   30, lat0: 51, lon1:-150, lat1: -51, color: '#ffb347' },
-    ];
-    /* Geostationary arcs (GOES) */
-    var geo = [
-      { lon0: -75, lat0: 0, lon1: -75, lat1:  0, color: '#aaffaa' },
-    ];
-    return polar.concat(iss).concat(geo).map(function (a) {
-      return {
-        startLat: a.lat0, startLng: a.lon0,
-        endLat:   a.lat1, endLng:   a.lon1,
-        color:    a.color
-      };
-    });
-  })();
-  /* ── Sensor label points ──────────────────────────────── */
-  var labels = [
-    { lat:  51.6, lng:  -80, label: 'GEDI / ECOSTRESS (ISS)' },
-    { lat:  98.0, lng:   10, label: 'Landsat 9 (SSO)' },
-    { lat: -51.6, lng:  140, label: 'Sentinel-2 (SSO)' },
-    { lat:   0,   lng:  -75, label: 'GOES-16 (GEO)' },
-  ];
-  var globe = Globe()
-    .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
-    .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
-    .backgroundImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png')
-    .atmosphereColor('#1a6aff')
-    .atmosphereAltitude(0.18)
-    .arcsData(arcs)
-    .arcColor('color')
-    .arcAltitude(0.25)
-    .arcStroke(0.6)
-    .arcDashLength(0.35)
-    .arcDashGap(0.15)
-    .arcDashAnimateTime(3000)
-    .arcOpacity(0.85)
-    .width(el.clientWidth)
-    .height(el.clientHeight)
-    (el);
-  /* ── Auto-rotate ──────────────────────────────────────── */
-  globe.controls().autoRotate = true;
-  globe.controls().autoRotateSpeed = 0.6;
-  globe.controls().enableZoom = false;
-  /* ── Initial camera tilt ──────────────────────────────── */
-  globe.pointOfView({ lat: 20, lng: 10, altitude: 2.2 });
-  /* ── Resize handler ───────────────────────────────────── */
+  var canvas = document.getElementById('earth-canvas');
+  if (!canvas || typeof THREE === 'undefined') return;
+  var W = canvas.parentElement.clientWidth > 680 ? 680 : canvas.parentElement.clientWidth;
+  var H = 420;
+  canvas.width  = W * window.devicePixelRatio;
+  canvas.height = H * window.devicePixelRatio;
+  canvas.style.width  = W + 'px';
+  canvas.style.height = H + 'px';
+  /* ── Renderer ─────────────────────────────────────────── */
+  var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: false });
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setSize(W, H);
+  renderer.setClearColor(0x00080f);
+  var scene  = new THREE.Scene();
+  var camera = new THREE.PerspectiveCamera(42, W / H, 0.1, 1000);
+  camera.position.set(0, 0.3, 2.8);
+  camera.lookAt(0, 0, 0);
+  /* ── Stars ────────────────────────────────────────────── */
+  var starGeo = new THREE.BufferGeometry();
+  var starPos = [];
+  for (var s = 0; s < 1800; s++) {
+    var theta = Math.random() * 2 * Math.PI;
+    var phi   = Math.acos(2 * Math.random() - 1);
+    var r     = 80 + Math.random() * 40;
+    starPos.push(r * Math.sin(phi) * Math.cos(theta),
+                 r * Math.sin(phi) * Math.sin(theta),
+                 r * Math.cos(phi));
+  }
+  starGeo.setAttribute('position', new THREE.Float32BufferAttribute(starPos, 3));
+  scene.add(new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xffffff, size: 0.18 })));
+  /* ── Earth sphere ─────────────────────────────────────── */
+  var earthGeo = new THREE.SphereGeometry(1, 64, 64);
+  /* Procedural ocean+land colours via vertex shader */
+  var earthMat = new THREE.MeshPhongMaterial({
+    color:    new THREE.Color(0x1b6ca8),
+    emissive: new THREE.Color(0x051520),
+    specular: new THREE.Color(0x4488bb),
+    shininess: 22
+  });
+  var earth = new THREE.Mesh(earthGeo, earthMat);
+  scene.add(earth);
+  /* ── Latitude / longitude grid ────────────────────────── */
+  var gridMat = new THREE.LineBasicMaterial({ color: 0x4af0ff, transparent: true, opacity: 0.12 });
+  for (var lat = -75; lat <= 75; lat += 15) {
+    var pts = [];
+    var latR = lat * Math.PI / 180;
+    for (var lng2 = 0; lng2 <= 360; lng2 += 3) {
+      var lngR = lng2 * Math.PI / 180;
+      pts.push(new THREE.Vector3(
+        1.002 * Math.cos(latR) * Math.cos(lngR),
+        1.002 * Math.sin(latR),
+        1.002 * Math.cos(latR) * Math.sin(lngR)
+      ));
+    }
+    scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), gridMat));
+  }
+  for (var lng3 = 0; lng3 < 360; lng3 += 15) {
+    var pts2 = [];
+    var lngR2 = lng3 * Math.PI / 180;
+    for (var lat2 = -90; lat2 <= 90; lat2 += 3) {
+      var latR2 = lat2 * Math.PI / 180;
+      pts2.push(new THREE.Vector3(
+        1.002 * Math.cos(latR2) * Math.cos(lngR2),
+        1.002 * Math.sin(latR2),
+        1.002 * Math.cos(latR2) * Math.sin(lngR2)
+      ));
+    }
+    scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts2), gridMat));
+  }
+  /* ── Atmosphere glow ──────────────────────────────────── */
+  var atmGeo = new THREE.SphereGeometry(1.08, 64, 64);
+  var atmMat = new THREE.MeshPhongMaterial({
+    color: 0x2277ff, transparent: true, opacity: 0.08,
+    side: THREE.BackSide
+  });
+  scene.add(new THREE.Mesh(atmGeo, atmMat));
+  /* ── Satellite orbit rings ────────────────────────────── */
+  function addOrbit(inclDeg, lonAscDeg, color, altitude) {
+    var pts3 = [];
+    var incl = inclDeg * Math.PI / 180;
+    var lonA = lonAscDeg * Math.PI / 180;
+    var r = 1 + altitude;
+    for (var i = 0; i <= 180; i++) {
+      var u = (i / 180) * 2 * Math.PI;
+      /* orbit in its own plane then rotate */
+      var x0 = r * Math.cos(u);
+      var y0 = r * Math.sin(u) * Math.cos(incl);
+      var z0 = r * Math.sin(u) * Math.sin(incl);
+      var x1 = x0 * Math.cos(lonA) - z0 * Math.sin(lonA);
+      var z1 = x0 * Math.sin(lonA) + z0 * Math.cos(lonA);
+      pts3.push(new THREE.Vector3(x1, y0, z1));
+    }
+    var orbitLine = new THREE.Line(
+      new THREE.BufferGeometry().setFromPoints(pts3),
+      new THREE.LineBasicMaterial({ color: color, transparent: true, opacity: 0.7 })
+    );
+    scene.add(orbitLine);
+  }
+  /* Sun-synchronous polar orbits (Landsat, Sentinel-2, ICESat-2) */
+  addOrbit(98,   0, 0x00d4ff, 0.08);
+  addOrbit(98,  60, 0x00d4ff, 0.08);
+  addOrbit(98, 120, 0x44ddff, 0.09);
+  /* ISS inclined orbit (GEDI, ECOSTRESS) */
+  addOrbit(51.6,  30, 0xffaa33, 0.12);
+  addOrbit(51.6, 150, 0xffaa33, 0.12);
+  /* ── Lights ───────────────────────────────────────────── */
+  scene.add(new THREE.AmbientLight(0x334466, 1.2));
+  var sun = new THREE.DirectionalLight(0xffffff, 1.6);
+  sun.position.set(5, 3, 5);
+  scene.add(sun);
+  /* ── Drag-to-rotate ───────────────────────────────────── */
+  var isDragging = false, prevX = 0, prevY = 0;
+  var rotX = 0.2, rotY = 0;
+  canvas.addEventListener('mousedown',  function (e) { isDragging = true;  prevX = e.clientX; prevY = e.clientY; });
+  canvas.addEventListener('mousemove',  function (e) {
+    if (!isDragging) return;
+    rotY += (e.clientX - prevX) * 0.005;
+    rotX += (e.clientY - prevY) * 0.003;
+    rotX = Math.max(-1.2, Math.min(1.2, rotX));
+    prevX = e.clientX; prevY = e.clientY;
+  });
+  canvas.addEventListener('mouseup',   function () { isDragging = false; });
+  canvas.addEventListener('mouseleave',function () { isDragging = false; });
+  canvas.addEventListener('touchstart', function (e) { isDragging = true; prevX = e.touches[0].clientX; prevY = e.touches[0].clientY; });
+  canvas.addEventListener('touchmove',  function (e) {
+    if (!isDragging) return;
+    rotY += (e.touches[0].clientX - prevX) * 0.005;
+    prevX = e.touches[0].clientX;
+  });
+  canvas.addEventListener('touchend', function () { isDragging = false; });
+  /* ── Animate ──────────────────────────────────────────── */
+  var autoSpeed = 0.0015;
+  function animate() {
+    requestAnimationFrame(animate);
+    if (!isDragging) rotY += autoSpeed;
+    earth.rotation.y = rotY;
+    earth.rotation.x = rotX;
+    renderer.render(scene, camera);
+  }
+  animate();
+  /* ── Resize ───────────────────────────────────────────── */
   window.addEventListener('resize', function () {
-    globe.width(el.clientWidth);
+    var nw = Math.min(canvas.parentElement.clientWidth, 680);
+    renderer.setSize(nw, H);
+    canvas.style.width = nw + 'px';
+    camera.aspect = nw / H;
+    camera.updateProjectionMatrix();
   });
 })();
 </script>
