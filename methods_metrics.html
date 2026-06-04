@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Causal Inference – Dingjin Chu</title>
+<title>Evaluation Metrics – Dingjin Chu</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -74,11 +74,40 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="styles.css">
 </head>
 
-<body class="nav-fixed fullcontent quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+<body class="nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
     const toggleBodyColorMode = (bsSheetEl) => {
       const mode = bsSheetEl.getAttribute("data-mode");
       const bodyEl = window.document.querySelector("body");
@@ -394,14 +423,26 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Contents</h2>
+   
+  <ul class="collapse">
+  <li><a href="#goodness-of-fit-metrics" id="toc-goodness-of-fit-metrics" class="nav-link active" data-scroll-target="#goodness-of-fit-metrics">Goodness-of-Fit Metrics</a></li>
+  <li><a href="#error-metrics" id="toc-error-metrics" class="nav-link" data-scroll-target="#error-metrics">Error Metrics</a></li>
+  <li><a href="#model-efficiency-metrics" id="toc-model-efficiency-metrics" class="nav-link" data-scroll-target="#model-efficiency-metrics">Model Efficiency Metrics</a></li>
+  <li><a href="#trend" id="toc-trend" class="nav-link" data-scroll-target="#trend">Trend Metrics</a></li>
+  <li><a href="#validation-model-selection" id="toc-validation-model-selection" class="nav-link" data-scroll-target="#validation-model-selection">Validation &amp; Model Selection</a></li>
+  </ul>
+</nav>
+    </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Causal Inference</h1>
+<h1 class="title">Evaluation Metrics</h1>
 </div>
 
 
@@ -418,47 +459,194 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>Causal inference provides a rigorous framework for identifying the <em>independent causal effect</em> of one variable on another — going beyond the correlational relationships that regression and machine learning describe. The foundational distinction is between association (<em>X</em> and <em>Y</em> covary) and causation (<em>X</em> produces <em>Y</em> when manipulated), formalized through two complementary traditions: the <strong>potential outcomes framework</strong> (Rubin, Neyman) and <strong>structural causal models</strong> (Pearl).</p>
+<p>Quantitative metrics are the language through which model performance, dataset quality, and trend significance are communicated. Choosing the right metric — and understanding what it does and does not capture — is as important as the model itself. This page documents the metrics most commonly used across forest biomass estimation, urban cooling analysis, and ecosystem response studies.</p>
+<div style="display:flex; flex-wrap:wrap; gap:0.5rem; margin:1rem 0 1.5rem 0; padding:0.85rem 1rem; background:rgba(0,0,0,0.03); border-radius:8px;">
+<p><a href="#r2" class="btn btn-outline-secondary btn-sm">R²</a> <a href="#pearson" class="btn btn-outline-secondary btn-sm">r / r²</a> <a href="#rmse" class="btn btn-outline-secondary btn-sm">RMSE</a> <a href="#rrmse" class="btn btn-outline-secondary btn-sm">rRMSE</a> <a href="#mae" class="btn btn-outline-secondary btn-sm">MAE</a> <a href="#bias" class="btn btn-outline-secondary btn-sm">Bias</a> <a href="#mbe" class="btn btn-outline-secondary btn-sm">MBE</a> <a href="#mape" class="btn btn-outline-secondary btn-sm">MAPE</a> <a href="#nse" class="btn btn-outline-secondary btn-sm">NSE</a> <a href="#ioa" class="btn btn-outline-secondary btn-sm">IoA</a> <a href="#trend" class="btn btn-outline-secondary btn-sm">Trend</a> <a href="#mk" class="btn btn-outline-secondary btn-sm">Mann-Kendall</a> <a href="#cv" class="btn btn-outline-secondary btn-sm">Cross-validation</a> <a href="#aic" class="btn btn-outline-secondary btn-sm">AIC / BIC</a></p>
+</div>
 <hr>
-<section id="basic-mechanisms" class="level2">
-<h2 class="anchored" data-anchor-id="basic-mechanisms">Basic Mechanisms</h2>
-<p><strong>Directed Acyclic Graphs (DAGs)</strong> represent causal structures as graphs where nodes are variables and directed edges encode assumed causal directions. DAGs identify which variables must be conditioned on (confounders) or must <em>not</em> be conditioned on (mediators, colliders) to estimate an unconfounded causal effect — a process called <strong>backdoor adjustment</strong>. <strong>Pearl’s do-calculus</strong> formalizes interventional distributions P(Y | do(X)), distinguishing observational conditioning from hypothetical manipulation.</p>
-<p><strong>Instrumental Variables (IV)</strong> identify causal effects when unmeasured confounders exist, by leveraging a third variable (the instrument) that affects the treatment but influences the outcome only through the treatment pathway. <strong>Difference-in-Differences (DiD)</strong> compares changes over time between treated and control groups, removing time-invariant confounding under a parallel-trends assumption. <strong>Propensity Score Matching</strong> reweights or matches observational units to mimic a randomized experiment. <strong>Granger Causality</strong> tests whether past values of <em>X</em> improve forecasts of <em>Y</em> beyond <em>Y</em>’s own history in time series. <strong>Convergent Cross Mapping (CCM)</strong> detects causal coupling in nonlinear dynamical systems using the attractor manifold structure of time-series embeddings — particularly suited to ecological systems exhibiting chaotic dynamics.</p>
+<section id="goodness-of-fit-metrics" class="level2">
+<h2 class="anchored" data-anchor-id="goodness-of-fit-metrics">Goodness-of-Fit Metrics</h2>
 <hr>
-</section>
-<section id="advantages" class="level2">
-<h2 class="anchored" data-anchor-id="advantages">Advantages</h2>
-<ul>
-<li><strong>Identifies mechanisms, not just associations</strong> — enables attribution of ecosystem responses to specific environmental drivers</li>
-<li><strong>Handles confounding explicitly</strong> — DAG-based analysis identifies and adjusts for confounders that bias observational regression</li>
-<li><strong>Applicable to observational data</strong> — no experiment needed when design choices (IV, DiD, natural experiments) are available</li>
-<li><strong>Quantifies counterfactual scenarios</strong> — answers “what would NPP have been without this extreme event?” — essential for climate impact attribution</li>
-<li><strong>Connects to policy</strong> — causal estimates of disturbance effects support management decisions (e.g., effect of fire suppression on forest carbon)</li>
-<li><strong>Integrates with ML</strong> — causal ML (double ML, causal forests) combines the flexibility of machine learning with the rigor of causal identification</li>
-</ul>
-<hr>
-</section>
-<section id="disadvantages" class="level2">
-<h2 class="anchored" data-anchor-id="disadvantages">Disadvantages</h2>
-<ul>
-<li><strong>Strong untestable assumptions</strong> — causal identification requires assumptions (no unmeasured confounding, instrument validity, parallel trends) that cannot be fully verified from data</li>
-<li><strong>Weak instruments</strong> — IV estimates become unreliable when the instrument is weakly correlated with the treatment, inflating standard errors</li>
-<li><strong>Complex ecological systems</strong> — ecosystems involve bidirectional feedbacks, lagged responses, and non-stationarity that challenge standard causal frameworks</li>
-<li><strong>Limited to identified effects</strong> — DAG-based inference requires specifying the full causal graph, which may be uncertain or contested</li>
-<li><strong>Granger causality is not true causality</strong> — predictive improvement in time series does not guarantee mechanistic causation; spurious Granger relationships arise from shared drivers</li>
-<li><strong>Data requirements</strong> — DiD requires long pre-treatment baselines; CCM requires long time series to reconstruct attractor manifolds</li>
-</ul>
+<section id="r2" class="level3">
+<h3 class="anchored" data-anchor-id="r2">R² — Coefficient of Determination</h3>
+<p><span class="math display">\[R^2 = 1 - \frac{\sum_{i=1}^{n}(y_i - \hat{y}_i)^2}{\sum_{i=1}^{n}(y_i - \bar{y})^2}\]</span></p>
+<p><strong>Interpretation:</strong> The proportion of variance in the observed values <span class="math inline">\(y_i\)</span> explained by the model predictions <span class="math inline">\(\hat{y}_i\)</span>. Ranges from <span class="math inline">\(-\infty\)</span> to 1; a value of 1 indicates perfect prediction, 0 indicates the model performs no better than the mean, and negative values indicate the model is worse than predicting the mean.</p>
+<p><strong>Common use:</strong> Biomass model fit, LST prediction accuracy, NPP–climate regression.</p>
+<p><strong>Pitfalls:</strong> - A high R² does not guarantee low prediction error — the model may explain variance but still have large systematic offsets - R² increases monotonically as predictors are added; use <strong>adjusted R²</strong> for comparing models of different complexity - R² is sensitive to the range of <span class="math inline">\(y\)</span>: artificially wide ranges inflate R²</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In remote sensing regression (e.g., GEDI AGB vs.&nbsp;field AGB), R² is almost always reported alongside RMSE — R² quantifies explanatory power, RMSE quantifies prediction error in the original units.</p>
+</div>
+</div>
 <hr>
 </section>
-<section id="applications-in-ecosystem-research" class="level2">
-<h2 class="anchored" data-anchor-id="applications-in-ecosystem-research">Applications in Ecosystem Research</h2>
-<ul>
-<li><strong>Climate–NPP attribution</strong> — isolating the causal effect of compound dry–hot events on NPP variability from confounding trends in CO₂ fertilization and land use change</li>
-<li><strong>Disturbance impact estimation</strong> — causal effect of bark beetle outbreaks on forest carbon stocks using IV or DiD with spatially varying infestation spread</li>
-<li><strong>Urban cooling attribution</strong> — separating the causal effect of canopy cover from correlated socioeconomic and land use variables on urban heat islands</li>
-<li><strong>Fire–vegetation feedbacks</strong> — CCM to detect bidirectional causal coupling between fire frequency and vegetation greenness in savanna systems</li>
-<li><strong>Remote sensing–based attribution</strong> — double ML combining satellite time series with meteorological drivers to causally attribute land surface temperature trends</li>
-</ul>
+<section id="pearson" class="level3">
+<h3 class="anchored" data-anchor-id="pearson">r and r² — Pearson Correlation Coefficient</h3>
+<p><span class="math display">\[r = \frac{\sum_{i=1}^{n}(x_i - \bar{x})(y_i - \bar{y})}{\sqrt{\sum(x_i-\bar{x})^2 \cdot \sum(y_i-\bar{y})^2}}\]</span></p>
+<p><strong>Interpretation:</strong> <span class="math inline">\(r\)</span> measures the linear association between two variables, ranging from −1 (perfect negative) to +1 (perfect positive). <span class="math inline">\(r^2\)</span> is the square of the Pearson correlation — it equals R² <strong>only</strong> when the regression passes through the origin and is fit by OLS without an intercept. In general, <span class="math inline">\(r^2 \neq R^2\)</span>.</p>
+<p><strong>Key distinction from R²:</strong> | Metric | What it measures | Range | |——–|—————–|——-| | <span class="math inline">\(r\)</span> | Strength and direction of linear association | −1 to 1 | | <span class="math inline">\(r^2\)</span> | Proportion of shared variance (symmetric) | 0 to 1 | | <span class="math inline">\(R^2\)</span> | Proportion of <span class="math inline">\(y\)</span> variance explained by the model (asymmetric) | <span class="math inline">\(-\infty\)</span> to 1 |</p>
+<p><strong>Common use:</strong> Climate–NPP relationships, canopy height vs.&nbsp;AGB, LST vs.&nbsp;canopy cover correlations.</p>
+<p><strong>Pitfalls:</strong> - <span class="math inline">\(r\)</span> detects only <strong>linear</strong> association; nonlinear relationships can yield <span class="math inline">\(r \approx 0\)</span> even when a strong relationship exists - Sensitive to outliers — a single extreme point can substantially inflate <span class="math inline">\(r\)</span> - For non-normal data, use <strong>Spearman’s</strong> <span class="math inline">\(\rho\)</span> (rank correlation) instead</p>
+<hr>
+</section>
+</section>
+<section id="error-metrics" class="level2">
+<h2 class="anchored" data-anchor-id="error-metrics">Error Metrics</h2>
+<hr>
+<section id="rmse" class="level3">
+<h3 class="anchored" data-anchor-id="rmse">RMSE — Root Mean Square Error</h3>
+<p><span class="math display">\[\text{RMSE} = \sqrt{\frac{1}{n}\sum_{i=1}^{n}(\hat{y}_i - y_i)^2}\]</span></p>
+<p><strong>Interpretation:</strong> The square root of the average squared residual — expressed in the <strong>same units</strong> as <span class="math inline">\(y\)</span>. RMSE penalizes large errors more heavily than small ones due to the squaring, making it sensitive to outliers.</p>
+<p><strong>Common use:</strong> AGB prediction error (Mg ha⁻¹), LST prediction error (°C), ET estimation error (mm/day).</p>
+<p><strong>Pitfalls:</strong> - Not scale-free — cannot compare RMSE across datasets with different units or ranges; use <strong>rRMSE</strong> instead - Dominated by large errors, which may or may not be ecologically meaningful - Does not reveal the direction of error (use <strong>MBE</strong> or <strong>Bias</strong> for that)</p>
+<hr>
+</section>
+<section id="rrmse" class="level3">
+<h3 class="anchored" data-anchor-id="rrmse">rRMSE — Relative RMSE</h3>
+<p><span class="math display">\[\text{rRMSE} = \frac{\text{RMSE}}{\bar{y}} \times 100\%\]</span></p>
+<p><strong>Interpretation:</strong> RMSE expressed as a percentage of the mean observed value. Scale-free, enabling comparison across datasets, sensors, or biomes.</p>
+<p><strong>Common use:</strong> Comparing biomass estimation accuracy across tropical vs.&nbsp;boreal forests; benchmarking different sensor combinations.</p>
+<p><strong>Typical thresholds (AGB remote sensing):</strong> - rRMSE &lt; 20% — excellent - rRMSE 20–40% — acceptable - rRMSE &gt; 40% — poor</p>
+<hr>
+</section>
+<section id="mae" class="level3">
+<h3 class="anchored" data-anchor-id="mae">MAE — Mean Absolute Error</h3>
+<p><span class="math display">\[\text{MAE} = \frac{1}{n}\sum_{i=1}^{n}|\hat{y}_i - y_i|\]</span></p>
+<p><strong>Interpretation:</strong> The average absolute residual in the original units of <span class="math inline">\(y\)</span>. Unlike RMSE, MAE weights all errors equally regardless of magnitude, making it more robust to outliers.</p>
+<p><strong>When to prefer MAE over RMSE:</strong> - When large errors should not be disproportionately penalized - When the error distribution is heavy-tailed (e.g., biomass in high-density old-growth stands) - When communicating results to non-technical audiences (more interpretable)</p>
+<p><strong>Common use:</strong> Canopy height error, NPP prediction error, urban LST estimation.</p>
+<hr>
+</section>
+<section id="bias" class="level3">
+<h3 class="anchored" data-anchor-id="bias">Bias (%) — Systematic Prediction Offset</h3>
+<p><span class="math display">\[\text{Bias (\%)} = \frac{1}{n}\sum_{i=1}^{n}\frac{\hat{y}_i - y_i}{y_i} \times 100\%\]</span></p>
+<p><strong>Interpretation:</strong> The average relative over- or under-prediction as a percentage of the observed value. A positive bias means the model systematically overestimates; negative means underestimation.</p>
+<p><strong>Why it matters:</strong> RMSE and MAE measure scatter around the 1:1 line but cannot distinguish systematic bias from random error. A model can have low RMSE yet a large consistent bias.</p>
+<p><strong>Common use:</strong> - AGB products tend to underestimate in high-biomass tropical forests (saturation bias) - LST products may show cold or warm biases in urban canyon geometries - DGVM NPP may exhibit systematic overestimation in drought years</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Always report Bias alongside RMSE. Low RMSE + low Bias together indicate both high precision and high accuracy. Low RMSE + high Bias indicates a well-correlated but systematically shifted model.</p>
+</div>
+</div>
+<hr>
+</section>
+<section id="mbe" class="level3">
+<h3 class="anchored" data-anchor-id="mbe">MBE — Mean Bias Error</h3>
+<p><span class="math display">\[\text{MBE} = \frac{1}{n}\sum_{i=1}^{n}(\hat{y}_i - y_i)\]</span></p>
+<p><strong>Interpretation:</strong> The average signed residual in the original units. Positive MBE = model overestimates on average; negative = underestimates. Unlike Bias (%), MBE is expressed in the units of <span class="math inline">\(y\)</span>.</p>
+<p><strong>Relationship to other metrics:</strong></p>
+<p><span class="math display">\[\text{RMSE}^2 = \text{MBE}^2 + \sigma_\varepsilon^2\]</span></p>
+<p>where <span class="math inline">\(\sigma_\varepsilon^2\)</span> is the variance of residuals. This decomposition separates systematic bias from random scatter — useful for diagnosing model errors.</p>
+<hr>
+</section>
+<section id="mape" class="level3">
+<h3 class="anchored" data-anchor-id="mape">MAPE — Mean Absolute Percentage Error</h3>
+<p><span class="math display">\[\text{MAPE} = \frac{100\%}{n}\sum_{i=1}^{n}\left|\frac{y_i - \hat{y}_i}{y_i}\right|\]</span></p>
+<p><strong>Interpretation:</strong> Scale-free version of MAE expressed as a percentage. Widely used in forecasting and ecosystem modeling.</p>
+<p><strong>Pitfall:</strong> Undefined or unstable when <span class="math inline">\(y_i \approx 0\)</span> — problematic for sparse biomass areas, bare soil, or near-zero NPP in semi-arid regions. Use <strong>rRMSE</strong> or <strong>MAE</strong> in those cases.</p>
+<hr>
+</section>
+</section>
+<section id="model-efficiency-metrics" class="level2">
+<h2 class="anchored" data-anchor-id="model-efficiency-metrics">Model Efficiency Metrics</h2>
+<hr>
+<section id="nse" class="level3">
+<h3 class="anchored" data-anchor-id="nse">NSE — Nash–Sutcliffe Efficiency</h3>
+<p><span class="math display">\[\text{NSE} = 1 - \frac{\sum_{i=1}^{n}(y_i - \hat{y}_i)^2}{\sum_{i=1}^{n}(y_i - \bar{y})^2}\]</span></p>
+<p><strong>Interpretation:</strong> Dimensionless index (−∞ to 1) widely used in hydrology and ecosystem modeling. NSE = 1 is perfect; NSE = 0 means the model is no better than the observed mean; NSE &lt; 0 means the mean is a better predictor than the model.</p>
+<p><strong>Common use:</strong> Evaluating DGVM-simulated GPP, ET, and runoff against eddy covariance or streamflow observations; validating process-based urban ET models.</p>
+<p><strong>Key relationship:</strong> NSE is identical to R² when computed between observed and simulated values from regression through the origin — but for general predictions NSE ≠ R².</p>
+<hr>
+</section>
+<section id="ioa" class="level3">
+<h3 class="anchored" data-anchor-id="ioa">IoA — Index of Agreement</h3>
+<p><span class="math display">\[\text{IoA} = 1 - \frac{\sum_{i=1}^{n}(y_i - \hat{y}_i)^2}{\sum_{i=1}^{n}(|\hat{y}_i - \bar{y}| + |y_i - \bar{y}|)^2}\]</span></p>
+<p><strong>Interpretation:</strong> Ranges from 0 to 1. Unlike NSE, IoA is bounded below by 0, making it less sensitive to extreme over/underestimation. Values &gt; 0.8 generally indicate good model–observation agreement.</p>
+<p><strong>Common use:</strong> Process-based model evaluation (DGVMs, urban energy balance models), satellite LST vs.&nbsp;ground measurement comparison.</p>
+<hr>
+</section>
+</section>
+<section id="trend" class="level2">
+<h2 class="anchored" data-anchor-id="trend">Trend Metrics</h2>
+<hr>
+<section id="linear-trend-ols-slope" class="level3">
+<h3 class="anchored" data-anchor-id="linear-trend-ols-slope">Linear Trend — OLS Slope</h3>
+<p><span class="math display">\[\hat{\beta}_1 = \frac{\sum_{t=1}^{T}(t - \bar{t})(y_t - \bar{y})}{\sum_{t=1}^{T}(t - \bar{t})^2}\]</span></p>
+<p><strong>Interpretation:</strong> The ordinary least squares slope of <span class="math inline">\(y\)</span> on time <span class="math inline">\(t\)</span>, expressed in units of <span class="math inline">\(y\)</span> per year. Simple, widely used, but sensitive to outliers and non-stationarity.</p>
+<p><strong>Common use:</strong> Long-term NPP trends from MODIS MOD17, LST warming trends in urban areas, AGB change rates from multi-year LiDAR.</p>
+<p><strong>Pitfall:</strong> Assumes normally distributed residuals and stationarity. Use Mann-Kendall for non-parametric trend detection when these assumptions are violated.</p>
+<hr>
+</section>
+<section id="mk" class="level3">
+<h3 class="anchored" data-anchor-id="mk">Mann-Kendall Test — Non-Parametric Trend</h3>
+<p>The Mann-Kendall test evaluates whether a monotonic upward or downward trend exists in a time series without assuming normality.</p>
+<p><strong>Test statistic:</strong> <span class="math display">\[S = \sum_{i=1}^{n-1}\sum_{j=i+1}^{n} \text{sgn}(y_j - y_i)\]</span></p>
+<p>where <span class="math inline">\(\text{sgn}(\cdot)\)</span> is the sign function (+1, 0, −1).</p>
+<p><strong>Interpretation:</strong> <span class="math inline">\(S &gt; 0\)</span> suggests an upward trend; <span class="math inline">\(S &lt; 0\)</span> a downward trend. Statistical significance is assessed via the standardized <span class="math inline">\(Z\)</span> statistic.</p>
+<p><strong>Sen’s Slope</strong> — the median of all pairwise slopes <span class="math inline">\(\frac{y_j - y_i}{j - i}\)</span> — is reported alongside the Mann-Kendall <span class="math inline">\(p\)</span>-value as a robust trend magnitude estimate.</p>
+<p><strong>Common use:</strong> - Detecting significant NPP trends in Central Asia despite high interannual variability - Identifying long-term LST warming trends in cities - Forest biomass change detection in repeat LiDAR surveys</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Use Mann-Kendall + Sen’s Slope together: Mann-Kendall provides the significance test, Sen’s Slope provides the magnitude. Both are robust to non-normality and are the standard in ecological trend analysis.</p>
+</div>
+</div>
+<hr>
+</section>
+</section>
+<section id="validation-model-selection" class="level2">
+<h2 class="anchored" data-anchor-id="validation-model-selection">Validation &amp; Model Selection</h2>
+<hr>
+<section id="cv" class="level3">
+<h3 class="anchored" data-anchor-id="cv">Cross-Validation Metrics</h3>
+<p><strong>k-fold cross-validation</strong> partitions the dataset into <span class="math inline">\(k\)</span> folds, training on <span class="math inline">\(k-1\)</span> and testing on the held-out fold, repeating <span class="math inline">\(k\)</span> times. The reported RMSE, MAE, and R² are averaged across folds.</p>
+<p><strong>Spatial cross-validation</strong> — critical in remote sensing — ensures training and test sets are spatially separated to prevent spatial autocorrelation from inflating accuracy. Methods include: - <strong>Spatial block CV</strong> — geographic blocking by grid cells or regions - <strong>Buffered leave-one-out CV (BLOO-CV)</strong> — excludes a spatial buffer around each test point - <strong>Stratified CV by biome or land cover</strong> — ensures representation of all ecosystem types</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Standard random k-fold CV applied to spatially autocorrelated remote sensing data can overestimate R² by 0.1–0.3 and underestimate RMSE by 20–40%. Always use spatial CV for LiDAR-based AGB and satellite-derived LST models.</p>
+</div>
+</div>
+<hr>
+</section>
+<section id="aic" class="level3">
+<h3 class="anchored" data-anchor-id="aic">AIC / BIC — Model Selection Criteria</h3>
+<p><span class="math display">\[\text{AIC} = 2k - 2\ln(\hat{L}), \qquad \text{BIC} = k\ln(n) - 2\ln(\hat{L})\]</span></p>
+<p>where <span class="math inline">\(k\)</span> = number of parameters, <span class="math inline">\(n\)</span> = sample size, <span class="math inline">\(\hat{L}\)</span> = maximized likelihood.</p>
+<p><strong>Interpretation:</strong> Both penalize model complexity to prevent overfitting. Lower AIC/BIC = better model. BIC penalizes complexity more strongly than AIC for <span class="math inline">\(n &gt; 7\)</span>.</p>
+<p><strong><span class="math inline">\(\Delta\)</span>AIC rules of thumb:</strong> - <span class="math inline">\(\Delta\)</span>AIC &lt; 2 — models are statistically equivalent - <span class="math inline">\(\Delta\)</span>AIC 4–7 — some evidence for the lower-AIC model - <span class="math inline">\(\Delta\)</span>AIC &gt; 10 — strong evidence the lower-AIC model is better</p>
+<p><strong>Common use:</strong> Comparing mixed-effects model structures for biomass–canopy relationships; selecting predictor sets in NPP–climate regression; choosing between spatial autocorrelation model structures.</p>
+<hr>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -469,11 +657,12 @@ Note
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Return to <a href="./methods_ml.html">Machine Learning</a> or continue to <a href="./methods_process.html">Process-Based Models</a>.</p>
+<p>Return to <a href="./methods_assumptions.html">Key Assumptions</a> or go back to <a href="./methods_intro.html">Methods Introduction</a>.</p>
 </div>
 </div>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->
