@@ -1,0 +1,29 @@
+/* ── Homepage background image ───────────────────────────── */
+body {
+  background-image: url('photo/satellite_to_earth.png');
+  background-size: cover;
+  background-attachment: fixed;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+
+/* Frosted glass effect on content areas */
+#quarto-content,
+.quarto-about-jolla,
+.quarto-content {
+  background-color: rgba(255, 255, 255, 0.55);
+  border-radius: 10px;
+  padding: 2rem;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
+/* Navbar stays solid */
+.navbar {
+  background-color: rgba(255, 255, 255, 0.97) !important;
+}
+
+/* Footer stays solid */
+.nav-footer {
+  background-color: rgba(255, 255, 255, 0.95);
+}
