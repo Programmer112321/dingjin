@@ -435,6 +435,57 @@ Note
 </div>
 <hr>
 </section>
+<section id="sentinel-2-esa-copernicus" class="level2">
+<h2 class="anchored" data-anchor-id="sentinel-2-esa-copernicus">Sentinel-2 — ESA Copernicus</h2>
+<p><strong>Sentinel-2</strong> is a high-resolution multispectral mission from the European Space Agency (ESA) under the Copernicus Earth Observation Programme. Its combination of high spatial resolution, frequent revisit time, and free data access has made it one of the most widely used satellites in vegetation and land surface research.</p>
+<p><strong>Sensors:</strong> MultiSpectral Instrument (MSI) — Sentinel-2A and Sentinel-2B <strong>Spatial resolution:</strong> 10 m (B2, B3, B4, B8) · 20 m (B5, B6, B7, B8A, B11, B12) · 60 m (B1, B9, B10) <strong>Temporal resolution:</strong> ~5-day revisit (combined twin satellites) <strong>Spectral bands:</strong> 13 bands from visible to SWIR, including red-edge bands for vegetation analysis <strong>Coverage:</strong> Global land surface <strong>Key applications:</strong> Forest canopy health, LAI estimation, crop monitoring, urban green space mapping, water body detection</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Sentinel-2 data are freely available through the <a href="https://dataspace.copernicus.eu">Copernicus Data Space</a> and <a href="https://earthengine.google.com">Google Earth Engine</a>.</p>
+</div>
+</div>
+<hr>
+</section>
+<section id="hls-harmonized-landsat-and-sentinel-2-nasa" class="level2">
+<h2 class="anchored" data-anchor-id="hls-harmonized-landsat-and-sentinel-2-nasa">HLS — Harmonized Landsat and Sentinel-2 (NASA)</h2>
+<p><strong>HLS</strong> is a NASA-produced data product that harmonizes observations from the Landsat 8/9 OLI and Sentinel-2A/B MSI sensors into a consistent surface reflectance time series. By cross-calibrating the two satellite programs, HLS provides a near-seamless 30 m multispectral record with a ~2–3 day effective revisit, significantly reducing the data gaps introduced by cloud cover.</p>
+<p><strong>Agency:</strong> NASA Goddard Space Flight Center <strong>Sensors:</strong> Landsat 8 OLI · Landsat 9 OLI-2 · Sentinel-2A MSI · Sentinel-2B MSI (harmonized jointly) <strong>Spatial resolution:</strong> 30 m <strong>Temporal resolution:</strong> ~2–3 day effective revisit (combined four sensors) <strong>Spectral bands:</strong> 10 common bands (Coastal/Aerosol, Blue, Green, Red, NIR, SWIR1, SWIR2, Cirrus, SWIR-S2 equivalent) consistently cross-calibrated across sensors <strong>Products:</strong> - <strong>HLSL30</strong> — Landsat-derived surface reflectance (30 m) - <strong>HLSS30</strong> — Sentinel-2-derived surface reflectance (30 m, resampled) <strong>Coverage:</strong> Global land, from 2013 (Landsat 8) onward <strong>Key applications:</strong> Dense time-series vegetation phenology, crop monitoring, forest disturbance detection, intra-seasonal land cover change, gap-filling cloud-contaminated records</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>HLS is especially powerful for detecting short-duration events (e.g., crop harvest, defoliation outbreaks, wildfire) that require sub-weekly sampling, which neither Landsat nor Sentinel-2 alone can reliably provide.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>HLS data are freely available through <a href="https://earthdata.nasa.gov">NASA EarthData</a> (<code>HLSL30</code> and <code>HLSS30</code> collections) and <a href="https://earthengine.google.com">Google Earth Engine</a> (<code>NASA/HLS</code>).</p>
+</div>
+</div>
+<hr>
+</section>
 <section id="ecostress-ecosystem-spaceborne-thermal-radiometer-experiment-on-space-station-nasa-jpl" class="level2">
 <h2 class="anchored" data-anchor-id="ecostress-ecosystem-spaceborne-thermal-radiometer-experiment-on-space-station-nasa-jpl">ECOSTRESS — ECOsystem Spaceborne Thermal Radiometer Experiment on Space Station (NASA / JPL)</h2>
 <p><strong>ECOSTRESS</strong> is a NASA thermal infrared multispectral radiometer mounted on the International Space Station (ISS), designed to measure land surface temperature (LST) and evapotranspiration (ET) at fine spatial resolution (~70 m). Unlike sun-synchronous satellites that always acquire data at the same local time, ECOSTRESS benefits from the ISS’s precessing orbit — sampling a given location at varying times of day across repeated overpasses, enabling the capture of diurnal LST and ET cycles invisible to Landsat or Sentinel-based thermal products. This makes it uniquely suited for studying plant water stress responses, urban heat island dynamics, and irrigation water use across diverse ecosystems.</p>
@@ -502,25 +553,6 @@ Note
 </div>
 <hr>
 </section>
-<section id="sentinel-2-esa-copernicus" class="level2">
-<h2 class="anchored" data-anchor-id="sentinel-2-esa-copernicus">Sentinel-2 — ESA Copernicus</h2>
-<p><strong>Sentinel-2</strong> is a high-resolution multispectral mission from the European Space Agency (ESA) under the Copernicus Earth Observation Programme. Its combination of high spatial resolution, frequent revisit time, and free data access has made it one of the most widely used satellites in vegetation and land surface research.</p>
-<p><strong>Sensors:</strong> MultiSpectral Instrument (MSI) — Sentinel-2A and Sentinel-2B <strong>Spatial resolution:</strong> 10 m (B2, B3, B4, B8) · 20 m (B5, B6, B7, B8A, B11, B12) · 60 m (B1, B9, B10) <strong>Temporal resolution:</strong> ~5-day revisit (combined twin satellites) <strong>Spectral bands:</strong> 13 bands from visible to SWIR, including red-edge bands for vegetation analysis <strong>Coverage:</strong> Global land surface <strong>Key applications:</strong> Forest canopy health, LAI estimation, crop monitoring, urban green space mapping, water body detection</p>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Sentinel-2 data are freely available through the <a href="https://dataspace.copernicus.eu">Copernicus Data Space</a> and <a href="https://earthengine.google.com">Google Earth Engine</a>.</p>
-</div>
-</div>
-<hr>
-</section>
 <section id="modis-nasa-terra-aqua" class="level2">
 <h2 class="anchored" data-anchor-id="modis-nasa-terra-aqua">MODIS — NASA Terra &amp; Aqua</h2>
 <p><strong>MODIS</strong> (Moderate Resolution Imaging Spectroradiometer) is a key instrument aboard NASA’s Terra and Aqua satellites. While its spatial resolution is coarser than Landsat or Sentinel-2, its near-daily global coverage and long record (since 1999) make it indispensable for large-scale vegetation dynamics, land surface temperature, and fire monitoring.</p>
@@ -536,6 +568,44 @@ Note
 </div>
 <div class="callout-body-container callout-body">
 <p>MODIS data are freely available through <a href="https://earthdata.nasa.gov">NASA EarthData</a> and <a href="https://earthengine.google.com">Google Earth Engine</a>.</p>
+</div>
+</div>
+<hr>
+</section>
+<section id="viirs-visible-infrared-imaging-radiometer-suite-noaa-nasa" class="level2">
+<h2 class="anchored" data-anchor-id="viirs-visible-infrared-imaging-radiometer-suite-noaa-nasa">VIIRS — Visible Infrared Imaging Radiometer Suite (NOAA / NASA)</h2>
+<p><strong>VIIRS</strong> is the primary visible-to-thermal sensor aboard the Suomi-NPP, NOAA-20, and NOAA-21 satellites. It is the operational successor to MODIS, offering improved radiometric calibration, a wider swath, and a dedicated day-night band (DNB) that enables detection of city lights, gas flares, and fires at night. Its near-daily global coverage makes it a cornerstone dataset for large-scale land and ocean monitoring.</p>
+<p><strong>Agency:</strong> NOAA / NASA <strong>Satellites:</strong> Suomi-NPP (2011–present) · NOAA-20 / JPSS-1 (2017–present) · NOAA-21 / JPSS-2 (2022–present) <strong>Spatial resolution:</strong> 375 m (I-bands, visible/NIR/SWIR/TIR) · 750 m (M-bands, moderate resolution) · ~750 m (DNB) <strong>Temporal resolution:</strong> ~1-day global revisit <strong>Spectral bands:</strong> 22 bands from visible (0.41 μm) to longwave thermal infrared (12.5 μm), including a dedicated Day-Night Band (DNB) <strong>Key products:</strong> - <strong>VNP13</strong> — Vegetation indices (NDVI, EVI) at 500 m - <strong>VNP09</strong> — Daily surface reflectance - <strong>VNP46</strong> — Black Marble nighttime lights - <strong>VNP14</strong> — Active fire and thermal anomalies - <strong>VJ102IMG</strong> — Calibrated top-of-atmosphere radiance (I-bands) <strong>Key applications:</strong> Nighttime light mapping, active fire detection, vegetation phenology, snow and ice extent, sea surface temperature, aerosol optical depth</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>VIIRS data are freely available through <a href="https://earthdata.nasa.gov">NASA EarthData</a> and <a href="https://earthengine.google.com">Google Earth Engine</a>. The Black Marble (VNP46) nighttime lights product is also accessible via the <a href="https://blackmarble.gsfc.nasa.gov">NASA Black Marble website</a>.</p>
+</div>
+</div>
+<hr>
+</section>
+<section id="goes-geostationary-operational-environmental-satellite-noaa-nasa" class="level2">
+<h2 class="anchored" data-anchor-id="goes-geostationary-operational-environmental-satellite-noaa-nasa">GOES — Geostationary Operational Environmental Satellite (NOAA / NASA)</h2>
+<p><strong>GOES</strong> (GOES-16, GOES-17, GOES-18) is NOAA’s geostationary Earth observation system covering the Western Hemisphere. Unlike polar-orbiting sensors, GOES provides nearly continuous observations of a fixed region — as frequently as every 30 seconds during rapid-scan events — making it uniquely suited for near-real-time monitoring of weather, wildfires, and vegetation stress at continental scale.</p>
+<p><strong>Agency:</strong> NOAA / NASA <strong>Satellites:</strong> GOES-16 (East, 75.2°W) · GOES-18 (West, 137.2°W) <strong>Sensor:</strong> ABI — Advanced Baseline Imager <strong>Spatial resolution:</strong> 0.5 km (visible Band 2) · 1 km (near-IR bands) · 2 km (IR bands) <strong>Temporal resolution:</strong> Full-disk scan every 10–15 minutes; CONUS sector every 5 minutes; mesoscale every 30–60 seconds <strong>Spectral bands:</strong> 16 bands from visible (0.47 μm) to longwave IR (13.3 μm) <strong>Key products:</strong> Cloud cover, fire detection, aerosol optical depth, land surface temperature, vegetation index, lightning mapper (GLM), sea surface temperature <strong>Key applications:</strong> Wildfire detection and progression, severe weather monitoring, land surface temperature, near-real-time drought assessment, atmospheric water vapor</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>GOES-ABI data are freely available through <a href="https://registry.opendata.aws/noaa-goes/">NOAA’s AWS S3 bucket</a> (real-time), <a href="https://www.class.noaa.gov">NOAA CLASS</a> (archive), and <a href="https://earthengine.google.com">Google Earth Engine</a> (<code>NOAA/GOES</code>).</p>
 </div>
 </div>
 <hr>
@@ -568,108 +638,6 @@ Note
 </div>
 <div class="callout-body-container callout-body">
 <p>NAIP imagery is freely available through <a href="https://earthexplorer.usgs.gov">USGS EarthExplorer</a>, <a href="https://nrcs.app.box.com/v/naip">USDA Box</a>, and <a href="https://earthengine.google.com">Google Earth Engine</a> (<code>USDA/NAIP/DOQQ</code>).</p>
-</div>
-</div>
-<hr>
-</section>
-<section id="viirs-visible-infrared-imaging-radiometer-suite-noaa-nasa" class="level2">
-<h2 class="anchored" data-anchor-id="viirs-visible-infrared-imaging-radiometer-suite-noaa-nasa">VIIRS — Visible Infrared Imaging Radiometer Suite (NOAA / NASA)</h2>
-<p><strong>VIIRS</strong> is the primary visible-to-thermal sensor aboard the Suomi-NPP, NOAA-20, and NOAA-21 satellites. It is the operational successor to MODIS, offering improved radiometric calibration, a wider swath, and a dedicated day-night band (DNB) that enables detection of city lights, gas flares, and fires at night. Its near-daily global coverage makes it a cornerstone dataset for large-scale land and ocean monitoring.</p>
-<p><strong>Agency:</strong> NOAA / NASA <strong>Satellites:</strong> Suomi-NPP (2011–present) · NOAA-20 / JPSS-1 (2017–present) · NOAA-21 / JPSS-2 (2022–present) <strong>Spatial resolution:</strong> 375 m (I-bands, visible/NIR/SWIR/TIR) · 750 m (M-bands, moderate resolution) · ~750 m (DNB) <strong>Temporal resolution:</strong> ~1-day global revisit <strong>Spectral bands:</strong> 22 bands from visible (0.41 μm) to longwave thermal infrared (12.5 μm), including a dedicated Day-Night Band (DNB) <strong>Key products:</strong> - <strong>VNP13</strong> — Vegetation indices (NDVI, EVI) at 500 m - <strong>VNP09</strong> — Daily surface reflectance - <strong>VNP46</strong> — Black Marble nighttime lights - <strong>VNP14</strong> — Active fire and thermal anomalies - <strong>VJ102IMG</strong> — Calibrated top-of-atmosphere radiance (I-bands) <strong>Key applications:</strong> Nighttime light mapping, active fire detection, vegetation phenology, snow and ice extent, sea surface temperature, aerosol optical depth</p>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>VIIRS data are freely available through <a href="https://earthdata.nasa.gov">NASA EarthData</a> and <a href="https://earthengine.google.com">Google Earth Engine</a>. The Black Marble (VNP46) nighttime lights product is also accessible via the <a href="https://blackmarble.gsfc.nasa.gov">NASA Black Marble website</a>.</p>
-</div>
-</div>
-<hr>
-</section>
-<section id="hls-harmonized-landsat-and-sentinel-2-nasa" class="level2">
-<h2 class="anchored" data-anchor-id="hls-harmonized-landsat-and-sentinel-2-nasa">HLS — Harmonized Landsat and Sentinel-2 (NASA)</h2>
-<p><strong>HLS</strong> is a NASA-produced data product that harmonizes observations from the Landsat 8/9 OLI and Sentinel-2A/B MSI sensors into a consistent surface reflectance time series. By cross-calibrating the two satellite programs, HLS provides a near-seamless 30 m multispectral record with a ~2–3 day effective revisit, significantly reducing the data gaps introduced by cloud cover.</p>
-<p><strong>Agency:</strong> NASA Goddard Space Flight Center <strong>Sensors:</strong> Landsat 8 OLI · Landsat 9 OLI-2 · Sentinel-2A MSI · Sentinel-2B MSI (harmonized jointly) <strong>Spatial resolution:</strong> 30 m <strong>Temporal resolution:</strong> ~2–3 day effective revisit (combined four sensors) <strong>Spectral bands:</strong> 10 common bands (Coastal/Aerosol, Blue, Green, Red, NIR, SWIR1, SWIR2, Cirrus, SWIR-S2 equivalent) consistently cross-calibrated across sensors <strong>Products:</strong> - <strong>HLSL30</strong> — Landsat-derived surface reflectance (30 m) - <strong>HLSS30</strong> — Sentinel-2-derived surface reflectance (30 m, resampled) <strong>Coverage:</strong> Global land, from 2013 (Landsat 8) onward <strong>Key applications:</strong> Dense time-series vegetation phenology, crop monitoring, forest disturbance detection, intra-seasonal land cover change, gap-filling cloud-contaminated records</p>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Tip
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>HLS is especially powerful for detecting short-duration events (e.g., crop harvest, defoliation outbreaks, wildfire) that require sub-weekly sampling, which neither Landsat nor Sentinel-2 alone can reliably provide.</p>
-</div>
-</div>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>HLS data are freely available through <a href="https://earthdata.nasa.gov">NASA EarthData</a> (<code>HLSL30</code> and <code>HLSS30</code> collections) and <a href="https://earthengine.google.com">Google Earth Engine</a> (<code>NASA/HLS</code>).</p>
-</div>
-</div>
-<hr>
-</section>
-<section id="goes-geostationary-operational-environmental-satellite-noaa-nasa" class="level2">
-<h2 class="anchored" data-anchor-id="goes-geostationary-operational-environmental-satellite-noaa-nasa">GOES — Geostationary Operational Environmental Satellite (NOAA / NASA)</h2>
-<p><strong>GOES</strong> (GOES-16, GOES-17, GOES-18) is NOAA’s geostationary Earth observation system covering the Western Hemisphere. Unlike polar-orbiting sensors, GOES provides nearly continuous observations of a fixed region — as frequently as every 30 seconds during rapid-scan events — making it uniquely suited for near-real-time monitoring of weather, wildfires, and vegetation stress at continental scale.</p>
-<p><strong>Agency:</strong> NOAA / NASA <strong>Satellites:</strong> GOES-16 (East, 75.2°W) · GOES-18 (West, 137.2°W) <strong>Sensor:</strong> ABI — Advanced Baseline Imager <strong>Spatial resolution:</strong> 0.5 km (visible Band 2) · 1 km (near-IR bands) · 2 km (IR bands) <strong>Temporal resolution:</strong> Full-disk scan every 10–15 minutes; CONUS sector every 5 minutes; mesoscale every 30–60 seconds <strong>Spectral bands:</strong> 16 bands from visible (0.47 μm) to longwave IR (13.3 μm) <strong>Key products:</strong> Cloud cover, fire detection, aerosol optical depth, land surface temperature, vegetation index, lightning mapper (GLM), sea surface temperature <strong>Key applications:</strong> Wildfire detection and progression, severe weather monitoring, land surface temperature, near-real-time drought assessment, atmospheric water vapor</p>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>GOES-ABI data are freely available through <a href="https://registry.opendata.aws/noaa-goes/">NOAA’s AWS S3 bucket</a> (real-time), <a href="https://www.class.noaa.gov">NOAA CLASS</a> (archive), and <a href="https://earthengine.google.com">Google Earth Engine</a> (<code>NOAA/GOES</code>).</p>
-</div>
-</div>
-<hr>
-</section>
-<section id="deadtrees.earth-global-dead-tree-and-forest-disturbance-mapping" class="level2">
-<h2 class="anchored" data-anchor-id="deadtrees.earth-global-dead-tree-and-forest-disturbance-mapping">deadtrees.earth — Global Dead Tree and Forest Disturbance Mapping</h2>
-<p><strong>deadtrees.earth</strong> is an open-access platform that detects and maps dead and dying trees across the globe using dense Sentinel-2 time series and automated change detection algorithms. By tracking sharp spectral transitions associated with needle/leaf loss, crown browning, and mortality, it provides near-real-time and historical records of forest dieback events — including bark beetle outbreaks, drought-induced mortality, windthrow, and wildfire-related tree death — at 10 m spatial resolution.</p>
-<p><strong>Developed by:</strong> Remote Sensing and Earth Observation research community; platform maintained as a free public service <strong>Input data:</strong> Sentinel-2 multispectral time series (10 m, ~5-day revisit) <strong>Spatial resolution:</strong> 10 m (native Sentinel-2 resolution) <strong>Temporal coverage:</strong> 2017–present (Sentinel-2 archive); updated as new imagery becomes available <strong>Coverage:</strong> Global (all land areas with Sentinel-2 coverage) <strong>Detection approach:</strong> Per-pixel spectral trajectory analysis tracking changes in NDVI, red-edge bands, and SWIR reflectance to distinguish healthy canopy, stressed canopy, and dead/dying trees <strong>Key disturbance types detected:</strong> Bark beetle infestations (e.g., <em>Ips typographus</em> in European spruce forests), drought-induced dieback, wind and ice storm damage, wildfire tree mortality, forest harvesting <strong>Key applications:</strong> Forest health monitoring, bark beetle early warning, post-disturbance carbon flux estimation, regeneration tracking, forest management prioritization, calibration/validation of coarser disturbance products (Hansen GFC, MODIS burned area)</p>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Tip
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>deadtrees.earth is particularly powerful in Central Europe where bark beetle (<em>Ips typographus</em>) outbreaks have killed millions of hectares of Norway spruce since the 2018–2020 drought. Its 10 m Sentinel-2 basis allows detection of individual tree clusters and small-gap mortality invisible to MODIS-scale products.</p>
-</div>
-</div>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>The deadtrees.earth platform, interactive map, and data downloads are freely accessible at <a href="https://deadtrees.earth">deadtrees.earth</a>.</p>
 </div>
 </div>
 
