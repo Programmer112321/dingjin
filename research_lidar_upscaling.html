@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Blog – Dingjin Chu</title>
+<title>Upscaling LiDAR: From Airborne to Spaceborne – Dingjin Chu</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -31,8 +31,6 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
 <link href="./photo/favicon_satellite.svg" rel="icon" type="image/svg+xml">
-<script src="site_libs/quarto-listing/list.min.js"></script>
-<script src="site_libs/quarto-listing/quarto-listing.js"></script>
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
@@ -75,68 +73,10 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<script>
 
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-listing .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
-
-    const options = {
-      valueNames: ['listing-date','listing-title','listing-author','listing-image','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
-      
-      searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description","listing-categories"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-listing'] = new List('listing-listing', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  </script>
-
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
-
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
 
 <link rel="stylesheet" href="styles.css">
-<link rel="alternate" type="application/rss+xml" title="Dingjin Chu" href="blog.xml" data-external="1"></head>
+</head>
 
 <body class="nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
     const toggleBodyColorMode = (bsSheetEl) => {
@@ -419,7 +359,7 @@ window.Quarto = {
 <span class="menu-text">News</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="./blog.html" aria-current="page"> 
+    <a class="nav-link" href="./blog.html"> 
 <span class="menu-text">Blog/Notes</span></a>
   </li>  
   <li class="nav-item">
@@ -459,14 +399,28 @@ window.Quarto = {
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(5)</span></div><div class="category" data-category="M0RFUA==">3DEP <span class="quarto-category-count">(3)</span></div><div class="category" data-category="QmlvbWFzcw==">Biomass <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Q2Fub3B5JTIwSGVpZ2h0">Canopy Height <span class="quarto-category-count">(3)</span></div><div class="category" data-category="R0VESQ==">GEDI <span class="quarto-category-count">(4)</span></div><div class="category" data-category="Z2VuZXJhbA==">general <span class="quarto-category-count">(1)</span></div><div class="category" data-category="TGlEQVI=">LiDAR <span class="quarto-category-count">(4)</span></div><div class="category" data-category="TkVPTg==">NEON <span class="quarto-category-count">(2)</span></div><div class="category" data-category="Ug==">R <span class="quarto-category-count">(4)</span></div><div class="category" data-category="VHV0b3JpYWw=">Tutorial <span class="quarto-category-count">(4)</span></div><div class="category" data-category="VXJiYW4=">Urban <span class="quarto-category-count">(2)</span></div></div></div>
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Contents</h2>
+   
+  <ul class="collapse">
+  <li><a href="#the-scaling-problem" id="toc-the-scaling-problem" class="nav-link active" data-scroll-target="#the-scaling-problem">1 · The Scaling Problem</a></li>
+  <li><a href="#data-hierarchy-and-scale-characteristics" id="toc-data-hierarchy-and-scale-characteristics" class="nav-link" data-scroll-target="#data-hierarchy-and-scale-characteristics">2 · Data Hierarchy and Scale Characteristics</a></li>
+  <li><a href="#gedi-waveform-simulation-from-als" id="toc-gedi-waveform-simulation-from-als" class="nav-link" data-scroll-target="#gedi-waveform-simulation-from-als">3 · GEDI Waveform Simulation from ALS</a></li>
+  <li><a href="#methodological-frameworks-for-upscaling" id="toc-methodological-frameworks-for-upscaling" class="nav-link" data-scroll-target="#methodological-frameworks-for-upscaling">4 · Methodological Frameworks for Upscaling</a></li>
+  <li><a href="#usgs-3dep-as-the-upscaling-bridge" id="toc-usgs-3dep-as-the-upscaling-bridge" class="nav-link" data-scroll-target="#usgs-3dep-as-the-upscaling-bridge">5 · USGS 3DEP as the Upscaling Bridge</a></li>
+  <li><a href="#key-challenges" id="toc-key-challenges" class="nav-link" data-scroll-target="#key-challenges">6 · Key Challenges</a></li>
+  <li><a href="#emerging-directions" id="toc-emerging-directions" class="nav-link" data-scroll-target="#emerging-directions">7 · Emerging Directions</a></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">8 · Summary</a></li>
+  </ul>
+</nav>
+    </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Blog</h1>
+<h1 class="title">Upscaling LiDAR: From Airborne to Spaceborne</h1>
 </div>
 
 
@@ -483,208 +437,240 @@ window.Quarto = {
 </header>
 
 
-
-
-
-
-<div class="quarto-listing quarto-listing-container-default" id="listing-listing">
-<div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="TGlEQVIlMkNHRURJJTJDM0RFUCUyQ1VyYmFuJTJDQ2Fub3B5JTIwSGVpZ2h0JTJDUiUyQ1R1dG9yaWFs" data-listing-date-sort="1778389200000" data-listing-file-modified-sort="1778944116043" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1947">
-<div class="thumbnail"><a href="./posts/gedi-3dep-compare/index.html" class="no-external">
-
-<p class="card-img-top"><img src="posts\gedi-3dep-compare\fig_3dep_chm.png"  class="thumbnail-image card-img"/></p>
-
-</a></div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/gedi-3dep-compare/index.html" class="no-external">Multi-Source Urban Heights: GEDI L2A, 3DEP LiDAR, and OSM — New York City</a>
-</h3>
-<div class="listing-categories">
-
-<div class="listing-category" onclick="window.quartoListingCategory('TGlEQVI='); return false;">LiDAR</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('R0VESQ=='); return false;">GEDI</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('M0RFUA=='); return false;">3DEP</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('VXJiYW4='); return false;">Urban</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('Q2Fub3B5JTIwSGVpZ2h0'); return false;">Canopy Height</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('Ug=='); return false;">R</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('VHV0b3JpYWw='); return false;">Tutorial</div>
-
+<blockquote class="blockquote">
+<p><em>How do we bridge the gap between the centimeter-scale precision of airborne and drone LiDAR and the global but sparse footprints of spaceborne GEDI?</em></p>
+</blockquote>
+<hr>
+<section id="the-scaling-problem" class="level2">
+<h2 class="anchored" data-anchor-id="the-scaling-problem">1 · The Scaling Problem</h2>
+<p>LiDAR-based forest monitoring operates across a fundamental scale hierarchy that spans five orders of magnitude in spatial extent — from individual tree crowns measured by terrestrial laser scanning (TLS) at sub-centimeter resolution, to wall-to-wall continental coverage of 3DEP airborne LiDAR at ~1–10 pts/m², to the 25 m circular footprints of GEDI spaced ~600 m apart across the global tropics and temperate zone. Each tier of this hierarchy captures different aspects of forest structure, and no single platform can simultaneously deliver the spatial density, coverage extent, and temporal frequency required for global carbon accounting.</p>
+<p>The core challenge of <strong>LiDAR upscaling</strong> is to propagate structural information measured precisely at small scales — tree height, crown volume, canopy density, gap fraction — to the regional and global scales where forest carbon policy operates, while preserving the accuracy inherited from the high-fidelity source data.</p>
+<hr>
+</section>
+<section id="data-hierarchy-and-scale-characteristics" class="level2">
+<h2 class="anchored" data-anchor-id="data-hierarchy-and-scale-characteristics">2 · Data Hierarchy and Scale Characteristics</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Platform</th>
+<th>Footprint / density</th>
+<th>Coverage</th>
+<th>Temporal</th>
+<th>Key metric</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>TLS / Drone</strong></td>
+<td>0.5–5 cm</td>
+<td>&lt; 1 ha</td>
+<td>Campaign</td>
+<td>Branch, stem, crown</td>
+</tr>
+<tr class="even">
+<td><strong>Airborne ALS (3DEP, NEON)</strong></td>
+<td>1–20 pts/m²</td>
+<td>Local to national</td>
+<td>Periodic</td>
+<td>CHM, height pct., density</td>
+</tr>
+<tr class="odd">
+<td><strong>GEDI</strong></td>
+<td>25 m footprint, ~600 m spacing</td>
+<td>±51.6° global</td>
+<td>2019–present</td>
+<td>RH metrics, AGBD</td>
+</tr>
+<tr class="even">
+<td><strong>ICESat-2 (ATL08)</strong></td>
+<td>~100 m segment</td>
+<td>Global (±88°)</td>
+<td>91-day repeat</td>
+<td>Canopy height, ground</td>
+</tr>
+</tbody>
+</table>
+<p>The spatial mismatch is severe: a single 3DEP ALS tile at 1 pt/m² over a 1 km² area contains ~1,000,000 returns; GEDI provides roughly 3–5 footprints across the same area, each a 25 m circle. The information density ratio is approximately <strong>10,000:1</strong>. Upscaling is therefore fundamentally a <strong>statistical inference</strong> problem — how to learn from the dense but spatially limited ALS record and extrapolate to the globally sparse but spatially extensive GEDI sampling.</p>
+<hr>
+</section>
+<section id="gedi-waveform-simulation-from-als" class="level2">
+<h2 class="anchored" data-anchor-id="gedi-waveform-simulation-from-als">3 · GEDI Waveform Simulation from ALS</h2>
+<p>Before upscaling can proceed, the two sensor types must be placed on a common footing. The <strong>GEDI Simulator</strong> (Hancock et al., 2019) allows full-waveform GEDI returns to be synthesized from existing ALS point clouds by convolving the 3D point distribution within a simulated 25 m footprint with the instrument’s Gaussian pulse, noise model, and detection threshold. This produces simulated GEDI waveforms and derived RH metrics (RH25, RH50, RH75, RH95, RH98, RH100) from ALS data, enabling direct metric-to-metric comparison at the same location.</p>
+<p><strong>Key applications of GEDI simulation from 3DEP / NEON ALS:</strong></p>
+<ul>
+<li><strong>Calibration:</strong> Simulated GEDI metrics from ALS are compared to real GEDI acquisitions at co-located footprints to assess bias introduced by GEDI’s noise model, sensitivity threshold, and tandem-beam geometry. Studies consistently find that GEDI RH98 overestimates maximum canopy height by 1–3 m in closed-canopy boreal forests due to noise-induced apparent ground returns above the true canopy (Hofton et al., 2020).</li>
+<li><strong>Allometric calibration transfer:</strong> ALS-based AGB allometries (calibrated against field plots) can be transferred to GEDI metrics by expressing the allometry in terms of simulated RH metrics, rather than refitting with sparse GEDI footprint–plot pairs.</li>
+<li><strong>Filling GEDI gaps:</strong> Cloud cover and topographic shadowing create systematic gaps in GEDI coverage. ALS simulation allows gap-filling in areas with existing airborne coverage.</li>
+</ul>
+<p><strong>Foundational papers:</strong> - Blair &amp; Hofton (1999) — original large-footprint waveform simulation framework - Hancock et al.&nbsp;(2019) — GEDI Simulator release; benchmark against 3DEP over Pacific Northwest - Hofton et al.&nbsp;(2020) — GEDI calibration using airborne waveform LiDAR</p>
+<hr>
+</section>
+<section id="methodological-frameworks-for-upscaling" class="level2">
+<h2 class="anchored" data-anchor-id="methodological-frameworks-for-upscaling">4 · Methodological Frameworks for Upscaling</h2>
+<section id="area-based-approach-extended-to-gedi" class="level3">
+<h3 class="anchored" data-anchor-id="area-based-approach-extended-to-gedi">4.1 Area-Based Approach Extended to GEDI</h3>
+<p>The <strong>Area-Based Approach (ABA)</strong> is the standard methodology for ALS-based forest inventory: field plots provide ground-truth AGB or basal area, ALS-derived metrics (height percentiles, canopy cover, density indices) extracted over plot footprints serve as predictors, and a regression or machine learning model is trained and applied wall-to-wall. The ABA was developed for small-area operational forest inventory and typically achieves RMSE of 15–35 Mg ha⁻¹ for AGB depending on forest type.</p>
+<p>Extending ABA to GEDI involves two stages: 1. <strong>ALS → field calibration:</strong> Train an ALS-based AGB model using plot data 2. <strong>ALS → GEDI transfer:</strong> Express ALS-derived AGB predictions as a function of GEDI RH metrics within simulated footprints, yielding a GEDI-native allometric model</p>
+<p>This two-step transfer is used in the <strong>GEDI L4A algorithm</strong> (Duncanson et al., 2022), which employs 10 continent- and biome-specific models relating GEDI RH metrics to AGB, each calibrated using ALS-derived AGB estimates from co-located field-validated airborne surveys. The 3DEP program has contributed substantially to L4A calibration datasets across the contiguous United States.</p>
+<hr>
+</section>
+<section id="gedi-as-training-labels-for-wall-to-wall-fusion" class="level3">
+<h3 class="anchored" data-anchor-id="gedi-as-training-labels-for-wall-to-wall-fusion">4.2 GEDI as Training Labels for Wall-to-Wall Fusion</h3>
+<p>The most widely adopted upscaling pathway for global applications uses GEDI footprint-level estimates as <strong>sparse but globally representative training labels</strong>, fused with wall-to-wall optical or SAR imagery to predict at unseen locations. This approach shifts the core problem from LiDAR data fusion to machine learning generalization.</p>
+<p><strong>Canonical workflows:</strong></p>
+<p><strong>Canopy height (Lang et al., 2022 — ETH/Meta):</strong> GEDI L2A RH98 canopy height → training labels; Sentinel-2 spectral-temporal metrics → features; a global CNN (SegFormer-based) trained on ~1 billion pixels predicts 10 m canopy height wall-to-wall. Validated against NEON ALS and 3DEP tiles; global RMSE ~2.8 m.</p>
+<p><strong>Canopy height (Potapov et al., 2021 — NASA/UMD):</strong> GEDI L2A canopy height + Landsat 8 OLI annual composites → gradient boosting regression tree → 30 m global canopy height. Explicitly uses 3DEP-derived ALS metrics as independent validation across the CONUS.</p>
+<p><strong>Forest AGB (Wang et al., 2022):</strong> GEDI L4A footprint AGB → training; Landsat + Sentinel-1 SAR + Sentinel-2 + SRTM topography → features; deep learning (CNN + XGBoost ensemble) → 30 m global AGB. Achieves rRMSE ~30–45% globally; higher error in tropical dense-canopy forests.</p>
+<p><strong>Key design choices that affect upscaling accuracy:</strong> - <strong>Temporal matching:</strong> ALS and GEDI data must be from the same or nearby years to avoid change-induced mismatch; 3DEP tiles from 2012–2019 may predate GEDI (2019–present) by up to 7 years in fast-changing forests - <strong>Feature space coverage:</strong> The optical/SAR feature space of training GEDI footprints must cover the full range of the prediction domain; tropical forests with high AGB but few GEDI samples are systematically underrepresented - <strong>Saturation:</strong> Both GEDI RH metrics and SAR backscatter saturate above ~150–200 Mg ha⁻¹ AGB — a fundamental ceiling on prediction accuracy in high-biomass forests</p>
+<hr>
+</section>
+<section id="hierarchical-multi-scale-fusion" class="level3">
+<h3 class="anchored" data-anchor-id="hierarchical-multi-scale-fusion">4.3 Hierarchical / Multi-Scale Fusion</h3>
+<p>A more rigorous framework treats the upscaling as a <strong>hierarchical geostatistical problem</strong>, explicitly modeling the spatial covariance structure at each scale. The GEDI L4B gridded product uses a <strong>Hybrid Model-Based Geostatistical (HMB)</strong> estimator (Saarela et al., 2018) that:</p>
+<ol type="1">
+<li>Predicts AGB at each GEDI L4A footprint using the biome-specific allometric model</li>
+<li>Fits a geostatistical model (variogram) to the spatial correlation of L4A residuals</li>
+<li>Uses kriging to interpolate predictions to a 1 km grid with explicit uncertainty propagation</li>
+</ol>
+<p>This framework rigorously propagates uncertainty from the allometric model through the spatial interpolation, producing per-pixel standard errors alongside the mean AGBD estimate. 3DEP-derived ALS data from the CONUS contribute to the empirical variogram estimation and out-of-sample validation.</p>
+<hr>
+</section>
+<section id="transfer-learning-and-domain-adaptation" class="level3">
+<h3 class="anchored" data-anchor-id="transfer-learning-and-domain-adaptation">4.4 Transfer Learning and Domain Adaptation</h3>
+<p>A critical challenge in upscaling is <strong>geographic extrapolation</strong>: a model trained on GEDI footprints in temperate US forests (well-covered by 3DEP) must predict accurately in tropical forests, boreal zones, or arid woodlands with different structure–spectral relationships. Standard random forest and XGBoost models degrade substantially when applied outside their training domain.</p>
+<p>Emerging approaches:</p>
+<ul>
+<li><strong>Domain-adversarial training:</strong> Forces the feature extractor to learn representations invariant to geographic domain (source = 3DEP/NEON-rich regions; target = tropical regions with only GEDI and optical data), improving cross-domain AGB transfer (Dalponte et al., 2020; Wang et al., 2022)</li>
+<li><strong>Self-supervised pre-training on optical imagery:</strong> Pre-train a large vision model on global Sentinel-2/Landsat imagery without labels (SatMAE, SeCo), then fine-tune with GEDI labels — improves generalization to unseen biomes</li>
+<li><strong>Physics-informed constraints:</strong> Add loss penalties that enforce known relationships (AGB increases monotonically with canopy height within PFT) to prevent physically implausible predictions in novel environments</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="usgs-3dep-as-the-upscaling-bridge" class="level2">
+<h2 class="anchored" data-anchor-id="usgs-3dep-as-the-upscaling-bridge">5 · USGS 3DEP as the Upscaling Bridge</h2>
+<p>The <strong>USGS 3D Elevation Program (3DEP)</strong> occupies a uniquely important position in the ALS-to-GEDI upscaling chain for North American applications. As of FY2025, 3DEP has achieved ~90% CONUS coverage at Quality Level 2 (QL2, ≥2 pts/m²) or better, making it the largest contiguous ALS dataset available anywhere.</p>
+<p><strong>Specific contributions of 3DEP to GEDI upscaling:</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 35%">
+<col style="width: 64%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Role</th>
+<th>Mechanism</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>GEDI L4A calibration</strong></td>
+<td>3DEP-derived AGB estimates used as calibration targets in temperate US biomes</td>
+</tr>
+<tr class="even">
+<td><strong>GEDI waveform validation</strong></td>
+<td>Simulated GEDI waveforms from 3DEP compared to real GEDI acquisitions</td>
+</tr>
+<tr class="odd">
+<td><strong>Vertical accuracy assessment</strong></td>
+<td>3DEP DTM used to assess GEDI ground elevation errors in sloped terrain</td>
+</tr>
+<tr class="even">
+<td><strong>Gap-filling</strong></td>
+<td>3DEP fills GEDI gaps in high-latitude CONUS (&gt;51.6°N not covered by GEDI)</td>
+</tr>
+<tr class="odd">
+<td><strong>Temporal change detection</strong></td>
+<td>Multi-year 3DEP acquisitions detect post-disturbance height change independent of GEDI</td>
+</tr>
+<tr class="even">
+<td><strong>Training data for ML models</strong></td>
+<td>3DEP tiles provide dense labeled AGB/height data for supervised learning</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Spatial coverage progression:</strong> The animated 3DEP coverage map (FY2013–FY2025) shows steady annual expansion, with priority given to wildfire-prone western states (California, Oregon, Washington) and flood-prone river corridors. By FY2025, 3DEP provides the most comprehensive single-nation ALS archive ever assembled.</p>
+<p><strong>Resolution hierarchy within 3DEP:</strong> - <strong>QL0</strong> — experimental, &gt;8 pts/m² (urban, engineering) - <strong>QL1</strong> — ≥8 pts/m², ≤12.5 cm vertical RMSE (precision mapping) - <strong>QL2</strong> — ≥2 pts/m², ≤10 cm vertical RMSE (<strong>national standard</strong>) - <strong>QL3</strong> — ≥0.5 pts/m², ≤20 cm vertical RMSE (legacy coverage)</p>
+<p>For upscaling to GEDI, QL2 and above provide sufficient density to reliably simulate GEDI waveforms and estimate canopy height percentiles at 25 m footprint scale.</p>
+<hr>
+</section>
+<section id="key-challenges" class="level2">
+<h2 class="anchored" data-anchor-id="key-challenges">6 · Key Challenges</h2>
+<section id="sensor-physics-mismatch" class="level3">
+<h3 class="anchored" data-anchor-id="sensor-physics-mismatch">6.1 Sensor Physics Mismatch</h3>
+<p>GEDI uses a <strong>full-waveform</strong> Gaussian beam with a 25 m diameter and ~6 ns pulse width, recording the continuous distribution of energy returns with height. ALS systems typically record <strong>discrete returns</strong> (first, last, or multiple) from a narrow beam (0.1–0.3 m footprint). Converting ALS discrete returns to simulate GEDI waveforms requires careful modeling of the beam divergence, multiple scattering, and noise floor — errors in this simulation propagate directly into calibration offsets.</p>
+</section>
+<section id="saturation-in-dense-canopy" class="level3">
+<h3 class="anchored" data-anchor-id="saturation-in-dense-canopy">6.2 Saturation in Dense Canopy</h3>
+<p>Both ALS-derived canopy height metrics and GEDI RH metrics show <strong>saturation</strong> at high AGB values (typically &gt;150 Mg ha⁻¹ in tropical forests, &gt;200 Mg ha⁻¹ in temperate conifers). This is because the LiDAR signal is dominated by the uppermost canopy layer, with little sensitivity to biomass accumulated in lower strata or large trunk volumes. Saturation introduces systematic underestimation of AGB in the most carbon-rich forests — precisely those of greatest interest for climate policy.</p>
+<p>Mitigations: L-band SAR backscatter (ALOS PALSAR) remains sensitive at higher AGB; combining GEDI RH metrics with SAR reduces saturation bias. The forthcoming <strong>ESA BIOMASS</strong> P-band SAR mission is specifically designed to overcome saturation up to ~500 Mg ha⁻¹.</p>
+</section>
+<section id="temporal-mismatch" class="level3">
+<h3 class="anchored" data-anchor-id="temporal-mismatch">6.3 Temporal Mismatch</h3>
+<p>3DEP ALS acquisitions occurred over 2012–2025; GEDI operates 2019–present. In areas with active forest management, fire disturbance, or insect-induced mortality, structural changes between the ALS acquisition and the GEDI overpass can introduce calibration errors. Temporal correction using Landsat/Sentinel-based disturbance maps (LandTrendr, LCMS) is an active area of development.</p>
+</section>
+<section id="slope-and-terrain-effects" class="level3">
+<h3 class="anchored" data-anchor-id="slope-and-terrain-effects">6.4 Slope and Terrain Effects</h3>
+<p>GEDI footprint returns on steep slopes appear shifted in height because the circular footprint intercepts ground at multiple elevations. This introduces apparent height errors that can exceed 5 m on slopes &gt;25°, substantially degrading canopy height retrieval in mountainous terrain. Slope correction algorithms exist (Tang &amp; Armston, 2019) but require accurate DTMs — which 3DEP can provide.</p>
+</section>
+<section id="cloud-cover-gaps" class="level3">
+<h3 class="anchored" data-anchor-id="cloud-cover-gaps">6.5 Cloud Cover Gaps</h3>
+<p>GEDI accumulates coverage over multiple orbital passes, but persistent cloud cover in tropical regions (Amazon, Congo, Southeast Asia) creates systematic acquisition gaps in the very forests that matter most for global carbon accounting. ALS-based upscaling provides an independent path to wall-to-wall mapping in cloud-affected regions.</p>
+<hr>
+</section>
+</section>
+<section id="emerging-directions" class="level2">
+<h2 class="anchored" data-anchor-id="emerging-directions">7 · Emerging Directions</h2>
+<p><strong>Multi-mission fusion:</strong> Combining GEDI (25 m waveform, ±51.6°) with ICESat-2 ATL08 (global, ±88°, photon-counting) extends LiDAR-based canopy height estimation to boreal and Arctic forests beyond GEDI’s orbital limit. ICESat-2 and GEDI overlapped in 2019–2023, enabling cross-calibration studies.</p>
+<p><strong>GEDI continuity and GEDI-II:</strong> The original GEDI mission is planned for decommissioning; GEDI-II (under development) would extend the orbital inclination and improve coverage. Meanwhile, commercial spaceborne LiDAR platforms (e.g., Planet’s forest carbon products) are beginning to fill gaps.</p>
+<p><strong>Foundation models for forest structure:</strong> Large pre-trained vision transformers trained on multi-source remote sensing data (imagery + LiDAR + SAR) are emerging as universal upscaling engines — a single model can be fine-tuned for canopy height, AGB, or species composition with minimal additional labeled data.</p>
+<p><strong>Drone LiDAR as calibration nodes:</strong> UAS-LiDAR systems (DJI Zenmuse L1/L2, Riegl miniVUX) are increasingly used to acquire plot-level 3D point clouds at &lt;5 cm resolution, bridging the gap between TLS (sub-centimeter, single tree) and ALS (plot to regional). Drone acquisitions co-located with GEDI footprints provide the highest-quality calibration data possible — capturing complete 3D crown structure within the exact 25 m footprint geometry.</p>
+<hr>
+</section>
+<section id="summary" class="level2">
+<h2 class="anchored" data-anchor-id="summary">8 · Summary</h2>
+<p>The upscaling chain from drone/ALS LiDAR to GEDI represents one of the most active frontiers in forest carbon monitoring. The canonical pathway — <strong>field plots → ALS calibration → GEDI allometry → optical/SAR fusion → wall-to-wall map</strong> — has produced the first generation of globally consistent, meter-scale canopy height and biomass products. 3DEP’s continental ALS coverage is the backbone of this chain in North America, providing both the calibration data for GEDI allometries and the independent validation benchmark for global products.</p>
+<p>Outstanding challenges — sensor physics mismatch, saturation, temporal inconsistency, and geographic extrapolation — are being addressed through waveform simulation, multi-source fusion, and domain-adaptive machine learning. The next decade, with NISAR (L+S band SAR), BIOMASS (P-band SAR), and potential GEDI continuity missions, promises to resolve the saturation problem and extend LiDAR-based biomass monitoring to the full global forest carbon stock.</p>
+<hr>
+<p><strong>Key References</strong></p>
+<ul>
+<li>Blair, J.B. &amp; Hofton, M.A.&nbsp;(1999). Modeling laser altimeter return waveforms over complex vegetation using high-resolution elevation data. <em>Geophysical Research Letters</em>, 26(16), 2509–2512.</li>
+<li>Duncanson, L. et al.&nbsp;(2022). Aboveground biomass density models for NASA’s Global Ecosystem Dynamics Investigation (GEDI) lidar mission. <em>Remote Sensing of Environment</em>, 270, 112845.</li>
+<li>Hancock, S. et al.&nbsp;(2019). The GEDI Simulator: A large-footprint waveform lidar simulator for calibration and validation of spaceborne missions. <em>Earth and Space Science</em>, 6(2), 294–310.</li>
+<li>Hofton, M. et al.&nbsp;(2020). Decomposition of Global Forest Heights with full-waveform LiDAR. <em>AGU Advances</em>.</li>
+<li>Lang, N. et al.&nbsp;(2022). A high-resolution canopy height model of the Earth. <em>Nature Ecology &amp; Evolution</em>, 7, 1778–1789.</li>
+<li>Marselis, S.M. et al.&nbsp;(2020). Evaluating the potential of full-waveform lidar for mapping pan-tropical tree height. <em>Remote Sensing of Environment</em>, 239, 111588.</li>
+<li>Patterson, P.L. et al.&nbsp;(2019). Statistical properties of hybrid estimators proposed for GEDI—NASA’s global ecosystem dynamics investigation. <em>Environmental Research Letters</em>, 14(6), 065007.</li>
+<li>Potapov, P. et al.&nbsp;(2021). Mapping global forest canopy height through integration of GEDI and Landsat data. <em>Remote Sensing of Environment</em>, 253, 112165.</li>
+<li>Saarela, S. et al.&nbsp;(2018). Model-assisted estimation of growing stock volume using different combinations of LiDAR and Landsat data as auxiliary information. <em>Remote Sensing of Environment</em>, 203, 224–236.</li>
+<li>Tang, H. &amp; Armston, J. (2019). Algorithm Theoretical Basis Document (ATBD) for GEDI L2B Canopy Cover and Vertical Profile Metrics. NASA GSFC.</li>
+<li>Wang, Y. et al.&nbsp;(2022). A global map of forest canopy height derived from ICESat/GEDI. <em>Remote Sensing of Environment</em>.</li>
+</ul>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
 </div>
-<div class="delink listing-description"><a href="./posts/gedi-3dep-compare/index.html" class="no-external">
-Three independent data sources can measure urban heights in the Central Park–Manhattan corridor, each with different spatial coverage, resolution, accuracy, and access…
-</a></div>
-</div>
-<div class="metadata">
-<a href="./posts/gedi-3dep-compare/index.html" class="no-external">
-<div class="listing-date">
-May 10, 2026
-</div>
-<div class="listing-author">
-Dingjin Chu
-</div>
-</a>
+<div class="callout-title-container flex-fill">
+Note
 </div>
 </div>
-<div class="quarto-post image-right" data-index="1" data-categories="TGlEQVIlMkNHRURJJTJDVXJiYW4lMkNDYW5vcHklMjBIZWlnaHQlMkNSJTJDVHV0b3JpYWw=" data-listing-date-sort="1776574800000" data-listing-file-modified-sort="1778944111957" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="16" data-listing-word-count-sort="3080">
-<div class="thumbnail"><a href="./posts/gedi-urban-nyc/index.html" class="no-external">
-
-<p class="card-img-top"><img src="posts\gedi-urban-nyc\fig_zone_spatial.png"  class="thumbnail-image card-img"/></p>
-
-</a></div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/gedi-urban-nyc/index.html" class="no-external">Urban GEDI: Separating Vegetation from Buildings in New York City</a>
-</h3>
-<div class="listing-categories">
-
-<div class="listing-category" onclick="window.quartoListingCategory('TGlEQVI='); return false;">LiDAR</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('R0VESQ=='); return false;">GEDI</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('VXJiYW4='); return false;">Urban</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('Q2Fub3B5JTIwSGVpZ2h0'); return false;">Canopy Height</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('Ug=='); return false;">R</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('VHV0b3JpYWw='); return false;">Tutorial</div>
-
-</div>
-<div class="delink listing-description"><a href="./posts/gedi-urban-nyc/index.html" class="no-external">
-GEDI L2A measures the <strong>vertical distribution of returned laser energy</strong> — but in urban areas the sensor cannot distinguish a 20 m tree from a 20 m rooftop. Both produce similar…<strong></strong>
-</a></div>
-</div>
-<div class="metadata">
-<a href="./posts/gedi-urban-nyc/index.html" class="no-external">
-<div class="listing-date">
-Apr 19, 2026
-</div>
-<div class="listing-author">
-Dingjin Chu
-</div>
-</a>
+<div class="callout-body-container callout-body">
+<p>Return to <a href="./projects_intro.html">Research Introduction</a> or explore <a href="./datasets_lidar.html">LiDAR Datasets</a>.</p>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="2" data-categories="TGlEQVIlMkNHRURJJTJDTkVPTiUyQzNERVAlMkNCaW9tYXNzJTJDUiUyQ1R1dG9yaWFs" data-listing-date-sort="1775365200000" data-listing-file-modified-sort="1778944107067" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="13" data-listing-word-count-sort="2514">
-<div class="thumbnail"><a href="./posts/gedi-l4a/index.html" class="no-external">
 
-<p class="card-img-top"><img src="posts\gedi-l4a\fig_agbd_spatial.png"  class="thumbnail-image card-img"/></p>
 
-</a></div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/gedi-l4a/index.html" class="no-external">GEDI L4A Above-Ground Biomass at NEON SCBI: Comparison with NEON AOP and 3DEP Allometric Estimates</a>
-</h3>
-<div class="listing-categories">
+</section>
 
-<div class="listing-category" onclick="window.quartoListingCategory('TGlEQVI='); return false;">LiDAR</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('R0VESQ=='); return false;">GEDI</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('TkVPTg=='); return false;">NEON</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('M0RFUA=='); return false;">3DEP</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('QmlvbWFzcw=='); return false;">Biomass</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('Ug=='); return false;">R</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('VHV0b3JpYWw='); return false;">Tutorial</div>
-
-</div>
-<div class="delink listing-description"><a href="./posts/gedi-l4a/index.html" class="no-external">
-<strong>GEDI L4A</strong> converts full-waveform LiDAR returns into footprint-level <strong>above-ground biomass density (AGBD)</strong> estimates using allometric models trained on forest inventory data.…
-</a></div>
-</div>
-<div class="metadata">
-<a href="./posts/gedi-l4a/index.html" class="no-external">
-<div class="listing-date">
-Apr 5, 2026
-</div>
-<div class="listing-author">
-Dingjin Chu
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="3" data-categories="TGlEQVIlMkNHRURJJTJDTkVPTiUyQzNERVAlMkNDYW5vcHklMjBIZWlnaHQlMkNSJTJDVHV0b3JpYWw=" data-listing-date-sort="1774155600000" data-listing-file-modified-sort="1778944102526" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="12" data-listing-word-count-sort="2295">
-<div class="thumbnail"><a href="./posts/gedi-l2a/index.html" class="no-external">
-
-<p class="card-img-top"><img src="posts\gedi-l2a\fig_spatial.png"  class="thumbnail-image card-img"/></p>
-
-</a></div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/gedi-l2a/index.html" class="no-external">GEDI L2A Canopy Height at NEON SCBI: Comparison with NEON AOP and 3DEP LiDAR</a>
-</h3>
-<div class="listing-categories">
-
-<div class="listing-category" onclick="window.quartoListingCategory('TGlEQVI='); return false;">LiDAR</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('R0VESQ=='); return false;">GEDI</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('TkVPTg=='); return false;">NEON</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('M0RFUA=='); return false;">3DEP</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('Q2Fub3B5JTIwSGVpZ2h0'); return false;">Canopy Height</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('Ug=='); return false;">R</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('VHV0b3JpYWw='); return false;">Tutorial</div>
-
-</div>
-<div class="delink listing-description"><a href="./posts/gedi-l2a/index.html" class="no-external">
-<strong>GEDI L2A</strong> relative height (RH) metrics measure canopy vertical structure from the ISS. In forested landscapes, RH95 is the most widely used canopy height proxy. This post…<strong></strong>
-</a></div>
-</div>
-<div class="metadata">
-<a href="./posts/gedi-l2a/index.html" class="no-external">
-<div class="listing-date">
-Mar 22, 2026
-</div>
-<div class="listing-author">
-Dingjin Chu
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="4" data-categories="Z2VuZXJhbA==" data-listing-date-sort="1772344800000" data-listing-file-modified-sort="1778944097090" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="47">
-<div class="thumbnail"><a href="./posts/welcome/index.html" class="no-external">
-
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-
-</a></div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/welcome/index.html" class="no-external">Welcome to My Blog</a>
-</h3>
-<div class="listing-categories">
-
-<div class="listing-category" onclick="window.quartoListingCategory('Z2VuZXJhbA=='); return false;">general</div>
-
-</div>
-<div class="delink listing-description"><a href="./posts/welcome/index.html" class="no-external">
-This is the first post on my blog. I will use this space to share thoughts on remote sensing, LiDAR analysis, forest ecology, and my research journey as a PhD student at…
-</a></div>
-</div>
-<div class="metadata">
-<a href="./posts/welcome/index.html" class="no-external">
-<div class="listing-date">
-Mar 1, 2026
-</div>
-</a>
-</div>
-</div>
-</div>
-<div class="listing-no-matching d-none">No matching items</div>
-</div></main> <!-- /main -->
+</main> <!-- /main -->
 <canvas id="bg-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none;"></canvas>
 
 <script>
