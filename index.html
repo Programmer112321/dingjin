@@ -423,7 +423,7 @@ ul.task-list li input[type="checkbox"] {
 <p>Methodologically, I combine machine learning approaches, statistical modeling, and process-based models to elucidate and quantify key ecological and environmental processes. The overall methodological framework is summarized in the <a href="./methods_intro.html">Methods</a> section.</p>
 <hr>
 <div style="display:flex; flex-direction:column; align-items:center; margin:1.5rem 0;">
-  <canvas id="earth-canvas" style="width:100%; max-width:680px; height:420px; border-radius:12px; display:block; margin:0 auto; box-shadow:0 8px 32px rgba(0,60,140,0.3);"></canvas>
+  <canvas id="earth-canvas" style="width:100%; max-width:680px; height:420px; border-radius:12px; display:block; margin:0 auto; box-shadow:0 8px 32px rgba(0,60,140,0.3); cursor:grab;"></canvas>
   <p style="font-size:0.78rem; color:#888; margin-top:0.6rem; text-align:center;">
     Interactive 3D Earth — satellite orbit tracks · drag to rotate
   </p>
@@ -544,23 +544,38 @@ ul.task-list li input[type="checkbox"] {
   /* ── Drag-to-rotate ───────────────────────────────────── */
   var isDragging = false, prevX = 0, prevY = 0;
   var rotX = 0.2, rotY = 0;
-  canvas.addEventListener('mousedown',  function (e) { isDragging = true;  prevX = e.clientX; prevY = e.clientY; });
-  canvas.addEventListener('mousemove',  function (e) {
+  /* mousedown on canvas; mousemove/mouseup on window so dragging
+     continues even when the cursor moves outside the canvas boundary */
+  canvas.addEventListener('mousedown', function (e) {
+    isDragging = true;
+    canvas.style.cursor = 'grabbing';
+    prevX = e.clientX; prevY = e.clientY;
+    e.preventDefault();
+  });
+  window.addEventListener('mousemove', function (e) {
     if (!isDragging) return;
     rotY += (e.clientX - prevX) * 0.005;
     rotX += (e.clientY - prevY) * 0.003;
     rotX = Math.max(-1.2, Math.min(1.2, rotX));
     prevX = e.clientX; prevY = e.clientY;
   });
-  canvas.addEventListener('mouseup',   function () { isDragging = false; });
-  canvas.addEventListener('mouseleave',function () { isDragging = false; });
-  canvas.addEventListener('touchstart', function (e) { isDragging = true; prevX = e.touches[0].clientX; prevY = e.touches[0].clientY; });
-  canvas.addEventListener('touchmove',  function (e) {
+  window.addEventListener('mouseup', function () {
+    isDragging = false;
+    canvas.style.cursor = 'grab';
+  });
+  canvas.addEventListener('touchstart', function (e) {
+    isDragging = true;
+    prevX = e.touches[0].clientX; prevY = e.touches[0].clientY;
+    e.preventDefault();
+  }, { passive: false });
+  window.addEventListener('touchmove', function (e) {
     if (!isDragging) return;
     rotY += (e.touches[0].clientX - prevX) * 0.005;
-    prevX = e.touches[0].clientX;
-  });
-  canvas.addEventListener('touchend', function () { isDragging = false; });
+    rotX += (e.touches[0].clientY - prevY) * 0.003;
+    rotX = Math.max(-1.2, Math.min(1.2, rotX));
+    prevX = e.touches[0].clientX; prevY = e.touches[0].clientY;
+  }, { passive: false });
+  window.addEventListener('touchend', function () { isDragging = false; });
   /* ── Animate ──────────────────────────────────────────── */
   var autoSpeed = 0.0015;
   function animate() {
