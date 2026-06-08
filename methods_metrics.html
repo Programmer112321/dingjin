@@ -465,7 +465,7 @@ window.Quarto = {
 
 <p>Quantitative metrics are the language through which model performance, dataset quality, and trend significance are communicated. Choosing the right metric — and understanding what it does and does not capture — is as important as the model itself. This page documents the metrics most commonly used across forest biomass estimation, urban cooling analysis, and ecosystem response studies.</p>
 <div style="display:flex; flex-wrap:wrap; gap:0.5rem; margin:1rem 0 1.5rem 0; padding:0.85rem 1rem; background:rgba(0,0,0,0.03); border-radius:8px;">
-<p><a href="#r2" class="btn btn-outline-secondary btn-sm">R²</a> <a href="#pearson" class="btn btn-outline-secondary btn-sm">r / r²</a> <a href="#rmse" class="btn btn-outline-secondary btn-sm">RMSE</a> <a href="#rrmse" class="btn btn-outline-secondary btn-sm">rRMSE</a> <a href="#mae" class="btn btn-outline-secondary btn-sm">MAE</a> <a href="#bias" class="btn btn-outline-secondary btn-sm">Bias</a> <a href="#mbe" class="btn btn-outline-secondary btn-sm">MBE</a> <a href="#mape" class="btn btn-outline-secondary btn-sm">MAPE</a> <a href="#nse" class="btn btn-outline-secondary btn-sm">NSE</a> <a href="#ioa" class="btn btn-outline-secondary btn-sm">IoA</a> <a href="#trend" class="btn btn-outline-secondary btn-sm">Trend</a> <a href="#mk" class="btn btn-outline-secondary btn-sm">Mann-Kendall</a> <a href="#cv" class="btn btn-outline-secondary btn-sm">Cross-validation</a> <a href="#aic" class="btn btn-outline-secondary btn-sm">AIC / BIC</a></p>
+<p><a href="#r2" class="btn btn-outline-secondary btn-sm">R²</a> <a href="#pearson" class="btn btn-outline-secondary btn-sm">r / r²</a> <a href="#rmse" class="btn btn-outline-secondary btn-sm">RMSE</a> <a href="#rrmse" class="btn btn-outline-secondary btn-sm">rRMSE</a> <a href="#mae" class="btn btn-outline-secondary btn-sm">MAE</a> <a href="#bias" class="btn btn-outline-secondary btn-sm">Bias</a> <a href="#mbe" class="btn btn-outline-secondary btn-sm">MBE</a> <a href="#mape" class="btn btn-outline-secondary btn-sm">MAPE</a> <a href="#nse" class="btn btn-outline-secondary btn-sm">NSE</a> <a href="#ioa" class="btn btn-outline-secondary btn-sm">IoA</a> <a href="#trend" class="btn btn-outline-secondary btn-sm">Trend</a> <a href="#mk" class="btn btn-outline-secondary btn-sm">Mann-Kendall</a> <a href="#cv" class="btn btn-outline-secondary btn-sm">Cross-validation</a> <a href="#overfit" class="btn btn-outline-secondary btn-sm">Overfitting</a> <a href="#aic" class="btn btn-outline-secondary btn-sm">AIC / BIC</a></p>
 </div>
 <hr>
 <section id="goodness-of-fit-metrics" class="level2">
@@ -642,6 +642,190 @@ Important
 </div>
 </div>
 <hr>
+</section>
+<section id="overfit" class="level3">
+<h3 class="anchored" data-anchor-id="overfit">Overfitting Detection</h3>
+<p>Overfitting occurs when a model captures noise in the training data rather than the underlying signal — yielding low training error but high generalisation error. It is one of the most consequential failure modes in remote sensing regression, where field samples are scarce relative to the number of candidate predictors.</p>
+<section id="bias-variance-tradeoff" class="level4">
+<h4 class="anchored" data-anchor-id="bias-variance-tradeoff">1. Bias-Variance Tradeoff</h4>
+<p>The expected prediction error of any model decomposes as:</p>
+<p><span class="math display">\[\text{MSE}(\hat{f}) = \underbrace{\left[\text{Bias}(\hat{f})\right]^2}_{\text{systematic error}} + \underbrace{\text{Var}(\hat{f})}_{\text{estimation noise}} + \underbrace{\sigma_\varepsilon^2}_{\text{irreducible noise}}\]</span></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 20%">
+<col style="width: 15%">
+<col style="width: 25%">
+<col style="width: 40%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Regime</th>
+<th>Bias</th>
+<th>Variance</th>
+<th>Interpretation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Underfitting</td>
+<td>High</td>
+<td>Low</td>
+<td>Model too simple; misses real patterns</td>
+</tr>
+<tr class="even">
+<td>Well-generalised</td>
+<td>Low</td>
+<td>Low</td>
+<td>Ideal — train ≈ test performance</td>
+</tr>
+<tr class="odd">
+<td>Overfitting</td>
+<td>Low</td>
+<td>High</td>
+<td>Model memorises training noise; test error explodes</td>
+</tr>
+</tbody>
+</table>
+<p>Model complexity (tree depth, number of features, polynomial degree) increases variance and decreases bias. The optimal complexity minimises their sum.</p>
+</section>
+<section id="traintest-performance-gap" class="level4">
+<h4 class="anchored" data-anchor-id="traintest-performance-gap">2. Train–Test Performance Gap</h4>
+<p>The most direct overfitting diagnostic: compare metrics on held-out data to metrics on training data.</p>
+<p><span class="math display">\[\Delta R^2 = R^2_{\text{train}} - R^2_{\text{test}}, \qquad \Delta\text{RMSE} = \text{RMSE}_{\text{test}} - \text{RMSE}_{\text{train}}\]</span></p>
+<p><strong>Rules of thumb for AGB / LST regression:</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th><span class="math inline">\(\Delta R^2\)</span></th>
+<th><span class="math inline">\(\text{RMSE}_{\text{test}} / \text{RMSE}_{\text{train}}\)</span></th>
+<th>Diagnosis</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>&lt; 0.05</td>
+<td>&lt; 1.15</td>
+<td>Acceptable generalisation</td>
+</tr>
+<tr class="even">
+<td>0.05–0.15</td>
+<td>1.15–1.40</td>
+<td>Mild overfitting — consider regularisation or fewer features</td>
+</tr>
+<tr class="odd">
+<td>&gt; 0.15</td>
+<td>&gt; 1.40</td>
+<td>Severe overfitting — model is memorising training data</td>
+</tr>
+</tbody>
+</table>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Always report <strong>both</strong> training and test metrics in publications. Reporting only training R² conceals overfitting and inflates the perceived quality of the model.</p>
+</div>
+</div>
+</section>
+<section id="learning-curves" class="level4">
+<h4 class="anchored" data-anchor-id="learning-curves">3. Learning Curves</h4>
+<p>A learning curve plots training and validation error (e.g., RMSE) as a function of training sample size <span class="math inline">\(n\)</span>. It separates two fundamentally different failure modes:</p>
+<ul>
+<li><strong>High variance (overfitting):</strong> training RMSE is low; validation RMSE is high; the gap does not close as <span class="math inline">\(n\)</span> grows — more data is needed.</li>
+<li><strong>High bias (underfitting):</strong> both training and validation RMSE converge at a high error level — the model family is too simple.</li>
+</ul>
+<p>In AGB remote sensing, learning curves are particularly informative for diagnosing whether additional field plots would substantially reduce prediction error or whether the bottleneck is model architecture.</p>
+</section>
+<section id="regularisation" class="level4">
+<h4 class="anchored" data-anchor-id="regularisation">4. Regularisation</h4>
+<p>Regularisation constrains model complexity by adding a penalty on parameter magnitudes to the loss function.</p>
+<p><strong>Lasso (L1):</strong> <span class="math display">\[\min_{\boldsymbol{\beta}} \frac{1}{n}\|\mathbf{y} - \mathbf{X}\boldsymbol{\beta}\|^2 + \lambda\sum_{j=1}^{p}|\beta_j|\]</span></p>
+<p>Lasso drives some <span class="math inline">\(\beta_j\)</span> exactly to zero — effectively performing feature selection. Useful when most predictors are irrelevant (e.g., hundreds of spectral bands for AGB prediction).</p>
+<p><strong>Ridge (L2):</strong> <span class="math display">\[\min_{\boldsymbol{\beta}} \frac{1}{n}\|\mathbf{y} - \mathbf{X}\boldsymbol{\beta}\|^2 + \lambda\sum_{j=1}^{p}\beta_j^2\]</span></p>
+<p>Ridge shrinks all coefficients but retains all features. Handles multicollinearity well — important for optical remote sensing where spectral bands are highly correlated.</p>
+<p><strong>ElasticNet (L1 + L2 combined):</strong> <span class="math display">\[\min_{\boldsymbol{\beta}} \frac{1}{n}\|\mathbf{y} - \mathbf{X}\boldsymbol{\beta}\|^2 + \lambda_1\sum_{j}|\beta_j| + \lambda_2\sum_{j}\beta_j^2\]</span></p>
+<p>Balances sparsity (Lasso) and stability (Ridge). The hyperparameter <span class="math inline">\(\lambda\)</span> (or <span class="math inline">\(\lambda_1, \lambda_2\)</span>) is selected via cross-validated RMSE.</p>
+<p><strong>For tree-based models</strong> (Random Forest, XGBoost), regularisation is implicit in hyperparameters:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 66%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Effect on overfitting</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>max_depth</code> (XGBoost)</td>
+<td>Deeper trees → higher variance</td>
+</tr>
+<tr class="even">
+<td><code>min_samples_leaf</code> (RF)</td>
+<td>Higher → smoother decision boundary</td>
+</tr>
+<tr class="odd">
+<td><code>subsample</code>, <code>colsample_bytree</code> (XGBoost)</td>
+<td>Stochastic sampling reduces variance</td>
+</tr>
+<tr class="even">
+<td><code>lambda</code>, <code>alpha</code> (XGBoost L2/L1)</td>
+<td>Direct regularisation on leaf weights</td>
+</tr>
+<tr class="odd">
+<td><code>n_estimators</code> (RF/XGBoost)</td>
+<td>More trees reduce variance (RF) or require early stopping (XGBoost)</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="feature-importance-stability-shap-variance-across-folds" class="level4">
+<h4 class="anchored" data-anchor-id="feature-importance-stability-shap-variance-across-folds">5. Feature Importance Stability (SHAP Variance Across Folds)</h4>
+<p>A well-generalised model should assign consistent importance to the same features across different CV folds. If SHAP value rankings change substantially from fold to fold, the model is overfitting to idiosyncratic patterns in each training partition.</p>
+<p><strong>Practical check:</strong> compute SHAP values for each CV fold; report the mean and standard deviation of each feature’s mean |SHAP|. Features with high standard deviation relative to their mean importance are contributing noise, not signal.</p>
+</section>
+<section id="remote-sensing-specific-overfitting-risks" class="level4">
+<h4 class="anchored" data-anchor-id="remote-sensing-specific-overfitting-risks">6. Remote-Sensing-Specific Overfitting Risks</h4>
+<p><strong>Saturation in high-biomass forests:</strong> Field plots with AGB &gt; 300 Mg ha⁻¹ are rare in most datasets. A model that memorises these extreme observations performs well on training data but generalises poorly to unseen high-biomass stands. Detecting this: plot residuals vs.&nbsp;observed AGB — if large residuals cluster at high AGB only in the test set, saturation-driven overfitting is likely.</p>
+<p><strong>Spectral collinearity:</strong> Optical datasets (Landsat 8 bands, Sentinel-2 12 bands) are highly correlated. High VIF (Variance Inflation Factor &gt; 10) among predictors inflates coefficient variance in linear models and destabilises feature importance in tree models. Remedies: PCA preprocessing, Lasso, or explicit VIF filtering.</p>
+<p><strong>Spatial pseudoreplication (see also Spatial CV above):</strong> Spatially proximate training and test points share similar spectral and structural properties, creating the illusion of high accuracy. Random k-fold CV inflates <span class="math inline">\(R^2\)</span> by 0.1–0.3 in LiDAR AGB models with high spatial autocorrelation. Spatial block CV or BLOO-CV is mandatory.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A complete overfitting checklist for AGB / LST / NPP models:</p>
+<ol type="1">
+<li><label><input type="checkbox">Report <span class="math inline">\(\Delta R^2\)</span> and <span class="math inline">\(\Delta\text{RMSE}\)</span> (train vs.&nbsp;spatial-CV test)</label></li>
+<li><label><input type="checkbox">Use spatial block CV or BLOO-CV — never random k-fold alone</label></li>
+<li><label><input type="checkbox">Check learning curves: does validation RMSE plateau far above training RMSE?</label></li>
+<li><label><input type="checkbox">Apply regularisation (Lasso / Ridge / ElasticNet) or tune tree complexity</label></li>
+<li><label><input type="checkbox">Check SHAP stability across CV folds for top-ranked features</label></li>
+<li><label><input type="checkbox">Plot residuals vs.&nbsp;predicted and vs.&nbsp;key covariates (especially AGB range)</label></li>
+<li><label><input type="checkbox">Check VIF among predictors; remove or decorrelate features with VIF &gt; 10</label></li>
+</ol>
+</div>
+</div>
+<hr>
+</section>
 </section>
 <section id="aic" class="level3">
 <h3 class="anchored" data-anchor-id="aic">AIC / BIC — Model Selection Criteria</h3>
