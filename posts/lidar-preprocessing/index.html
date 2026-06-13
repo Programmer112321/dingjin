@@ -1,0 +1,1568 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Dingjin Chu">
+<meta name="dcterms.date" content="2026-02-15">
+<meta name="description" content="A step-by-step walkthrough of the full LiDAR pre-processing pipeline in R using lidR — from raw LAZ tiles to clean, normalized, metric-ready point clouds — with in-depth comparisons of decimation and noise removal strategies.">
+
+<title>Pre-Processing Airborne LiDAR Data: A Complete Pipeline – Dingjin Chu</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../photo/favicon_satellite.svg" rel="icon" type="image/svg+xml">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-b758ccaa5987ceb1b75504551e579abf.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-e31584831b205ffbb2d98406f31c2a5b.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-24772959a0e306aba8d7698078628ce7.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-e31584831b205ffbb2d98406f31c2a5b.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed fullcontent quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title"><i class="bi bi-broadcast-pin"></i> Dingjin Chu</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-research" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Research</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-research">    
+        <li>
+    <a class="dropdown-item" href="../../projects_intro.html">
+ <span class="dropdown-text">Introduction</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../projects_agb.html">
+ <span class="dropdown-text">Forest Above-Ground Biomass Estimation</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../projects_disturbance.html">
+ <span class="dropdown-text">Ecosystem Response to Disturbances</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../projects_urban.html">
+ <span class="dropdown-text">Cooling Effect of Urban Green Space</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../research_lidar_upscaling.html">
+ <span class="dropdown-text">LiDAR Upscaling Review</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-datasets" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Datasets</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-datasets">    
+        <li>
+    <a class="dropdown-item" href="../../datasets_intro.html">
+ <span class="dropdown-text">Introduction</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../datasets_lidar.html">
+ <span class="dropdown-text">LiDAR</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../datasets_optical.html">
+ <span class="dropdown-text">Optical Remote Sensing</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../datasets_radar.html">
+ <span class="dropdown-text">Radar</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../datasets_field.html">
+ <span class="dropdown-text">Field Investigation</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../datasets_derived.html">
+ <span class="dropdown-text">Derived Products</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-methods" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Methods</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-methods">    
+        <li>
+    <a class="dropdown-item" href="../../methods_intro.html">
+ <span class="dropdown-text">Introduction</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../methods_statistical.html">
+ <span class="dropdown-text">Statistical Modeling</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../methods_ml.html">
+ <span class="dropdown-text">Machine Learning</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../methods_causal.html">
+ <span class="dropdown-text">Causal Inference</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../methods_process.html">
+ <span class="dropdown-text">Process-Based Models</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../methods_assumptions.html">
+ <span class="dropdown-text">Key Assumptions</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../methods_metrics.html">
+ <span class="dropdown-text">Evaluation Metrics</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="../../cv.html"> 
+<span class="menu-text">About Me</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../news.html"> 
+<span class="menu-text">News</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog.html"> 
+<span class="menu-text">Blog/Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html#contact-me"> 
+<span class="menu-text">Contact Me</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/Programmer112321"> <i class="bi bi-github" role="img" aria-label="GitHub">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/dingjin-chu-892ba7352/"> <i class="bi bi-linkedin" role="img" aria-label="LinkedIn">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://scholar.google.com/citations?user=XzIFKvMAAAAJ&amp;hl=en"> 
+<span class="menu-text"><img src="photo/scholar_logo.svg" alt="Google Scholar" style="height:20px; vertical-align:middle; margin-top:-2px;"></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://zenodo.org/search?q=metadata.creators.person_or_org.name%3A%22Chu%2C%20Dingjin%22&amp;l=list&amp;p=1&amp;s=10&amp;sort=bestmatch"> 
+<span class="menu-text"><img src="photo/zenodo_logo.svg" alt="Zenodo" style="height:20px; vertical-align:middle; margin-top:-2px;"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Pre-Processing Airborne LiDAR Data: A Complete Pipeline</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">LiDAR</div>
+    <div class="quarto-category">3DEP</div>
+    <div class="quarto-category">Pre-processing</div>
+    <div class="quarto-category">R</div>
+    <div class="quarto-category">Tutorial</div>
+  </div>
+  </div>
+
+<div>
+  <div class="description">
+    A step-by-step walkthrough of the full LiDAR pre-processing pipeline in R using lidR — from raw LAZ tiles to clean, normalized, metric-ready point clouds — with in-depth comparisons of decimation and noise removal strategies.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Dingjin Chu </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">February 15, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Airborne LiDAR point clouds are rarely analysis-ready straight out of the box. Raw tiles from 3DEP, NEON AOP, or proprietary acquisitions often carry noise, inconsistent densities across acquisition campaigns, and missing normalizations. This post documents a reproducible, catalog-level pipeline in R using the <strong>lidR</strong> package — from raw LAS/LAZ ingestion to a clean, height-normalized, decimated cloud ready for metric computation.</p>
+<hr>
+<section id="part-1-full-pre-processing-metric-calculation-pipeline" class="level2">
+<h2 class="anchored" data-anchor-id="part-1-full-pre-processing-metric-calculation-pipeline">Part 1: Full Pre-Processing &amp; Metric Calculation Pipeline</h2>
+<section id="stage-1-input-catalog-setup" class="level3">
+<h3 class="anchored" data-anchor-id="stage-1-input-catalog-setup">Stage 1 — Input &amp; Catalog Setup</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lidR)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Build catalog from all tiles in a directory</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>ctg <span class="ot">&lt;-</span> <span class="fu">readLAScatalog</span>(<span class="st">"path/to/las_folder/"</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Drop pre-labeled noise at catalog level (LAS classes 7 = low noise, 18 = high noise)</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">opt_filter</span>(ctg) <span class="ot">&lt;-</span> <span class="st">"-drop_class 7 18"</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Set chunk buffer (required for SOR neighborhood at tile edges)</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">opt_chunk_buffer</span>(ctg) <span class="ot">&lt;-</span> <span class="dv">10</span>   <span class="co"># metres</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Inspect point density across tiles</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ctg)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Key decisions at this stage:</p>
+<ul>
+<li><strong><code>-drop_class 7 18</code></strong> removes points already flagged as noise by the data provider before any other processing. This is always the first step — it costs nothing and eliminates obvious junk early.</li>
+<li><strong>Chunk buffer = 10 m</strong> ensures that the k-nearest-neighbour search in Stage 4 (SOR) sees points from adjacent tiles at every edge. Without a buffer, border points are compared only to neighbours in their own tile, producing false noise flags.</li>
+<li>For 3DEP data, use <code>opt_chunk_size(ctg) &lt;- 500</code> to process in 500 × 500 m chunks if memory is constrained.</li>
+</ul>
+<hr>
+</section>
+<section id="stage-2-ground-classification-if-missing" class="level3">
+<h3 class="anchored" data-anchor-id="stage-2-ground-classification-if-missing">Stage 2 — Ground Classification (if missing)</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check whether ground points (Class 2) already exist</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>has_ground <span class="ot">&lt;-</span> <span class="cf">function</span>(las) <span class="fu">any</span>(las<span class="sc">@</span>data<span class="sc">$</span>Classification <span class="sc">==</span> LASGROUND)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># If absent, classify with Cloth Simulation Filter</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>classify_ground_csf <span class="ot">&lt;-</span> <span class="cf">function</span>(las) {</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">has_ground</span>(las)) {</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    las <span class="ot">&lt;-</span> <span class="fu">classify_ground</span>(las, <span class="fu">csf</span>(<span class="at">sloop_smooth =</span> <span class="cn">TRUE</span>, <span class="at">class_threshold =</span> <span class="fl">0.5</span>,</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>                                    <span class="at">cloth_resolution =</span> <span class="fl">0.5</span>, <span class="at">time_step =</span> <span class="fl">0.65</span>))</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(las)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>ctg_ground <span class="ot">&lt;-</span> <span class="fu">catalog_apply</span>(ctg, classify_ground_csf)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>3DEP tiles almost always arrive pre-classified (Class 2 is present). <strong>CSF is a safety fallback</strong> for tiles from other providers or older acquisitions where ground classification is absent or unreliable. CSF works by simulating a cloth dropped onto an inverted point cloud — points that remain within a threshold distance of the settled cloth are labelled as ground.</p>
+<hr>
+</section>
+<section id="stage-3-height-normalization" class="level3">
+<h3 class="anchored" data-anchor-id="stage-3-height-normalization">Stage 3 — Height Normalization</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>normalize_and_save <span class="ot">&lt;-</span> <span class="cf">function</span>(las) {</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Build DTM from ground points</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  dtm <span class="ot">&lt;-</span> <span class="fu">rasterize_terrain</span>(las, <span class="at">res =</span> <span class="dv">1</span>, <span class="at">algorithm =</span> <span class="fu">knnidw</span>(<span class="at">k =</span> <span class="dv">10</span>, <span class="at">p =</span> <span class="dv">2</span>))</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Normalize: Z → height above ground, save as separate attribute</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  las <span class="ot">&lt;-</span> <span class="fu">normalize_height</span>(las, dtm)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  las <span class="ot">&lt;-</span> <span class="fu">add_lasattribute</span>(las, las<span class="sc">@</span>data<span class="sc">$</span>Z, <span class="st">"Height"</span>, <span class="st">"Height above ground (m)"</span>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Restore raw Z (keeps both raw elevation and Height as independent attributes)</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  las <span class="ot">&lt;-</span> <span class="fu">unnormalize_height</span>(las)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Filter normalization artifacts and extreme outliers</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  las <span class="ot">&lt;-</span> <span class="fu">filter_poi</span>(las, Height <span class="sc">&gt;</span> <span class="sc">-</span><span class="fl">0.5</span> <span class="sc">&amp;</span> Height <span class="sc">&lt;</span> <span class="dv">80</span>)</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(las)</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Saving <code>Height</code> as a separate LAS attribute before calling <code>unnormalize_height()</code> is essential. After unnormalization, <code>Z</code> reverts to raw elevation (metres above sea level), but <code>Height</code> persists as a named attribute — both are now accessible for any subsequent metric computation without re-running the DTM step.</p>
+<p>The height filter removes two categories of artifacts:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Filter</th>
+<th>Removes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>Height &gt; -0.5</code></td>
+<td>Sub-ground points from DTM interpolation errors</td>
+</tr>
+<tr class="even">
+<td><code>Height &lt; 80 m</code></td>
+<td>High-altitude noise, birds, low-flying aircraft</td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+<section id="stage-4-statistical-outlier-removal-sor" class="level3">
+<h3 class="anchored" data-anchor-id="stage-4-statistical-outlier-removal-sor">Stage 4 — Statistical Outlier Removal (SOR)</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>remove_noise_sor <span class="ot">&lt;-</span> <span class="cf">function</span>(las) {</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  las <span class="ot">&lt;-</span> <span class="fu">classify_noise</span>(las, <span class="fu">sor</span>(<span class="at">k =</span> <span class="dv">15</span>, <span class="at">m =</span> <span class="dv">3</span>))</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  las <span class="ot">&lt;-</span> <span class="fu">filter_poi</span>(las, Classification <span class="sc">!=</span> LASNOISE)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(las)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>SOR must occur <strong>after normalization</strong> (so height context is correct) and <strong>before decimation</strong> (so artificial sparsity from thinning does not mislead the neighbourhood statistics). See the full discussion in <a href="#removal">Section 2</a> below.</p>
+<p>Parameters:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Value</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>k</code></td>
+<td>15</td>
+<td>Number of nearest neighbours per point</td>
+</tr>
+<tr class="even">
+<td><code>m</code></td>
+<td>3</td>
+<td>Flag points with mean NN distance &gt; μ + 3σ of the cloud</td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+<section id="stage-5-voxel-decimation-optional-recommended-for-3dep" class="level3">
+<h3 class="anchored" data-anchor-id="stage-5-voxel-decimation-optional-recommended-for-3dep">Stage 5 — Voxel Decimation (optional, recommended for 3DEP)</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>decimate_catalog <span class="ot">&lt;-</span> <span class="cf">function</span>(las, <span class="at">min_dens =</span> <span class="dv">5</span>) {</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Convert target density to voxel edge length</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  voxel_res <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">/</span> <span class="fu">sqrt</span>(min_dens)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Floor: never thin below 5 pts/m² to prevent over-thinning</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  voxel_res <span class="ot">&lt;-</span> <span class="fu">min</span>(voxel_res, <span class="dv">1</span> <span class="sc">/</span> <span class="fu">sqrt</span>(<span class="dv">5</span>))</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  las <span class="ot">&lt;-</span> <span class="fu">decimate_points</span>(las, <span class="fu">voxel</span>(voxel_res))</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(las)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>3DEP tiles may come from different acquisition years and sensors, producing density gradients across a study area. Voxel decimation enforces a spatially uniform minimum point spacing, preventing high-density zones from dominating derived metrics. See the full comparison in <a href="#decimation">Section 1</a> below.</p>
+<hr>
+</section>
+</section>
+<section id="decimation" class="level2">
+<h2 class="anchored" data-anchor-id="decimation">Section 1 — Decimation Methods in Depth</h2>
+<p>Decimation (also called thinning or subsampling) reduces point density to a target level. The choice of algorithm matters: different methods preserve different spatial and structural properties of the cloud.</p>
+<section id="random-thinning" class="level3">
+<h3 class="anchored" data-anchor-id="random-thinning">1.1 Random Thinning</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>las_random <span class="ot">&lt;-</span> <span class="fu">decimate_points</span>(las, <span class="fu">random</span>(<span class="at">density =</span> <span class="dv">10</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Each point is independently retained with probability <span class="math inline">\(p = d_\text{target} / d_\text{local}\)</span>, where <span class="math inline">\(d\)</span> is local point density. The selection is spatially blind — it does not consider where a point sits relative to its neighbours.</p>
+<p><strong>How it works:</strong> estimate current density, compute retention probability, sample points using a Bernoulli draw with that probability.</p>
+<p><strong>Strengths:</strong> - Fastest algorithm; trivially parallelisable - Preserves the statistical distribution of intensity, return number, and other attributes - No spatial discretisation artifacts</p>
+<p><strong>Weaknesses:</strong> - Does not produce spatial uniformity — dense clusters remain dense, sparse areas are unchanged - Sensitive to the random seed (reproducibility requires <code>set.seed()</code>) - In mixed 3DEP tiles with 2–30 pts/m² variation, random thinning averages out density but does not eliminate gradients</p>
+<p><strong>Best use:</strong> quick exploratory analysis where spatial uniformity is not required.</p>
+<hr>
+</section>
+<section id="voxel-thinning" class="level3">
+<h3 class="anchored" data-anchor-id="voxel-thinning">1.2 Voxel Thinning</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>las_voxel <span class="ot">&lt;-</span> <span class="fu">decimate_points</span>(las, <span class="fu">voxel</span>(<span class="at">res =</span> <span class="fl">0.5</span>))  <span class="co"># 0.5 m voxel edge</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>3D space is divided into cubic voxels of edge length <code>res</code>. One point is retained per occupied voxel — chosen randomly from all points within that voxel.</p>
+<p><strong>How it works:</strong> assign each point to a voxel by integer-dividing its X/Y/Z coordinates by <code>res</code>, then randomly select one point from each occupied voxel’s group.</p>
+<p><strong>Strengths:</strong> - Enforces 3D spatial uniformity — no two retained points can be closer than <code>res</code> in all three dimensions - Highly effective at removing density artifacts from scan angle overlap or multiple-pass acquisitions - Consistent point spacing benefits rasterisation, normal estimation, and metric computation</p>
+<p><strong>Weaknesses:</strong> - The retained point is random within the voxel — fine-scale vertical structure (e.g., sub-voxel canopy layering) may be degraded - At coarse <code>res</code>, subtle canopy gaps smaller than a voxel are lost - Does not target a specific points/m² — the output density depends on the actual 3D distribution of the cloud</p>
+<p><strong>Best use:</strong> removing density gradients in mixed 3DEP acquisitions; pre-processing for wall-to-wall AGB modelling.</p>
+<hr>
+</section>
+<section id="homogenize-thinning" class="level3">
+<h3 class="anchored" data-anchor-id="homogenize-thinning">1.3 Homogenize Thinning</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>las_homo <span class="ot">&lt;-</span> <span class="fu">decimate_points</span>(las, <span class="fu">homogenize</span>(<span class="at">density =</span> <span class="dv">10</span>, <span class="at">res =</span> <span class="dv">5</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>2D space is divided into cells of edge <code>res</code>. Within each cell, points are randomly subsampled to reach exactly <code>density</code> pts/m². Cells already below the target are left untouched.</p>
+<p><strong>How it works:</strong> compute local density in each <code>res × res</code> cell; if above target, randomly discard excess points; if at or below target, keep all.</p>
+<p><strong>Strengths:</strong> - Explicitly targets a density (pts/m²) rather than a voxel size - 2D spatial uniformity — horizontal density gradients are removed - Preserves full vertical structure within each cell (no 3D voxelisation) - Good balance between random (too little control) and voxel (too much 3D rigidity)</p>
+<p><strong>Weaknesses:</strong> - Does not address 3D density variation — points can still cluster vertically - Cell size <code>res</code> introduces a 2D discretisation scale that interacts with metric resolution - Slower than random thinning</p>
+<p><strong>Best use:</strong> normalising point density for plot-level or pixel-level AGB modelling where horizontal uniformity matters more than 3D uniformity.</p>
+<hr>
+</section>
+<section id="highest-lowest-point-per-cell" class="level3">
+<h3 class="anchored" data-anchor-id="highest-lowest-point-per-cell">1.4 Highest / Lowest Point per Cell</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>las_high <span class="ot">&lt;-</span> <span class="fu">decimate_points</span>(las, <span class="fu">highest</span>(<span class="at">res =</span> <span class="dv">1</span>))   <span class="co"># one point per 1 m² cell: the highest</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>las_low  <span class="ot">&lt;-</span> <span class="fu">decimate_points</span>(las, <span class="fu">lowest</span>(<span class="at">res =</span> <span class="dv">1</span>))    <span class="co"># the lowest</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Retains only the highest (or lowest) point within each 2D cell. Not a general pre-processing step — these are single-purpose filters.</p>
+<p><strong>Use cases:</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 21%">
+<col style="width: 43%">
+<col style="width: 35%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>Retained points</th>
+<th>Application</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>highest</code></td>
+<td>Top-of-canopy</td>
+<td>Approximate CHM without full rasterisation</td>
+</tr>
+<tr class="even">
+<td><code>lowest</code></td>
+<td>Near-ground</td>
+<td>Bare-earth surface approximation</td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+<section id="comparison-summary" class="level3">
+<h3 class="anchored" data-anchor-id="comparison-summary">1.5 Comparison Summary</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 21%">
+<col style="width: 22%">
+<col style="width: 19%">
+<col style="width: 7%">
+<col style="width: 19%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>Spatial uniformity</th>
+<th>Vertical structure</th>
+<th>Targets density?</th>
+<th>Speed</th>
+<th>Recommended for</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Random</td>
+<td>None</td>
+<td>Preserved</td>
+<td>Approximately</td>
+<td>★★★★★</td>
+<td>Exploration</td>
+</tr>
+<tr class="even">
+<td>Voxel</td>
+<td>3D uniform</td>
+<td>Partially lost</td>
+<td>No (size-based)</td>
+<td>★★★★☆</td>
+<td>Multi-campaign 3DEP</td>
+</tr>
+<tr class="odd">
+<td>Homogenize</td>
+<td>2D uniform</td>
+<td>Preserved</td>
+<td>Yes (pts/m²)</td>
+<td>★★★☆☆</td>
+<td>AGB pixel regression</td>
+</tr>
+<tr class="even">
+<td>Highest/Lowest</td>
+<td>2D uniform</td>
+<td>No</td>
+<td>No</td>
+<td>★★★★☆</td>
+<td>Surface extraction only</td>
+</tr>
+</tbody>
+</table>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For 3DEP data with mixed acquisition years, <strong>voxel thinning</strong> is the safest default. For NEON AOP data (single campaign, uniform density), no decimation is usually needed. For plot-level regression, <strong>homogenize</strong> preserves vertical profile shape better than voxel.</p>
+</div>
+</div>
+<hr>
+</section>
+</section>
+<section id="removal" class="level2">
+<h2 class="anchored" data-anchor-id="removal">Section 2 — Noise and Outlier Removal Methods</h2>
+<p>Noise in airborne LiDAR arises from multiple sources: multi-path reflections off water, birds and insects, atmospheric aerosols, electronic noise in the detector, and normalization artifacts near terrain discontinuities. No single removal method catches all types.</p>
+<section id="class-based-filtering-always-first" class="level3">
+<h3 class="anchored" data-anchor-id="class-based-filtering-always-first">2.1 Class-Based Filtering (Always First)</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>las <span class="ot">&lt;-</span> <span class="fu">filter_poi</span>(las, Classification <span class="sc">!=</span> LASNOISE)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Or at catalog level:</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">opt_filter</span>(ctg) <span class="ot">&lt;-</span> <span class="st">"-drop_class 7 18"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>LAS format defines standard noise classes: <strong>Class 7</strong> (low noise, below ground) and <strong>Class 18</strong> (high noise, above expected maximum). Many data providers pre-label these during production.</p>
+<p><strong>Strengths:</strong> zero computation cost; removes obvious, pre-identified noise before any processing.</p>
+<p><strong>Weaknesses:</strong> only removes what the provider already flagged — does not catch noise that slipped through classification.</p>
+<p><strong>Always apply this first</strong>, regardless of what follows.</p>
+<hr>
+</section>
+<section id="height-based-thresholding" class="level3">
+<h3 class="anchored" data-anchor-id="height-based-thresholding">2.2 Height-Based Thresholding</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>las <span class="ot">&lt;-</span> <span class="fu">filter_poi</span>(las, Height <span class="sc">&gt;</span> <span class="sc">-</span><span class="fl">0.5</span> <span class="sc">&amp;</span> Height <span class="sc">&lt;</span> <span class="dv">80</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>After normalization, any point with <code>Height &lt; -0.5</code> is a sub-ground artifact from DTM interpolation error; any point above 80 m (or the expected maximum canopy height for the region) is likely noise.</p>
+<p><strong>Strengths:</strong> extremely fast; region-specific thresholds can be tuned (e.g., <code>Height &lt; 60</code> in temperate forests; <code>Height &lt; 100</code> in tropical).</p>
+<p><strong>Weaknesses:</strong> does not detect isolated floating points within the valid range (e.g., a bird at 15 m looks identical to a mid-canopy return).</p>
+<p><strong>When to use:</strong> always — as a complement to other methods, not a substitute.</p>
+<hr>
+</section>
+<section id="statistical-outlier-removal-sor" class="level3">
+<h3 class="anchored" data-anchor-id="statistical-outlier-removal-sor">2.3 Statistical Outlier Removal (SOR)</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>las <span class="ot">&lt;-</span> <span class="fu">classify_noise</span>(las, <span class="fu">sor</span>(<span class="at">k =</span> <span class="dv">15</span>, <span class="at">m =</span> <span class="dv">3</span>))</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>las <span class="ot">&lt;-</span> <span class="fu">filter_poi</span>(las, Classification <span class="sc">!=</span> LASNOISE)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>For each point <span class="math inline">\(i\)</span>, compute the mean distance to its <span class="math inline">\(k\)</span> nearest neighbours:</p>
+<p><span class="math display">\[\bar{d}_i = \frac{1}{k} \sum_{j \in \mathcal{N}_k(i)} \|p_i - p_j\|\]</span></p>
+<p>Compute the global mean <span class="math inline">\(\mu\)</span> and standard deviation <span class="math inline">\(\sigma\)</span> of <span class="math inline">\(\bar{d}\)</span> across all points. Flag point <span class="math inline">\(i\)</span> as noise if:</p>
+<p><span class="math display">\[\bar{d}_i &gt; \mu + m \cdot \sigma\]</span></p>
+<p><strong>Strengths:</strong> - Catches isolated floating points within the valid height range (birds, aerosols) - Adapts automatically to local point density — thresholds are data-driven, not hand-tuned - Standard, reproducible, and native to lidR</p>
+<p><strong>Weaknesses:</strong> - Computationally expensive (<span class="math inline">\(O(n \log n)\)</span> for kNN + linear scan) - Requires chunk buffer = 10 m to avoid false positives at tile edges - In sparse areas (edges of flight swath, steep terrain), even legitimate points may have high mean NN distances and get flagged → consider <code>m = 4</code> or <code>m = 5</code> in open terrain - Does not use attribute information (intensity, return number) — purely geometric</p>
+<p><strong>Parameter guidance:</strong></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Setting</th>
+<th><code>k</code></th>
+<th><code>m</code></th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Conservative (keep more)</td>
+<td>15</td>
+<td>4–5</td>
+<td>Sparse terrain, open canopy</td>
+</tr>
+<tr class="even">
+<td>Standard</td>
+<td>15</td>
+<td>3</td>
+<td>Most forest environments</td>
+</tr>
+<tr class="odd">
+<td>Aggressive (remove more)</td>
+<td>8</td>
+<td>2</td>
+<td>Dense urban, noisy sensor</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Must apply after normalization</strong> and before decimation (see Stage 4).</p>
+<hr>
+</section>
+<section id="isolated-voxel-removal-ivr" class="level3">
+<h3 class="anchored" data-anchor-id="isolated-voxel-removal-ivr">2.4 Isolated Voxel Removal (IVR)</h3>
+<p>An alternative to SOR that operates in 3D voxel space rather than continuous point distance. Divide the cloud into voxels of edge <code>res</code>; flag points in voxels that have fewer than <code>min_pts</code> occupied neighbours in a 3×3×3 voxel neighbourhood.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># lidR does not have built-in IVR; custom implementation:</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>ivr_noise <span class="ot">&lt;-</span> <span class="cf">function</span>(las, <span class="at">res =</span> <span class="dv">1</span>, <span class="at">min_pts =</span> <span class="dv">5</span>) {</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  vox  <span class="ot">&lt;-</span> <span class="fu">voxel_metrics</span>(las, <span class="sc">~</span><span class="fu">list</span>(<span class="at">n =</span> .N), <span class="at">res =</span> res)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Join voxel occupancy back and filter isolated voxels</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># (simplified — full implementation requires neighbourhood search on vox grid)</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(las)</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Strengths:</strong> faster than SOR in very dense clouds; no kNN computation. <strong>Weaknesses:</strong> resolution-dependent; not natively supported in lidR.</p>
+<hr>
+</section>
+<section id="isolation-forest-ml-based" class="level3">
+<h3 class="anchored" data-anchor-id="isolation-forest-ml-based">2.5 Isolation Forest (ML-Based)</h3>
+<p>Isolation Forest is an unsupervised anomaly detection algorithm that identifies noise using the principle that outlier points require fewer binary splits to isolate than inlier points. Unlike SOR, it operates on multiple attributes simultaneously — X, Y, Z, Intensity, ReturnNumber, NumberOfReturns — making it sensitive to spectral and return-structure anomalies in addition to geometric ones.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Requires reticulate + Python sklearn</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(reticulate)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>sklearn <span class="ot">&lt;-</span> <span class="fu">import</span>(<span class="st">"sklearn.ensemble"</span>)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>iforest <span class="ot">&lt;-</span> sklearn<span class="sc">$</span><span class="fu">IsolationForest</span>(<span class="at">contamination =</span> <span class="fl">0.01</span>, <span class="at">n_estimators =</span> <span class="dv">100</span>L)</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>features <span class="ot">&lt;-</span> las<span class="sc">@</span>data[, .(X, Y, Z, Intensity, ReturnNumber, NumberOfReturns)]</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>labels <span class="ot">&lt;-</span> iforest<span class="sc">$</span><span class="fu">fit_predict</span>(<span class="fu">as.matrix</span>(features))</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>las <span class="ot">&lt;-</span> <span class="fu">filter_poi</span>(las, labels <span class="sc">==</span> <span class="dv">1</span>)   <span class="co"># 1 = inlier, -1 = outlier</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Strengths:</strong> - Multi-dimensional — catches noise invisible to SOR (e.g., low-intensity returns at normal heights from water surfaces) - Contamination rate is interpretable (fraction of cloud expected to be noise) - No assumption about distance distributions</p>
+<p><strong>Weaknesses:</strong> - Requires Python bridge (<code>reticulate</code>) — not a pure R solution - 100× slower than SOR on large tiles - Sensitive to feature scaling; requires normalisation of input attributes - Not tile-edge-safe without explicit overlap handling</p>
+<p><strong>Best use:</strong> post-processing validation of SOR results; specialized applications where intensity or return-structure noise is the primary concern.</p>
+<hr>
+</section>
+<section id="removal-method-comparison" class="level3">
+<h3 class="anchored" data-anchor-id="removal-method-comparison">2.6 Removal Method Comparison</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 10%">
+<col style="width: 15%">
+<col style="width: 21%">
+<col style="width: 9%">
+<col style="width: 20%">
+<col style="width: 21%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>Geometric</th>
+<th>Attribute-aware</th>
+<th>Speed</th>
+<th>Tile-edge safe</th>
+<th>Native to lidR</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Class filter</td>
+<td>—</td>
+<td>—</td>
+<td>★★★★★</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr class="even">
+<td>Height threshold</td>
+<td>✓</td>
+<td>—</td>
+<td>★★★★★</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr class="odd">
+<td>SOR</td>
+<td>✓</td>
+<td>—</td>
+<td>★★★☆☆</td>
+<td>With buffer</td>
+<td>✓</td>
+</tr>
+<tr class="even">
+<td>Voxel IVR</td>
+<td>✓</td>
+<td>—</td>
+<td>★★★★☆</td>
+<td>✓</td>
+<td>Partial</td>
+</tr>
+<tr class="odd">
+<td>Isolation Forest</td>
+<td>✓</td>
+<td>✓</td>
+<td>★☆☆☆☆</td>
+<td>Manual</td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Recommended combination for 3DEP data:</strong></p>
+<ol type="1">
+<li>Class filter (<code>-drop_class 7 18</code>) — always first</li>
+<li>Height threshold (<code>Height &gt; -0.5 &amp; Height &lt; 80</code>) — after normalization</li>
+<li>SOR (<code>k = 15, m = 3</code>, with 10 m buffer) — after normalization, before decimation</li>
+</ol>
+<p>This three-step stack removes the vast majority of LiDAR noise in typical forest and urban environments with minimal false positive rate and manageable computation time.</p>
+</div>
+</div>
+<hr>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The next post covers extracting canopy height and structural metrics from the cleaned cloud using <code>lidR::cloud_metrics()</code> and <code>lidR::pixel_metrics()</code>.</p>
+</div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<canvas id="bg-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none;"></canvas>
+
+<script>
+(function () {
+  var canvas = document.getElementById('bg-canvas');
+  var ctx = canvas.getContext('2d');
+  var particles = [];
+  var N = 90;
+  var maxDist = 130;
+
+  /* ── Detect dark mode ─────────────────────────────────── */
+  function isDark() {
+    return document.documentElement.getAttribute('data-bs-theme') === 'dark' ||
+           document.body.classList.contains('quarto-dark') ||
+           window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+
+  function dotColor()  { return isDark() ? 'rgba(130,190,255,0.75)' : 'rgba(50,120,200,0.55)'; }
+  function lineColor(a){ return isDark() ? 'rgba(130,190,255,'+a+')' : 'rgba(50,120,200,'+a+')'; }
+
+  /* ── Particle constructor ─────────────────────────────── */
+  function Particle() {
+    this.reset(true);
+  }
+  Particle.prototype.reset = function (initial) {
+    this.x  = Math.random() * canvas.width;
+    this.y  = initial ? Math.random() * canvas.height : -5;
+    this.vx = (Math.random() - 0.5) * 0.45;
+    this.vy = (Math.random() - 0.5) * 0.45;
+    this.r  = Math.random() * 1.8 + 0.8;
+  };
+
+  /* ── Init / resize ────────────────────────────────────── */
+  function init() {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+    if (particles.length === 0) {
+      for (var i = 0; i < N; i++) particles.push(new Particle());
+    }
+  }
+
+  /* ── Animation loop ───────────────────────────────────── */
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    /* connections */
+    for (var i = 0; i < N; i++) {
+      for (var j = i + 1; j < N; j++) {
+        var dx   = particles[i].x - particles[j].x;
+        var dy   = particles[i].y - particles[j].y;
+        var dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < maxDist) {
+          var alpha = (1 - dist / maxDist) * 0.28;
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = lineColor(alpha);
+          ctx.lineWidth   = 0.6;
+          ctx.stroke();
+        }
+      }
+    }
+
+    /* dots */
+    ctx.fillStyle = dotColor();
+    for (var k = 0; k < N; k++) {
+      var p = particles[k];
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fill();
+
+      p.x += p.vx;
+      p.y += p.vy;
+
+      if (p.x < -10) p.x = canvas.width  + 5;
+      if (p.x > canvas.width  + 10) p.x = -5;
+      if (p.y < -10) p.y = canvas.height + 5;
+      if (p.y > canvas.height + 10) p.y = -5;
+    }
+
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', function () {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+  });
+
+  init();
+  draw();
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+
+  /* ── Block right-click context menu ──────────────────────── */
+  document.addEventListener("contextmenu", function (e) {
+    e.preventDefault();
+    return false;
+  });
+
+  /* ── Block copy-related keyboard shortcuts ───────────────── */
+  document.addEventListener("keydown", function (e) {
+    var ctrl = e.ctrlKey || e.metaKey; // Ctrl on Win/Linux, Cmd on Mac
+
+    if (ctrl) {
+      switch (e.key.toLowerCase()) {
+        case "c":  // Copy
+        case "a":  // Select All
+        case "x":  // Cut
+        case "u":  // View Source
+        case "s":  // Save Page
+        case "p":  // Print
+          e.preventDefault();
+          return false;
+      }
+      // Ctrl+Shift+I/J/C — DevTools
+      if (e.shiftKey && ["i", "j", "c"].includes(e.key.toLowerCase())) {
+        e.preventDefault();
+        return false;
+      }
+    }
+
+    // F12 — DevTools
+    if (e.key === "F12") {
+      e.preventDefault();
+      return false;
+    }
+  });
+
+  /* ── Block drag-and-drop of text / images ────────────────── */
+  document.addEventListener("dragstart", function (e) {
+    e.preventDefault();
+    return false;
+  });
+
+  /* ── Block copy event directly ───────────────────────────── */
+  document.addEventListener("copy", function (e) {
+    e.preventDefault();
+    return false;
+  });
+
+  /* ── Block cut event ─────────────────────────────────────── */
+  document.addEventListener("cut", function (e) {
+    e.preventDefault();
+    return false;
+  });
+})();
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/Programmer112321\.github\.io\/dingjin\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+<p>© 2026 Dingjin Chu</p>
+</div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>
