@@ -8,9 +8,9 @@
 
 <meta name="author" content="Dingjin Chu">
 <meta name="dcterms.date" content="2026-02-15">
-<meta name="description" content="A step-by-step walkthrough of the full LiDAR pre-processing pipeline in R using lidR — from raw LAZ tiles to clean, normalized, metric-ready point clouds — with in-depth comparisons of decimation and noise removal strategies.">
+<meta name="description" content="A complete LiDAR pre-processing pipeline — from raw LAZ tiles to clean, normalized, metric-ready point clouds — with every stage shown in both lidR and lasR, plus pros/cons and decimation and noise-removal method comparisons.">
 
-<title>Pre-Processing Airborne LiDAR Data: A Complete Pipeline – Dingjin Chu</title>
+<title>Pre-Processing Airborne LiDAR Data: lidR vs lasR Side-by-Side – Dingjin Chu</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -472,7 +472,7 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Pre-Processing Airborne LiDAR Data: A Complete Pipeline</h1>
+<h1 class="title">Pre-Processing Airborne LiDAR Data: lidR vs lasR Side-by-Side</h1>
   <div class="quarto-categories">
     <div class="quarto-category">LiDAR</div>
     <div class="quarto-category">3DEP</div>
@@ -484,7 +484,7 @@ window.Quarto = {
 
 <div>
   <div class="description">
-    A step-by-step walkthrough of the full LiDAR pre-processing pipeline in R using lidR — from raw LAZ tiles to clean, normalized, metric-ready point clouds — with in-depth comparisons of decimation and noise removal strategies.
+    A complete LiDAR pre-processing pipeline — from raw LAZ tiles to clean, normalized, metric-ready point clouds — with every stage shown in both lidR and lasR, plus pros/cons and decimation and noise-removal method comparisons.
   </div>
 </div>
 
@@ -513,71 +513,312 @@ window.Quarto = {
 </header>
 
 
-<p>Airborne LiDAR point clouds are rarely analysis-ready straight out of the box. Raw tiles from 3DEP, NEON AOP, or proprietary acquisitions often carry noise, inconsistent densities across acquisition campaigns, and missing normalizations. This post documents a reproducible, catalog-level pipeline in R using the <strong>lidR</strong> package — from raw LAS/LAZ ingestion to a clean, height-normalized, decimated cloud ready for metric computation.</p>
+<p>Airborne LiDAR point clouds are rarely analysis-ready out of the box. Raw tiles from 3DEP, NEON AOP, or proprietary acquisitions often carry noise, inconsistent densities across acquisition campaigns, and missing height normalization. This post documents a reproducible pipeline in R covering every stage from raw LAS/LAZ ingestion to a clean, normalized, decimated cloud — shown in parallel in both <strong>lidR</strong> and <strong>lasR</strong>.</p>
+<section id="lidr-vs-lasr-core-philosophy" class="level2">
+<h2 class="anchored" data-anchor-id="lidr-vs-lasr-core-philosophy">lidR vs lasR — Core Philosophy</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 14%">
+<col style="width: 42%">
+<col style="width: 42%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>lidR</th>
+<th>lasR</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Processing model</td>
+<td>Loads tiles into R <code>LAS</code> objects, one chunk at a time</td>
+<td>Streaming C++ pipeline; tiles never fully loaded into R memory</td>
+</tr>
+<tr class="even">
+<td>API style</td>
+<td>Function calls on <code>LAS</code>/<code>LAScatalog</code> objects</td>
+<td>Stage composition with <code>+</code>, executed via <code>exec()</code></td>
+</tr>
+<tr class="odd">
+<td>Speed</td>
+<td>Single-threaded R loops; C++ for some algorithms</td>
+<td>Fully multi-threaded C++ — 5–10× faster on large datasets</td>
+</tr>
+<tr class="even">
+<td>Memory footprint</td>
+<td>One chunk in RAM at a time; scales with chunk size</td>
+<td>Constant regardless of file size</td>
+</tr>
+<tr class="odd">
+<td>Interactivity</td>
+<td>Easy mid-pipeline inspection and visualization</td>
+<td>Batch-only; harder to inspect intermediate states</td>
+</tr>
+<tr class="even">
+<td>Best for</td>
+<td>Exploration, small–medium datasets, learning</td>
+<td>Production pipelines, large tiles, HPC</td>
+</tr>
+</tbody>
+</table>
 <hr>
-<section id="part-1-full-pre-processing-metric-calculation-pipeline" class="level2">
-<h2 class="anchored" data-anchor-id="part-1-full-pre-processing-metric-calculation-pipeline">Part 1: Full Pre-Processing &amp; Metric Calculation Pipeline</h2>
-<section id="stage-1-input-catalog-setup" class="level3">
-<h3 class="anchored" data-anchor-id="stage-1-input-catalog-setup">Stage 1 — Input &amp; Catalog Setup</h3>
+</section>
+<section id="part-1-pre-processing-pipeline-stage-by-stage" class="level2">
+<h2 class="anchored" data-anchor-id="part-1-pre-processing-pipeline-stage-by-stage">Part 1: Pre-Processing Pipeline — Stage by Stage</h2>
+<section id="stage-1-input-catalog-pipeline-setup" class="level3">
+<h3 class="anchored" data-anchor-id="stage-1-input-catalog-pipeline-setup">Stage 1 — Input &amp; Catalog / Pipeline Setup</h3>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" href="">lidR</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false" href="">lasR</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lidR)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Build catalog from all tiles in a directory</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>ctg <span class="ot">&lt;-</span> <span class="fu">readLAScatalog</span>(<span class="st">"path/to/las_folder/"</span>)</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Drop pre-labeled noise at catalog level (LAS classes 7 = low noise, 18 = high noise)</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">opt_filter</span>(ctg) <span class="ot">&lt;-</span> <span class="st">"-drop_class 7 18"</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Drop pre-labeled noise at catalog level (Class 7 = low, 18 = high noise)</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">opt_filter</span>(ctg)       <span class="ot">&lt;-</span> <span class="st">"-drop_class 7 18"</span></span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Set chunk buffer (required for SOR neighborhood at tile edges)</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">opt_chunk_buffer</span>(ctg) <span class="ot">&lt;-</span> <span class="dv">10</span>   <span class="co"># metres</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">opt_chunk_buffer</span>(ctg) <span class="ot">&lt;-</span> <span class="dv">10</span>        <span class="co"># metres</span></span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Inspect point density across tiles</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ctg)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Key decisions at this stage:</p>
-<ul>
-<li><strong><code>-drop_class 7 18</code></strong> removes points already flagged as noise by the data provider before any other processing. This is always the first step — it costs nothing and eliminates obvious junk early.</li>
-<li><strong>Chunk buffer = 10 m</strong> ensures that the k-nearest-neighbour search in Stage 4 (SOR) sees points from adjacent tiles at every edge. Without a buffer, border points are compared only to neighbours in their own tile, producing false noise flags.</li>
-<li>For 3DEP data, use <code>opt_chunk_size(ctg) &lt;- 500</code> to process in 500 × 500 m chunks if memory is constrained.</li>
-</ul>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Control chunk size if memory is constrained</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="fu">opt_chunk_size</span>(ctg)   <span class="ot">&lt;-</span> <span class="dv">500</span>       <span class="co"># 500 × 500 m chunks</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Inspect point density and tile coverage</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(ctg, <span class="at">mapview =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ctg)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lasR)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># In lasR there is no catalog object.</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># The folder path is passed directly to exec().</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Filtering, buffering, and chunk size are set in exec() or on the reader stage.</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>read_stage <span class="ot">&lt;-</span> <span class="fu">reader_las</span>(<span class="at">filter =</span> <span class="st">"-drop_class 7 18"</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Buffer and chunk size are arguments to exec()</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co"># (set once for the entire pipeline)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Stage 1 — Pros &amp; Cons
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 7%">
+<col style="width: 46%">
+<col style="width: 46%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>lidR</th>
+<th>lasR</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Pros</strong></td>
+<td><code>LAScatalog</code> gives a visual tile map; <code>summary()</code> reports per-tile density and coverage; easy to spot problematic tiles before running anything</td>
+<td>No catalog setup needed — folder path goes straight to <code>exec()</code>; less boilerplate; buffer/chunk settings in one place</td>
+</tr>
+<tr class="even">
+<td><strong>Cons</strong></td>
+<td>Catalog creation scans all file headers — slow for thousands of tiles; chunk buffer must be explicitly remembered and set</td>
+<td>No visual tile overview; harder to identify corrupt or outlier-density tiles before the run starts</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
 <hr>
 </section>
 <section id="stage-2-ground-classification-if-missing" class="level3">
 <h3 class="anchored" data-anchor-id="stage-2-ground-classification-if-missing">Stage 2 — Ground Classification (if missing)</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check whether ground points (Class 2) already exist</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>has_ground <span class="ot">&lt;-</span> <span class="cf">function</span>(las) <span class="fu">any</span>(las<span class="sc">@</span>data<span class="sc">$</span>Classification <span class="sc">==</span> LASGROUND)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># If absent, classify with Cloth Simulation Filter</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>classify_ground_csf <span class="ot">&lt;-</span> <span class="cf">function</span>(las) {</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">has_ground</span>(las)) {</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    las <span class="ot">&lt;-</span> <span class="fu">classify_ground</span>(las, <span class="fu">csf</span>(<span class="at">sloop_smooth =</span> <span class="cn">TRUE</span>, <span class="at">class_threshold =</span> <span class="fl">0.5</span>,</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>                                    <span class="at">cloth_resolution =</span> <span class="fl">0.5</span>, <span class="at">time_step =</span> <span class="fl">0.65</span>))</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(las)</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>ctg_ground <span class="ot">&lt;-</span> <span class="fu">catalog_apply</span>(ctg, classify_ground_csf)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>3DEP tiles almost always arrive pre-classified (Class 2 is present). <strong>CSF is a safety fallback</strong> for tiles from other providers or older acquisitions where ground classification is absent or unreliable. CSF works by simulating a cloth dropped onto an inverted point cloud — points that remain within a threshold distance of the settled cloth are labelled as ground.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true" href="">lidR</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false" href="">lasR</a></li></ul>
+<div class="tab-content">
+<div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>has_ground <span class="ot">&lt;-</span> <span class="cf">function</span>(las) <span class="fu">any</span>(las<span class="sc">@</span>data<span class="sc">$</span>Classification <span class="sc">==</span> LASGROUND)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>classify_ground_csf <span class="ot">&lt;-</span> <span class="cf">function</span>(las) {</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">has_ground</span>(las)) {</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    las <span class="ot">&lt;-</span> <span class="fu">classify_ground</span>(</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>      las,</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">csf</span>(<span class="at">sloop_smooth    =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>          <span class="at">class_threshold =</span> <span class="fl">0.5</span>,</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>          <span class="at">cloth_resolution =</span> <span class="fl">0.5</span>,</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>          <span class="at">time_step       =</span> <span class="fl">0.65</span>)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(las)</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply across the catalog</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="fu">opt_output_files</span>(ctg) <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="fu">tempdir</span>(), <span class="st">"/{*}_ground"</span>)</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>ctg_ground <span class="ot">&lt;-</span> <span class="fu">catalog_apply</span>(ctg, classify_ground_csf)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># lasR does not support conditional per-tile logic inside the pipeline,</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># so CSF runs unconditionally (safe — re-classifying already-labelled</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># ground points does not change them if class_threshold is strict).</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>ground_stage <span class="ot">&lt;-</span> <span class="fu">classify_ground</span>(</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">csf</span>(<span class="at">sloop_smooth     =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">class_threshold  =</span> <span class="fl">0.5</span>,</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">cloth_resolution =</span> <span class="fl">0.5</span>,</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>      <span class="at">time_step        =</span> <span class="fl">0.65</span>)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Stage 2 — Pros &amp; Cons
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 7%">
+<col style="width: 46%">
+<col style="width: 46%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>lidR</th>
+<th>lasR</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Pros</strong></td>
+<td>Conditional logic (<code>has_ground</code>) avoids re-running CSF on pre-classified 3DEP tiles, saving time; can visualize classified ground on a single tile before batch-running</td>
+<td>CSF stage is compiled C++ — significantly faster per tile; seamless integration into the rest of the pipeline</td>
+</tr>
+<tr class="even">
+<td><strong>Cons</strong></td>
+<td><code>catalog_apply()</code> with a custom function is verbose; per-tile conditional adds bookkeeping; R-level loop overhead</td>
+<td>No conditional: CSF always runs, adding unnecessary compute for 3DEP data where ground is already classified; cannot inspect one tile interactively before committing to the full run</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Note:</strong> 3DEP data almost always ships with Class 2 pre-labelled. CSF is a safety fallback. CSF works by simulating a cloth dropped onto an inverted point cloud — points within <code>class_threshold</code> metres of the settled cloth are labelled ground.</p>
+</div>
+</div>
+</div>
 <hr>
 </section>
 <section id="stage-3-height-normalization" class="level3">
 <h3 class="anchored" data-anchor-id="stage-3-height-normalization">Stage 3 — Height Normalization</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>normalize_and_save <span class="ot">&lt;-</span> <span class="cf">function</span>(las) {</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Build DTM from ground points</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  dtm <span class="ot">&lt;-</span> <span class="fu">rasterize_terrain</span>(las, <span class="at">res =</span> <span class="dv">1</span>, <span class="at">algorithm =</span> <span class="fu">knnidw</span>(<span class="at">k =</span> <span class="dv">10</span>, <span class="at">p =</span> <span class="dv">2</span>))</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Normalize: Z → height above ground, save as separate attribute</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  las <span class="ot">&lt;-</span> <span class="fu">normalize_height</span>(las, dtm)</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  las <span class="ot">&lt;-</span> <span class="fu">add_lasattribute</span>(las, las<span class="sc">@</span>data<span class="sc">$</span>Z, <span class="st">"Height"</span>, <span class="st">"Height above ground (m)"</span>)</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Restore raw Z (keeps both raw elevation and Height as independent attributes)</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  las <span class="ot">&lt;-</span> <span class="fu">unnormalize_height</span>(las)</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Filter normalization artifacts and extreme outliers</span></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  las <span class="ot">&lt;-</span> <span class="fu">filter_poi</span>(las, Height <span class="sc">&gt;</span> <span class="sc">-</span><span class="fl">0.5</span> <span class="sc">&amp;</span> Height <span class="sc">&lt;</span> <span class="dv">80</span>)</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(las)</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Saving <code>Height</code> as a separate LAS attribute before calling <code>unnormalize_height()</code> is essential. After unnormalization, <code>Z</code> reverts to raw elevation (metres above sea level), but <code>Height</code> persists as a named attribute — both are now accessible for any subsequent metric computation without re-running the DTM step.</p>
-<p>The height filter removes two categories of artifacts:</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true" href="">lidR</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false" href="">lasR</a></li></ul>
+<div class="tab-content">
+<div id="tabset-3-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-3-1-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>normalize_and_save <span class="ot">&lt;-</span> <span class="cf">function</span>(las) {</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Build DTM from ground points via k-NN inverse distance weighting</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  dtm <span class="ot">&lt;-</span> <span class="fu">rasterize_terrain</span>(las, <span class="at">res =</span> <span class="dv">1</span>, <span class="at">algorithm =</span> <span class="fu">knnidw</span>(<span class="at">k =</span> <span class="dv">10</span>, <span class="at">p =</span> <span class="dv">2</span>))</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Normalize: subtract DTM → Z now = height above ground</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  las <span class="ot">&lt;-</span> <span class="fu">normalize_height</span>(las, dtm)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Save height as a named extra-bytes attribute BEFORE restoring raw Z</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  las <span class="ot">&lt;-</span> <span class="fu">add_lasattribute</span>(las, las<span class="sc">@</span>data<span class="sc">$</span>Z, <span class="st">"Height"</span>, <span class="st">"Height above ground (m)"</span>)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Restore raw Z (both raw elevation and Height now co-exist as attributes)</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  las <span class="ot">&lt;-</span> <span class="fu">unnormalize_height</span>(las)</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Remove normalization artifacts and extreme outliers</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  las <span class="ot">&lt;-</span> <span class="fu">filter_poi</span>(las, Height <span class="sc">&gt;</span> <span class="sc">-</span><span class="fl">0.5</span> <span class="sc">&amp;</span> Height <span class="sc">&lt;</span> <span class="dv">80</span>)</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(las)</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a><span class="fu">opt_output_files</span>(ctg) <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="fu">tempdir</span>(), <span class="st">"/{*}_norm"</span>)</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>ctg_norm <span class="ot">&lt;-</span> <span class="fu">catalog_apply</span>(ctg_ground, normalize_and_save)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="tabset-3-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-2-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># lasR's normalize() stage builds the DTM and subtracts it in one streaming pass.</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Z is modified in place (normalized height replaces raw Z in the output file).</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># To preserve raw Z alongside height, use store_in_VPC() or a two-pass approach.</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>norm_stage <span class="ot">&lt;-</span> <span class="fu">normalize</span>(<span class="fu">knnidw</span>(<span class="at">k =</span> <span class="dv">10</span>, <span class="at">p =</span> <span class="dv">2</span>))</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Height filter: use a filter stage after normalization</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>filt_stage <span class="ot">&lt;-</span> <span class="fu">filter_poi</span>(</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">keep_z_above</span>(<span class="sc">-</span><span class="fl">0.5</span>) <span class="sc">&amp;</span> <span class="fu">keep_z_below</span>(<span class="dv">80</span>)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Note: lasR normalizes Z permanently in the output LAS.</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="co"># If you need both raw Z and Height as co-existing attributes,</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="co"># run a separate first pass to save raw Z as extra bytes,</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="co"># then normalize in the second pass:</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>save_raw_z <span class="ot">&lt;-</span> <span class="fu">add_extrabytes</span>(<span class="st">"float"</span>, <span class="st">"RawZ"</span>, <span class="st">"Raw elevation (m above sea level)"</span>)</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="co"># ... then run normalize_stage in a chained pipeline</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Stage 3 — Pros &amp; Cons
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 7%">
+<col style="width: 46%">
+<col style="width: 46%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>lidR</th>
+<th>lasR</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Pros</strong></td>
+<td><code>add_lasattribute()</code> + <code>unnormalize_height()</code> elegantly preserves both raw Z and normalized height in the same file — no second pass needed; DTM can be inspected as a raster object before committing</td>
+<td>DTM building and height subtraction happen in a single streaming pass without materialising the full raster in memory; much faster on very large tiles</td>
+</tr>
+<tr class="even">
+<td><strong>Cons</strong></td>
+<td><code>rasterize_terrain()</code> builds a full DTM raster in memory before normalization — memory-intensive for large tiles with dense ground returns; R-level <code>unnormalize_height()</code> adds a linear scan overhead</td>
+<td>Z is overwritten in place — recovering raw elevation requires either a pre-saved copy or an extra-bytes pass; filter stage syntax differs from lidR’s <code>filter_poi()</code></td>
+</tr>
+</tbody>
+</table>
+<p>The height filter thresholds:</p>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -587,110 +828,355 @@ window.Quarto = {
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>Height &gt; -0.5</code></td>
-<td>Sub-ground points from DTM interpolation errors</td>
+<td><code>Height &gt; −0.5 m</code></td>
+<td>Sub-ground artifacts from DTM interpolation</td>
 </tr>
 <tr class="even">
 <td><code>Height &lt; 80 m</code></td>
-<td>High-altitude noise, birds, low-flying aircraft</td>
+<td>High noise, birds, aircraft</td>
 </tr>
 </tbody>
 </table>
+</div>
+</div>
+</div>
 <hr>
 </section>
 <section id="stage-4-statistical-outlier-removal-sor" class="level3">
 <h3 class="anchored" data-anchor-id="stage-4-statistical-outlier-removal-sor">Stage 4 — Statistical Outlier Removal (SOR)</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>remove_noise_sor <span class="ot">&lt;-</span> <span class="cf">function</span>(las) {</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  las <span class="ot">&lt;-</span> <span class="fu">classify_noise</span>(las, <span class="fu">sor</span>(<span class="at">k =</span> <span class="dv">15</span>, <span class="at">m =</span> <span class="dv">3</span>))</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  las <span class="ot">&lt;-</span> <span class="fu">filter_poi</span>(las, Classification <span class="sc">!=</span> LASNOISE)</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(las)</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>SOR must occur <strong>after normalization</strong> (so height context is correct) and <strong>before decimation</strong> (so artificial sparsity from thinning does not mislead the neighbourhood statistics). See the full discussion in <a href="#removal">Section 2</a> below.</p>
-<p>Parameters:</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-4-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-1" role="tab" aria-controls="tabset-4-1" aria-selected="true" href="">lidR</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-2" role="tab" aria-controls="tabset-4-2" aria-selected="false" href="">lasR</a></li></ul>
+<div class="tab-content">
+<div id="tabset-4-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-4-1-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>remove_noise_sor <span class="ot">&lt;-</span> <span class="cf">function</span>(las) {</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Classify noise — does NOT remove yet, only labels (Class 18)</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  las <span class="ot">&lt;-</span> <span class="fu">classify_noise</span>(las, <span class="fu">sor</span>(<span class="at">k =</span> <span class="dv">15</span>, <span class="at">m =</span> <span class="dv">3</span>))</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Remove classified noise points</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  las <span class="ot">&lt;-</span> <span class="fu">filter_poi</span>(las, Classification <span class="sc">!=</span> LASNOISE)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(las)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Buffer must already be set on ctg (opt_chunk_buffer = 10)</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="fu">opt_output_files</span>(ctg) <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="fu">tempdir</span>(), <span class="st">"/{*}_clean"</span>)</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>ctg_clean <span class="ot">&lt;-</span> <span class="fu">catalog_apply</span>(ctg_norm, remove_noise_sor)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="tabset-4-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-2-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># lasR runs SOR natively in C++ with the buffer passed to exec().</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># It classifies and removes in one stage.</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>sor_stage <span class="ot">&lt;-</span> <span class="fu">classify_noise</span>(<span class="fu">sor</span>(<span class="at">k =</span> <span class="dv">15</span>, <span class="at">m =</span> <span class="dv">3</span>))</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Buffer = 10 m is set in exec() — applies to all neighborhood stages</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Stage 4 — Pros &amp; Cons
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
 <table class="caption-top table">
+<colgroup>
+<col style="width: 7%">
+<col style="width: 46%">
+<col style="width: 46%">
+</colgroup>
 <thead>
 <tr class="header">
-<th>Parameter</th>
-<th>Value</th>
-<th>Meaning</th>
+<th></th>
+<th>lidR</th>
+<th>lasR</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>k</code></td>
-<td>15</td>
-<td>Number of nearest neighbours per point</td>
+<td><strong>Pros</strong></td>
+<td>Two-step classify-then-filter gives you control: you can inspect flagged points before removing them (<code>filter_poi(las, Classification == LASNOISE)</code> → visualize); easy to tune <code>k</code> and <code>m</code> interactively on one tile</td>
+<td>SOR runs in C++ with multi-threading — 4–8× faster; buffer management is automatic in <code>exec()</code>; no separate filter step needed</td>
 </tr>
 <tr class="even">
-<td><code>m</code></td>
-<td>3</td>
-<td>Flag points with mean NN distance &gt; μ + 3σ of the cloud</td>
+<td><strong>Cons</strong></td>
+<td>Pure R kNN search is slow for high-density tiles (&gt; 50 pts/m²); chunk buffer must be remembered and set on the catalog separately; two function calls where one would suffice</td>
+<td>Cannot inspect flagged-but-not-yet-removed points without a debug run; slightly less fine-grained control over the classify/remove separation</td>
 </tr>
 </tbody>
 </table>
+<p><strong>Ordering rule (both packages):</strong> SOR must run <strong>after normalization</strong> (so height context is valid) and <strong>before decimation</strong> (so artificial sparsity does not mislead the neighbourhood statistics).</p>
+<p>SOR formula:</p>
+<p><span class="math display">\[\bar{d}_i = \frac{1}{k}\sum_{j \in \mathcal{N}_k(i)} \|p_i - p_j\|, \qquad \text{flag if } \bar{d}_i &gt; \mu + m\sigma\]</span></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th><code>k</code></th>
+<th><code>m</code></th>
+<th>Recommended setting</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>15</td>
+<td>4–5</td>
+<td>Sparse terrain / open canopy</td>
+</tr>
+<tr class="even">
+<td>15</td>
+<td>3</td>
+<td>Standard forest environments</td>
+</tr>
+<tr class="odd">
+<td>8</td>
+<td>2</td>
+<td>Dense urban / noisy sensor</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
 <hr>
 </section>
 <section id="stage-5-voxel-decimation-optional-recommended-for-3dep" class="level3">
 <h3 class="anchored" data-anchor-id="stage-5-voxel-decimation-optional-recommended-for-3dep">Stage 5 — Voxel Decimation (optional, recommended for 3DEP)</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>decimate_catalog <span class="ot">&lt;-</span> <span class="cf">function</span>(las, <span class="at">min_dens =</span> <span class="dv">5</span>) {</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Convert target density to voxel edge length</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  voxel_res <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">/</span> <span class="fu">sqrt</span>(min_dens)</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Floor: never thin below 5 pts/m² to prevent over-thinning</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  voxel_res <span class="ot">&lt;-</span> <span class="fu">min</span>(voxel_res, <span class="dv">1</span> <span class="sc">/</span> <span class="fu">sqrt</span>(<span class="dv">5</span>))</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  las <span class="ot">&lt;-</span> <span class="fu">decimate_points</span>(las, <span class="fu">voxel</span>(voxel_res))</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(las)</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>3DEP tiles may come from different acquisition years and sensors, producing density gradients across a study area. Voxel decimation enforces a spatially uniform minimum point spacing, preventing high-density zones from dominating derived metrics. See the full comparison in <a href="#decimation">Section 1</a> below.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-5-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-1" role="tab" aria-controls="tabset-5-1" aria-selected="true" href="">lidR</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-5-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-2" role="tab" aria-controls="tabset-5-2" aria-selected="false" href="">lasR</a></li></ul>
+<div class="tab-content">
+<div id="tabset-5-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-5-1-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>decimate_catalog <span class="ot">&lt;-</span> <span class="cf">function</span>(las, <span class="at">min_dens =</span> <span class="dv">5</span>) {</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Voxel edge length from target density</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  voxel_res <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">/</span> <span class="fu">sqrt</span>(min_dens)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  voxel_res <span class="ot">&lt;-</span> <span class="fu">min</span>(voxel_res, <span class="dv">1</span> <span class="sc">/</span> <span class="fu">sqrt</span>(<span class="dv">5</span>))  <span class="co"># floor at 5 pts/m²</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  las <span class="ot">&lt;-</span> <span class="fu">decimate_points</span>(las, <span class="fu">voxel</span>(voxel_res))</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(las)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="fu">opt_output_files</span>(ctg) <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="fu">tempdir</span>(), <span class="st">"/{*}_decim"</span>)</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>ctg_final <span class="ot">&lt;-</span> <span class="fu">catalog_apply</span>(ctg_clean, decimate_catalog)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="tabset-5-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-5-2-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># lasR uses sampling_voxel() with the voxel edge length directly.</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Same formula: res = 1 / sqrt(target_density)</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>voxel_res   <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">/</span> <span class="fu">sqrt</span>(<span class="dv">5</span>)          <span class="co"># 0.447 m for 5 pts/m² floor</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>decim_stage <span class="ot">&lt;-</span> <span class="fu">sampling_voxel</span>(voxel_res)</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Other options in lasR:</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="co"># sampling_random(density = 10)         # random thinning</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="co"># sampling_homogenize(density = 10, res = 5)  # 2D homogenize</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Stage 5 — Pros &amp; Cons
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 7%">
+<col style="width: 46%">
+<col style="width: 46%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>lidR</th>
+<th>lasR</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Pros</strong></td>
+<td>Four decimation algorithms (<code>voxel</code>, <code>random</code>, <code>homogenize</code>, <code>highest</code>/<code>lowest</code>) — easy to swap and compare; result is immediately accessible as a <code>LAS</code> object for inspection</td>
+<td><code>sampling_voxel()</code> runs in C++ — faster; chained directly after SOR with no intermediate file write required; cleaner syntax</td>
+</tr>
+<tr class="even">
+<td><strong>Cons</strong></td>
+<td><code>decimate_points()</code> in a <code>catalog_apply()</code> loop has R-level overhead; limited to what lidR implements</td>
+<td>Fewer built-in algorithms than lidR (no <code>highest</code>/<code>lowest</code> equivalent in lasR at time of writing); no interactive mid-pipeline density check</td>
+</tr>
+</tbody>
+</table>
+<p>See <a href="#decimation">Section 1</a> below for a full comparison of all decimation algorithms.</p>
+</div>
+</div>
+</div>
 <hr>
 </section>
 </section>
+<section id="complete-pipeline-summary" class="level2">
+<h2 class="anchored" data-anchor-id="complete-pipeline-summary">Complete Pipeline Summary</h2>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-6-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-1" role="tab" aria-controls="tabset-6-1" aria-selected="true" href="">lidR (full pipeline)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-6-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-2" role="tab" aria-controls="tabset-6-2" aria-selected="false" href="">lasR (full pipeline)</a></li></ul>
+<div class="tab-content">
+<div id="tabset-6-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-6-1-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lidR)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co"># ── 1. Setup ────────────────────────────────────────────</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>ctg <span class="ot">&lt;-</span> <span class="fu">readLAScatalog</span>(<span class="st">"path/to/las_folder/"</span>)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="fu">opt_filter</span>(ctg)       <span class="ot">&lt;-</span> <span class="st">"-drop_class 7 18"</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="fu">opt_chunk_buffer</span>(ctg) <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="fu">opt_chunk_size</span>(ctg)   <span class="ot">&lt;-</span> <span class="dv">500</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="co"># ── 2. Ground classification ─────────────────────────</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>has_ground <span class="ot">&lt;-</span> <span class="cf">function</span>(las) <span class="fu">any</span>(las<span class="sc">@</span>data<span class="sc">$</span>Classification <span class="sc">==</span> LASGROUND)</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>full_pipeline <span class="ot">&lt;-</span> <span class="cf">function</span>(las) {</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Stage 2: ground (if absent)</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">has_ground</span>(las))</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>    las <span class="ot">&lt;-</span> <span class="fu">classify_ground</span>(las, <span class="fu">csf</span>(<span class="at">sloop_smooth =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>                                    <span class="at">class_threshold =</span> <span class="fl">0.5</span>,</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>                                    <span class="at">cloth_resolution =</span> <span class="fl">0.5</span>))</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Stage 3: normalize + save Height attribute</span></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>  dtm <span class="ot">&lt;-</span> <span class="fu">rasterize_terrain</span>(las, <span class="at">res =</span> <span class="dv">1</span>, <span class="at">algorithm =</span> <span class="fu">knnidw</span>(<span class="at">k =</span> <span class="dv">10</span>, <span class="at">p =</span> <span class="dv">2</span>))</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>  las <span class="ot">&lt;-</span> <span class="fu">normalize_height</span>(las, dtm)</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>  las <span class="ot">&lt;-</span> <span class="fu">add_lasattribute</span>(las, las<span class="sc">@</span>data<span class="sc">$</span>Z, <span class="st">"Height"</span>, <span class="st">"Height above ground (m)"</span>)</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>  las <span class="ot">&lt;-</span> <span class="fu">unnormalize_height</span>(las)</span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>  las <span class="ot">&lt;-</span> <span class="fu">filter_poi</span>(las, Height <span class="sc">&gt;</span> <span class="sc">-</span><span class="fl">0.5</span> <span class="sc">&amp;</span> Height <span class="sc">&lt;</span> <span class="dv">80</span>)</span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Stage 4: SOR noise removal</span></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>  las <span class="ot">&lt;-</span> <span class="fu">classify_noise</span>(las, <span class="fu">sor</span>(<span class="at">k =</span> <span class="dv">15</span>, <span class="at">m =</span> <span class="dv">3</span>))</span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>  las <span class="ot">&lt;-</span> <span class="fu">filter_poi</span>(las, Classification <span class="sc">!=</span> LASNOISE)</span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Stage 5: voxel decimation</span></span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>  las <span class="ot">&lt;-</span> <span class="fu">decimate_points</span>(las, <span class="fu">voxel</span>(<span class="dv">1</span> <span class="sc">/</span> <span class="fu">sqrt</span>(<span class="dv">5</span>)))</span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(las)</span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a><span class="fu">opt_output_files</span>(ctg) <span class="ot">&lt;-</span> <span class="st">"output/{*}_clean.laz"</span></span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a>output <span class="ot">&lt;-</span> <span class="fu">catalog_apply</span>(ctg, full_pipeline)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="tabset-6-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-6-2-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lasR)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>pipeline <span class="ot">&lt;-</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">reader_las</span>(<span class="at">filter =</span> <span class="st">"-drop_class 7 18"</span>)        <span class="sc">+</span>  <span class="co"># Stage 1</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">classify_ground</span>(<span class="fu">csf</span>(<span class="at">sloop_smooth    =</span> <span class="cn">TRUE</span>,        <span class="co"># Stage 2</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>                      <span class="at">class_threshold =</span> <span class="fl">0.5</span>,</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>                      <span class="at">cloth_resolution =</span> <span class="fl">0.5</span>))    <span class="sc">+</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">normalize</span>(<span class="fu">knnidw</span>(<span class="at">k =</span> <span class="dv">10</span>, <span class="at">p =</span> <span class="dv">2</span>))               <span class="sc">+</span>  <span class="co"># Stage 3</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter_poi</span>(<span class="fu">keep_z_above</span>(<span class="sc">-</span><span class="fl">0.5</span>) <span class="sc">&amp;</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>             <span class="fu">keep_z_below</span>(<span class="dv">80</span>))                   <span class="sc">+</span>  <span class="co"># Stage 3 filter</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">classify_noise</span>(<span class="fu">sor</span>(<span class="at">k =</span> <span class="dv">15</span>, <span class="at">m =</span> <span class="dv">3</span>))             <span class="sc">+</span>  <span class="co"># Stage 4</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sampling_voxel</span>(<span class="dv">1</span> <span class="sc">/</span> <span class="fu">sqrt</span>(<span class="dv">5</span>))                    <span class="sc">+</span>  <span class="co"># Stage 5</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">write_las</span>(<span class="at">ofile =</span> <span class="st">"output/*.laz"</span>)                 <span class="co"># output</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a><span class="fu">exec</span>(pipeline,</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>     <span class="at">on     =</span> <span class="st">"path/to/las_folder/"</span>,</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>     <span class="at">ncores =</span> <span class="dv">4</span>L,</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>     <span class="at">chunk  =</span> <span class="dv">500</span>,</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>     <span class="at">buffer =</span> <span class="dv">10</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>When to choose which:</strong></p>
+<ul>
+<li><strong>lidR</strong> — exploring a new dataset, tuning parameters interactively, datasets &lt; 50 GB, need <code>add_lasattribute()</code> / <code>unnormalize_height()</code> to preserve both raw Z and height.</li>
+<li><strong>lasR</strong> — production runs, datasets &gt; 50 GB, HPC clusters, time-critical workflows. Expect 5–10× speedup over equivalent lidR pipelines.</li>
+</ul>
+</div>
+</div>
+<hr>
+</section>
 <section id="decimation" class="level2">
 <h2 class="anchored" data-anchor-id="decimation">Section 1 — Decimation Methods in Depth</h2>
-<p>Decimation (also called thinning or subsampling) reduces point density to a target level. The choice of algorithm matters: different methods preserve different spatial and structural properties of the cloud.</p>
+<p>Decimation reduces point density to a target level. The choice of algorithm matters — different methods preserve different spatial and structural properties.</p>
 <section id="random-thinning" class="level3">
 <h3 class="anchored" data-anchor-id="random-thinning">1.1 Random Thinning</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>las_random <span class="ot">&lt;-</span> <span class="fu">decimate_points</span>(las, <span class="fu">random</span>(<span class="at">density =</span> <span class="dv">10</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Each point is independently retained with probability <span class="math inline">\(p = d_\text{target} / d_\text{local}\)</span>, where <span class="math inline">\(d\)</span> is local point density. The selection is spatially blind — it does not consider where a point sits relative to its neighbours.</p>
-<p><strong>How it works:</strong> estimate current density, compute retention probability, sample points using a Bernoulli draw with that probability.</p>
-<p><strong>Strengths:</strong> - Fastest algorithm; trivially parallelisable - Preserves the statistical distribution of intensity, return number, and other attributes - No spatial discretisation artifacts</p>
-<p><strong>Weaknesses:</strong> - Does not produce spatial uniformity — dense clusters remain dense, sparse areas are unchanged - Sensitive to the random seed (reproducibility requires <code>set.seed()</code>) - In mixed 3DEP tiles with 2–30 pts/m² variation, random thinning averages out density but does not eliminate gradients</p>
-<p><strong>Best use:</strong> quick exploratory analysis where spatial uniformity is not required.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-7-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-7-1" role="tab" aria-controls="tabset-7-1" aria-selected="true" href="">lidR</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-7-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-7-2" role="tab" aria-controls="tabset-7-2" aria-selected="false" href="">lasR</a></li></ul>
+<div class="tab-content">
+<div id="tabset-7-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-7-1-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>las_random <span class="ot">&lt;-</span> <span class="fu">decimate_points</span>(las, <span class="fu">random</span>(<span class="at">density =</span> <span class="dv">10</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="tabset-7-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-7-2-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>decim <span class="ot">&lt;-</span> <span class="fu">sampling_random</span>(<span class="at">density =</span> <span class="dv">10</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</div>
+</div>
+<p>Each point is independently retained with probability <span class="math inline">\(p = d_{\text{target}} / d_{\text{local}}\)</span>. Spatially blind — does not consider where a point sits relative to its neighbours.</p>
+<p><strong>Strengths:</strong> fastest; preserves attribute distributions (intensity, return number); no spatial discretisation.</p>
+<p><strong>Weaknesses:</strong> no spatial uniformity — dense clusters stay dense; sensitive to random seed; density gradients persist in mixed 3DEP tiles.</p>
+<p><strong>Best use:</strong> quick exploration where spatial uniformity is not required.</p>
 <hr>
 </section>
 <section id="voxel-thinning" class="level3">
 <h3 class="anchored" data-anchor-id="voxel-thinning">1.2 Voxel Thinning</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>las_voxel <span class="ot">&lt;-</span> <span class="fu">decimate_points</span>(las, <span class="fu">voxel</span>(<span class="at">res =</span> <span class="fl">0.5</span>))  <span class="co"># 0.5 m voxel edge</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>3D space is divided into cubic voxels of edge length <code>res</code>. One point is retained per occupied voxel — chosen randomly from all points within that voxel.</p>
-<p><strong>How it works:</strong> assign each point to a voxel by integer-dividing its X/Y/Z coordinates by <code>res</code>, then randomly select one point from each occupied voxel’s group.</p>
-<p><strong>Strengths:</strong> - Enforces 3D spatial uniformity — no two retained points can be closer than <code>res</code> in all three dimensions - Highly effective at removing density artifacts from scan angle overlap or multiple-pass acquisitions - Consistent point spacing benefits rasterisation, normal estimation, and metric computation</p>
-<p><strong>Weaknesses:</strong> - The retained point is random within the voxel — fine-scale vertical structure (e.g., sub-voxel canopy layering) may be degraded - At coarse <code>res</code>, subtle canopy gaps smaller than a voxel are lost - Does not target a specific points/m² — the output density depends on the actual 3D distribution of the cloud</p>
-<p><strong>Best use:</strong> removing density gradients in mixed 3DEP acquisitions; pre-processing for wall-to-wall AGB modelling.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-8-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-8-1" role="tab" aria-controls="tabset-8-1" aria-selected="true" href="">lidR</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-8-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-8-2" role="tab" aria-controls="tabset-8-2" aria-selected="false" href="">lasR</a></li></ul>
+<div class="tab-content">
+<div id="tabset-8-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-8-1-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>las_voxel <span class="ot">&lt;-</span> <span class="fu">decimate_points</span>(las, <span class="fu">voxel</span>(<span class="at">res =</span> <span class="fl">0.45</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="tabset-8-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-8-2-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>decim <span class="ot">&lt;-</span> <span class="fu">sampling_voxel</span>(<span class="at">res =</span> <span class="fl">0.45</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</div>
+</div>
+<p>3D space is divided into cubic voxels of edge <code>res</code>. One random point is retained per occupied voxel.</p>
+<p><strong>Strengths:</strong> enforces 3D spatial uniformity; removes density gradients from scan-angle overlap or multi-pass acquisition; consistent spacing benefits rasterisation and metric computation.</p>
+<p><strong>Weaknesses:</strong> retained point is random within the voxel — fine-scale vertical structure may be degraded; does not target a specific pts/m².</p>
+<p><strong>Best use:</strong> mixed 3DEP acquisitions; wall-to-wall AGB modelling.</p>
 <hr>
 </section>
 <section id="homogenize-thinning" class="level3">
 <h3 class="anchored" data-anchor-id="homogenize-thinning">1.3 Homogenize Thinning</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>las_homo <span class="ot">&lt;-</span> <span class="fu">decimate_points</span>(las, <span class="fu">homogenize</span>(<span class="at">density =</span> <span class="dv">10</span>, <span class="at">res =</span> <span class="dv">5</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>2D space is divided into cells of edge <code>res</code>. Within each cell, points are randomly subsampled to reach exactly <code>density</code> pts/m². Cells already below the target are left untouched.</p>
-<p><strong>How it works:</strong> compute local density in each <code>res × res</code> cell; if above target, randomly discard excess points; if at or below target, keep all.</p>
-<p><strong>Strengths:</strong> - Explicitly targets a density (pts/m²) rather than a voxel size - 2D spatial uniformity — horizontal density gradients are removed - Preserves full vertical structure within each cell (no 3D voxelisation) - Good balance between random (too little control) and voxel (too much 3D rigidity)</p>
-<p><strong>Weaknesses:</strong> - Does not address 3D density variation — points can still cluster vertically - Cell size <code>res</code> introduces a 2D discretisation scale that interacts with metric resolution - Slower than random thinning</p>
-<p><strong>Best use:</strong> normalising point density for plot-level or pixel-level AGB modelling where horizontal uniformity matters more than 3D uniformity.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-9-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-9-1" role="tab" aria-controls="tabset-9-1" aria-selected="true" href="">lidR</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-9-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-9-2" role="tab" aria-controls="tabset-9-2" aria-selected="false" href="">lasR</a></li></ul>
+<div class="tab-content">
+<div id="tabset-9-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-9-1-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>las_homo <span class="ot">&lt;-</span> <span class="fu">decimate_points</span>(las, <span class="fu">homogenize</span>(<span class="at">density =</span> <span class="dv">10</span>, <span class="at">res =</span> <span class="dv">5</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="tabset-9-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-9-2-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>decim <span class="ot">&lt;-</span> <span class="fu">sampling_homogenize</span>(<span class="at">density =</span> <span class="dv">10</span>, <span class="at">res =</span> <span class="dv">5</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</div>
+</div>
+<p>2D cells of edge <code>res</code> are randomly thinned to exactly <code>density</code> pts/m². Cells already below target are left untouched.</p>
+<p><strong>Strengths:</strong> explicitly targets pts/m²; removes horizontal density gradients; preserves full vertical structure within each cell.</p>
+<p><strong>Weaknesses:</strong> 3D clustering can persist vertically; slower than random.</p>
+<p><strong>Best use:</strong> plot-level or pixel-level AGB regression where horizontal uniformity matters more than 3D structure.</p>
 <hr>
 </section>
 <section id="highest-lowest-point-per-cell" class="level3">
 <h3 class="anchored" data-anchor-id="highest-lowest-point-per-cell">1.4 Highest / Lowest Point per Cell</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>las_high <span class="ot">&lt;-</span> <span class="fu">decimate_points</span>(las, <span class="fu">highest</span>(<span class="at">res =</span> <span class="dv">1</span>))   <span class="co"># one point per 1 m² cell: the highest</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>las_low  <span class="ot">&lt;-</span> <span class="fu">decimate_points</span>(las, <span class="fu">lowest</span>(<span class="at">res =</span> <span class="dv">1</span>))    <span class="co"># the lowest</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Retains only the highest (or lowest) point within each 2D cell. Not a general pre-processing step — these are single-purpose filters.</p>
-<p><strong>Use cases:</strong></p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-10-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-10-1" role="tab" aria-controls="tabset-10-1" aria-selected="true" href="">lidR</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-10-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-10-2" role="tab" aria-controls="tabset-10-2" aria-selected="false" href="">lasR</a></li></ul>
+<div class="tab-content">
+<div id="tabset-10-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-10-1-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>las_high <span class="ot">&lt;-</span> <span class="fu">decimate_points</span>(las, <span class="fu">highest</span>(<span class="at">res =</span> <span class="dv">1</span>))</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>las_low  <span class="ot">&lt;-</span> <span class="fu">decimate_points</span>(las, <span class="fu">lowest</span>(<span class="at">res =</span> <span class="dv">1</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="tabset-10-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-10-2-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Not a named stage in lasR; approximate with:</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="co"># filter to highest Z per voxel column using a custom step</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</div>
+</div>
+<p>Retains only the highest or lowest point per 2D cell. Not a general pre-processing step.</p>
 <table class="caption-top table">
-<colgroup>
-<col style="width: 21%">
-<col style="width: 43%">
-<col style="width: 35%">
-</colgroup>
 <thead>
 <tr class="header">
 <th>Method</th>
@@ -702,12 +1188,12 @@ window.Quarto = {
 <tr class="odd">
 <td><code>highest</code></td>
 <td>Top-of-canopy</td>
-<td>Approximate CHM without full rasterisation</td>
+<td>Approximate CHM</td>
 </tr>
 <tr class="even">
 <td><code>lowest</code></td>
 <td>Near-ground</td>
-<td>Bare-earth surface approximation</td>
+<td>Bare-earth approximation</td>
 </tr>
 </tbody>
 </table>
@@ -718,11 +1204,12 @@ window.Quarto = {
 <table class="caption-top table">
 <colgroup>
 <col style="width: 9%">
-<col style="width: 21%">
 <col style="width: 22%">
-<col style="width: 19%">
+<col style="width: 24%">
+<col style="width: 20%">
+<col style="width: 8%">
 <col style="width: 7%">
-<col style="width: 19%">
+<col style="width: 7%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -731,7 +1218,8 @@ window.Quarto = {
 <th>Vertical structure</th>
 <th>Targets density?</th>
 <th>Speed</th>
-<th>Recommended for</th>
+<th>lidR</th>
+<th>lasR</th>
 </tr>
 </thead>
 <tbody>
@@ -741,7 +1229,8 @@ window.Quarto = {
 <td>Preserved</td>
 <td>Approximately</td>
 <td>★★★★★</td>
-<td>Exploration</td>
+<td>✓</td>
+<td>✓</td>
 </tr>
 <tr class="even">
 <td>Voxel</td>
@@ -749,7 +1238,8 @@ window.Quarto = {
 <td>Partially lost</td>
 <td>No (size-based)</td>
 <td>★★★★☆</td>
-<td>Multi-campaign 3DEP</td>
+<td>✓</td>
+<td>✓</td>
 </tr>
 <tr class="odd">
 <td>Homogenize</td>
@@ -757,15 +1247,17 @@ window.Quarto = {
 <td>Preserved</td>
 <td>Yes (pts/m²)</td>
 <td>★★★☆☆</td>
-<td>AGB pixel regression</td>
+<td>✓</td>
+<td>✓</td>
 </tr>
 <tr class="even">
-<td>Highest/Lowest</td>
+<td>Highest / Lowest</td>
 <td>2D uniform</td>
 <td>No</td>
 <td>No</td>
 <td>★★★★☆</td>
-<td>Surface extraction only</td>
+<td>✓</td>
+<td>Partial</td>
 </tr>
 </tbody>
 </table>
@@ -779,7 +1271,7 @@ Tip
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>For 3DEP data with mixed acquisition years, <strong>voxel thinning</strong> is the safest default. For NEON AOP data (single campaign, uniform density), no decimation is usually needed. For plot-level regression, <strong>homogenize</strong> preserves vertical profile shape better than voxel.</p>
+<p>For 3DEP with mixed acquisition years: <strong>voxel</strong>. For NEON AOP (single campaign, uniform density): no decimation needed. For plot-level regression: <strong>homogenize</strong> preserves vertical profile shape better.</p>
 </div>
 </div>
 <hr>
@@ -787,161 +1279,216 @@ Tip
 </section>
 <section id="removal" class="level2">
 <h2 class="anchored" data-anchor-id="removal">Section 2 — Noise and Outlier Removal Methods</h2>
-<p>Noise in airborne LiDAR arises from multiple sources: multi-path reflections off water, birds and insects, atmospheric aerosols, electronic noise in the detector, and normalization artifacts near terrain discontinuities. No single removal method catches all types.</p>
-<section id="class-based-filtering-always-first" class="level3">
-<h3 class="anchored" data-anchor-id="class-based-filtering-always-first">2.1 Class-Based Filtering (Always First)</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>las <span class="ot">&lt;-</span> <span class="fu">filter_poi</span>(las, Classification <span class="sc">!=</span> LASNOISE)</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Or at catalog level:</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">opt_filter</span>(ctg) <span class="ot">&lt;-</span> <span class="st">"-drop_class 7 18"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>LAS format defines standard noise classes: <strong>Class 7</strong> (low noise, below ground) and <strong>Class 18</strong> (high noise, above expected maximum). Many data providers pre-label these during production.</p>
-<p><strong>Strengths:</strong> zero computation cost; removes obvious, pre-identified noise before any processing.</p>
-<p><strong>Weaknesses:</strong> only removes what the provider already flagged — does not catch noise that slipped through classification.</p>
-<p><strong>Always apply this first</strong>, regardless of what follows.</p>
-<hr>
-</section>
-<section id="height-based-thresholding" class="level3">
-<h3 class="anchored" data-anchor-id="height-based-thresholding">2.2 Height-Based Thresholding</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>las <span class="ot">&lt;-</span> <span class="fu">filter_poi</span>(las, Height <span class="sc">&gt;</span> <span class="sc">-</span><span class="fl">0.5</span> <span class="sc">&amp;</span> Height <span class="sc">&lt;</span> <span class="dv">80</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>After normalization, any point with <code>Height &lt; -0.5</code> is a sub-ground artifact from DTM interpolation error; any point above 80 m (or the expected maximum canopy height for the region) is likely noise.</p>
-<p><strong>Strengths:</strong> extremely fast; region-specific thresholds can be tuned (e.g., <code>Height &lt; 60</code> in temperate forests; <code>Height &lt; 100</code> in tropical).</p>
-<p><strong>Weaknesses:</strong> does not detect isolated floating points within the valid range (e.g., a bird at 15 m looks identical to a mid-canopy return).</p>
-<p><strong>When to use:</strong> always — as a complement to other methods, not a substitute.</p>
-<hr>
-</section>
-<section id="statistical-outlier-removal-sor" class="level3">
-<h3 class="anchored" data-anchor-id="statistical-outlier-removal-sor">2.3 Statistical Outlier Removal (SOR)</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>las <span class="ot">&lt;-</span> <span class="fu">classify_noise</span>(las, <span class="fu">sor</span>(<span class="at">k =</span> <span class="dv">15</span>, <span class="at">m =</span> <span class="dv">3</span>))</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>las <span class="ot">&lt;-</span> <span class="fu">filter_poi</span>(las, Classification <span class="sc">!=</span> LASNOISE)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>For each point <span class="math inline">\(i\)</span>, compute the mean distance to its <span class="math inline">\(k\)</span> nearest neighbours:</p>
-<p><span class="math display">\[\bar{d}_i = \frac{1}{k} \sum_{j \in \mathcal{N}_k(i)} \|p_i - p_j\|\]</span></p>
-<p>Compute the global mean <span class="math inline">\(\mu\)</span> and standard deviation <span class="math inline">\(\sigma\)</span> of <span class="math inline">\(\bar{d}\)</span> across all points. Flag point <span class="math inline">\(i\)</span> as noise if:</p>
-<p><span class="math display">\[\bar{d}_i &gt; \mu + m \cdot \sigma\]</span></p>
-<p><strong>Strengths:</strong> - Catches isolated floating points within the valid height range (birds, aerosols) - Adapts automatically to local point density — thresholds are data-driven, not hand-tuned - Standard, reproducible, and native to lidR</p>
-<p><strong>Weaknesses:</strong> - Computationally expensive (<span class="math inline">\(O(n \log n)\)</span> for kNN + linear scan) - Requires chunk buffer = 10 m to avoid false positives at tile edges - In sparse areas (edges of flight swath, steep terrain), even legitimate points may have high mean NN distances and get flagged → consider <code>m = 4</code> or <code>m = 5</code> in open terrain - Does not use attribute information (intensity, return number) — purely geometric</p>
-<p><strong>Parameter guidance:</strong></p>
+<section id="class-based-filtering" class="level3">
+<h3 class="anchored" data-anchor-id="class-based-filtering">2.1 Class-Based Filtering</h3>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-11-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-11-1" role="tab" aria-controls="tabset-11-1" aria-selected="true" href="">lidR</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-11-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-11-2" role="tab" aria-controls="tabset-11-2" aria-selected="false" href="">lasR</a></li></ul>
+<div class="tab-content">
+<div id="tabset-11-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-11-1-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>las <span class="ot">&lt;-</span> <span class="fu">filter_poi</span>(las, Classification <span class="sc">!=</span> LASNOISE)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Or at catalog level:</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="fu">opt_filter</span>(ctg) <span class="ot">&lt;-</span> <span class="st">"-drop_class 7 18"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="tabset-11-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-11-2-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Pass filter string directly to reader_las():</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>read_stage <span class="ot">&lt;-</span> <span class="fu">reader_las</span>(<span class="at">filter =</span> <span class="st">"-drop_class 7 18"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</div>
+</div>
+<p>Removes LAS Class 7 (low noise) and Class 18 (high noise) pre-labelled by the data provider. Zero computation cost. Always apply first.</p>
 <table class="caption-top table">
+<colgroup>
+<col style="width: 7%">
+<col style="width: 46%">
+<col style="width: 46%">
+</colgroup>
 <thead>
 <tr class="header">
-<th>Setting</th>
-<th><code>k</code></th>
-<th><code>m</code></th>
-<th>Notes</th>
+<th></th>
+<th>lidR</th>
+<th>lasR</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>Conservative (keep more)</td>
-<td>15</td>
-<td>4–5</td>
-<td>Sparse terrain, open canopy</td>
+<td><strong>Pros</strong></td>
+<td>Can apply at catalog level (no per-tile code)</td>
+<td>Integrated into the reader — no extra stage</td>
 </tr>
 <tr class="even">
-<td>Standard</td>
-<td>15</td>
-<td>3</td>
-<td>Most forest environments</td>
-</tr>
-<tr class="odd">
-<td>Aggressive (remove more)</td>
-<td>8</td>
-<td>2</td>
-<td>Dense urban, noisy sensor</td>
+<td><strong>Cons</strong></td>
+<td>Easy to forget to set <code>opt_filter</code> before running</td>
+<td>Filter string syntax is the same; no additional control</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Must apply after normalization</strong> and before decimation (see Stage 4).</p>
+<hr>
+</section>
+<section id="height-based-thresholding" class="level3">
+<h3 class="anchored" data-anchor-id="height-based-thresholding">2.2 Height-Based Thresholding</h3>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-12-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-12-1" role="tab" aria-controls="tabset-12-1" aria-selected="true" href="">lidR</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-12-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-12-2" role="tab" aria-controls="tabset-12-2" aria-selected="false" href="">lasR</a></li></ul>
+<div class="tab-content">
+<div id="tabset-12-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-12-1-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>las <span class="ot">&lt;-</span> <span class="fu">filter_poi</span>(las, Height <span class="sc">&gt;</span> <span class="sc">-</span><span class="fl">0.5</span> <span class="sc">&amp;</span> Height <span class="sc">&lt;</span> <span class="dv">80</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="tabset-12-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-12-2-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>filt <span class="ot">&lt;-</span> <span class="fu">filter_poi</span>(<span class="fu">keep_z_above</span>(<span class="sc">-</span><span class="fl">0.5</span>) <span class="sc">&amp;</span> <span class="fu">keep_z_below</span>(<span class="dv">80</span>))</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Note: in lasR this filters on Z (normalized), not a separate 'Height' attribute</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</div>
+</div>
+<p>Fast, tunable, always complementary to SOR. Does not catch noise within the valid height range.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 7%">
+<col style="width: 46%">
+<col style="width: 46%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>lidR</th>
+<th>lasR</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Pros</strong></td>
+<td>Filters on named <code>Height</code> attribute (works even after unnormalization restores raw Z)</td>
+<td>Direct filter stage; no attribute dependency</td>
+</tr>
+<tr class="even">
+<td><strong>Cons</strong></td>
+<td>Requires <code>Height</code> attribute to be present</td>
+<td>Filters on Z; if Z is raw elevation (not normalized), filter must use absolute elevation values instead</td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+<section id="statistical-outlier-removal-sor" class="level3">
+<h3 class="anchored" data-anchor-id="statistical-outlier-removal-sor">2.3 Statistical Outlier Removal (SOR)</h3>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-13-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-13-1" role="tab" aria-controls="tabset-13-1" aria-selected="true" href="">lidR</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-13-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-13-2" role="tab" aria-controls="tabset-13-2" aria-selected="false" href="">lasR</a></li></ul>
+<div class="tab-content">
+<div id="tabset-13-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-13-1-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>las <span class="ot">&lt;-</span> <span class="fu">classify_noise</span>(las, <span class="fu">sor</span>(<span class="at">k =</span> <span class="dv">15</span>, <span class="at">m =</span> <span class="dv">3</span>))</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>las <span class="ot">&lt;-</span> <span class="fu">filter_poi</span>(las, Classification <span class="sc">!=</span> LASNOISE)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="tabset-13-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-13-2-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>sor_stage <span class="ot">&lt;-</span> <span class="fu">classify_noise</span>(<span class="fu">sor</span>(<span class="at">k =</span> <span class="dv">15</span>, <span class="at">m =</span> <span class="dv">3</span>))</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Buffer is set via exec(..., buffer = 10)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</div>
+</div>
+<p><span class="math display">\[\bar{d}_i &gt; \mu + m\sigma \Rightarrow \text{noise}\]</span></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 7%">
+<col style="width: 46%">
+<col style="width: 46%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>lidR</th>
+<th>lasR</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Pros</strong></td>
+<td>Two-step classify-then-remove: inspect flagged points before deletion; easy to tune on one tile</td>
+<td>C++ multi-threaded kNN: 4–8× faster; buffer handled automatically in <code>exec()</code></td>
+</tr>
+<tr class="even">
+<td><strong>Cons</strong></td>
+<td>Slow R kNN on dense clouds; buffer must be remembered separately</td>
+<td>Cannot inspect flagged points mid-pipeline without a debug run</td>
+</tr>
+</tbody>
+</table>
 <hr>
 </section>
 <section id="isolated-voxel-removal-ivr" class="level3">
 <h3 class="anchored" data-anchor-id="isolated-voxel-removal-ivr">2.4 Isolated Voxel Removal (IVR)</h3>
-<p>An alternative to SOR that operates in 3D voxel space rather than continuous point distance. Divide the cloud into voxels of edge <code>res</code>; flag points in voxels that have fewer than <code>min_pts</code> occupied neighbours in a 3×3×3 voxel neighbourhood.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># lidR does not have built-in IVR; custom implementation:</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>ivr_noise <span class="ot">&lt;-</span> <span class="cf">function</span>(las, <span class="at">res =</span> <span class="dv">1</span>, <span class="at">min_pts =</span> <span class="dv">5</span>) {</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  vox  <span class="ot">&lt;-</span> <span class="fu">voxel_metrics</span>(las, <span class="sc">~</span><span class="fu">list</span>(<span class="at">n =</span> .N), <span class="at">res =</span> res)</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Join voxel occupancy back and filter isolated voxels</span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># (simplified — full implementation requires neighbourhood search on vox grid)</span></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(las)</span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><strong>Strengths:</strong> faster than SOR in very dense clouds; no kNN computation. <strong>Weaknesses:</strong> resolution-dependent; not natively supported in lidR.</p>
+<p>No native lasR equivalent. In lidR, requires a custom <code>voxel_metrics()</code> implementation. Faster than SOR on very dense clouds but resolution-dependent and less adaptive.</p>
 <hr>
 </section>
 <section id="isolation-forest-ml-based" class="level3">
 <h3 class="anchored" data-anchor-id="isolation-forest-ml-based">2.5 Isolation Forest (ML-Based)</h3>
-<p>Isolation Forest is an unsupervised anomaly detection algorithm that identifies noise using the principle that outlier points require fewer binary splits to isolate than inlier points. Unlike SOR, it operates on multiple attributes simultaneously — X, Y, Z, Intensity, ReturnNumber, NumberOfReturns — making it sensitive to spectral and return-structure anomalies in addition to geometric ones.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Requires reticulate + Python sklearn</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(reticulate)</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>sklearn <span class="ot">&lt;-</span> <span class="fu">import</span>(<span class="st">"sklearn.ensemble"</span>)</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>iforest <span class="ot">&lt;-</span> sklearn<span class="sc">$</span><span class="fu">IsolationForest</span>(<span class="at">contamination =</span> <span class="fl">0.01</span>, <span class="at">n_estimators =</span> <span class="dv">100</span>L)</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>features <span class="ot">&lt;-</span> las<span class="sc">@</span>data[, .(X, Y, Z, Intensity, ReturnNumber, NumberOfReturns)]</span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>labels <span class="ot">&lt;-</span> iforest<span class="sc">$</span><span class="fu">fit_predict</span>(<span class="fu">as.matrix</span>(features))</span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>las <span class="ot">&lt;-</span> <span class="fu">filter_poi</span>(las, labels <span class="sc">==</span> <span class="dv">1</span>)   <span class="co"># 1 = inlier, -1 = outlier</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><strong>Strengths:</strong> - Multi-dimensional — catches noise invisible to SOR (e.g., low-intensity returns at normal heights from water surfaces) - Contamination rate is interpretable (fraction of cloud expected to be noise) - No assumption about distance distributions</p>
-<p><strong>Weaknesses:</strong> - Requires Python bridge (<code>reticulate</code>) — not a pure R solution - 100× slower than SOR on large tiles - Sensitive to feature scaling; requires normalisation of input attributes - Not tile-edge-safe without explicit overlap handling</p>
-<p><strong>Best use:</strong> post-processing validation of SOR results; specialized applications where intensity or return-structure noise is the primary concern.</p>
+<p>No native implementation in either package. Requires Python via <code>reticulate</code>. Multi-attribute aware (intensity, return number) but 100× slower than SOR. Best used as a post-hoc validation of SOR results, not as a primary noise filter.</p>
 <hr>
 </section>
-<section id="removal-method-comparison" class="level3">
-<h3 class="anchored" data-anchor-id="removal-method-comparison">2.6 Removal Method Comparison</h3>
+<section id="removal-method-summary" class="level3">
+<h3 class="anchored" data-anchor-id="removal-method-summary">2.6 Removal Method Summary</h3>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 10%">
+<col style="width: 11%">
+<col style="width: 8%">
+<col style="width: 8%">
 <col style="width: 15%">
-<col style="width: 21%">
-<col style="width: 9%">
-<col style="width: 20%">
+<col style="width: 23%">
+<col style="width: 10%">
 <col style="width: 21%">
 </colgroup>
 <thead>
 <tr class="header">
 <th>Method</th>
+<th>lidR</th>
+<th>lasR</th>
 <th>Geometric</th>
 <th>Attribute-aware</th>
 <th>Speed</th>
 <th>Tile-edge safe</th>
-<th>Native to lidR</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td>Class filter</td>
+<td>✓</td>
+<td>✓</td>
 <td>—</td>
 <td>—</td>
 <td>★★★★★</td>
-<td>✓</td>
 <td>✓</td>
 </tr>
 <tr class="even">
 <td>Height threshold</td>
 <td>✓</td>
+<td>✓</td>
+<td>✓</td>
 <td>—</td>
 <td>★★★★★</td>
-<td>✓</td>
 <td>✓</td>
 </tr>
 <tr class="odd">
 <td>SOR</td>
 <td>✓</td>
+<td>✓</td>
+<td>✓</td>
 <td>—</td>
 <td>★★★☆☆</td>
 <td>With buffer</td>
-<td>✓</td>
 </tr>
 <tr class="even">
 <td>Voxel IVR</td>
+<td>Partial</td>
+<td>—</td>
 <td>✓</td>
 <td>—</td>
 <td>★★★★☆</td>
 <td>✓</td>
-<td>Partial</td>
 </tr>
 <tr class="odd">
 <td>Isolation Forest</td>
+<td>Via Python</td>
+<td>—</td>
 <td>✓</td>
 <td>✓</td>
 <td>★☆☆☆☆</td>
 <td>Manual</td>
-<td>No</td>
 </tr>
 </tbody>
 </table>
@@ -955,13 +1502,12 @@ Important
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p><strong>Recommended combination for 3DEP data:</strong></p>
+<p><strong>Recommended stack for 3DEP data (both lidR and lasR):</strong></p>
 <ol type="1">
 <li>Class filter (<code>-drop_class 7 18</code>) — always first</li>
-<li>Height threshold (<code>Height &gt; -0.5 &amp; Height &lt; 80</code>) — after normalization</li>
-<li>SOR (<code>k = 15, m = 3</code>, with 10 m buffer) — after normalization, before decimation</li>
+<li>Height threshold (<code>&gt; -0.5 m</code> and <code>&lt; 80 m</code>) — after normalization</li>
+<li>SOR (<code>k = 15, m = 3</code>, buffer = 10 m) — after normalization, before decimation</li>
 </ol>
-<p>This three-step stack removes the vast majority of LiDAR noise in typical forest and urban environments with minimal false positive rate and manageable computation time.</p>
 </div>
 </div>
 <hr>
@@ -975,7 +1521,7 @@ Note
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>The next post covers extracting canopy height and structural metrics from the cleaned cloud using <code>lidR::cloud_metrics()</code> and <code>lidR::pixel_metrics()</code>.</p>
+<p>The next post covers extracting canopy height, complexity, and building metrics from the cleaned cloud: <a href="../../posts/lidar-metrics/index.html">LiDAR Metric Calculation</a>.</p>
 </div>
 </div>
 
