@@ -1,0 +1,1731 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Dingjin Chu">
+<meta name="dcterms.date" content="2026-03-10">
+<meta name="description" content="A comprehensive guide to computing LiDAR structural metrics in R using lidR — canopy height percentiles, complexity indices (Rumple, VCI, CRR), density profiles, and building-specific metrics for urban morphology analysis.">
+
+<title>LiDAR Metric Calculation: Canopy Structure, Complexity, and Urban Buildings – Dingjin Chu</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../photo/favicon_satellite.svg" rel="icon" type="image/svg+xml">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-b758ccaa5987ceb1b75504551e579abf.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-e31584831b205ffbb2d98406f31c2a5b.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-24772959a0e306aba8d7698078628ce7.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-e31584831b205ffbb2d98406f31c2a5b.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed fullcontent quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title"><i class="bi bi-broadcast-pin"></i> Dingjin Chu</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-research" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Research</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-research">    
+        <li>
+    <a class="dropdown-item" href="../../projects_intro.html">
+ <span class="dropdown-text">Introduction</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../projects_agb.html">
+ <span class="dropdown-text">Forest Above-Ground Biomass Estimation</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../projects_disturbance.html">
+ <span class="dropdown-text">Ecosystem Response to Disturbances</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../projects_urban.html">
+ <span class="dropdown-text">Cooling Effect of Urban Green Space</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../research_lidar_upscaling.html">
+ <span class="dropdown-text">LiDAR Upscaling Review</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-datasets" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Datasets</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-datasets">    
+        <li>
+    <a class="dropdown-item" href="../../datasets_intro.html">
+ <span class="dropdown-text">Introduction</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../datasets_lidar.html">
+ <span class="dropdown-text">LiDAR</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../datasets_optical.html">
+ <span class="dropdown-text">Optical Remote Sensing</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../datasets_radar.html">
+ <span class="dropdown-text">Radar</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../datasets_field.html">
+ <span class="dropdown-text">Field Investigation</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../datasets_derived.html">
+ <span class="dropdown-text">Derived Products</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-methods" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Methods</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-methods">    
+        <li>
+    <a class="dropdown-item" href="../../methods_intro.html">
+ <span class="dropdown-text">Introduction</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../methods_statistical.html">
+ <span class="dropdown-text">Statistical Modeling</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../methods_ml.html">
+ <span class="dropdown-text">Machine Learning</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../methods_causal.html">
+ <span class="dropdown-text">Causal Inference</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../methods_process.html">
+ <span class="dropdown-text">Process-Based Models</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../methods_assumptions.html">
+ <span class="dropdown-text">Key Assumptions</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../methods_metrics.html">
+ <span class="dropdown-text">Evaluation Metrics</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="../../cv.html"> 
+<span class="menu-text">About Me</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../news.html"> 
+<span class="menu-text">News</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog.html"> 
+<span class="menu-text">Blog/Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html#contact-me"> 
+<span class="menu-text">Contact Me</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/Programmer112321"> <i class="bi bi-github" role="img" aria-label="GitHub">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/dingjin-chu-892ba7352/"> <i class="bi bi-linkedin" role="img" aria-label="LinkedIn">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://scholar.google.com/citations?user=XzIFKvMAAAAJ&amp;hl=en"> 
+<span class="menu-text"><img src="photo/scholar_logo.svg" alt="Google Scholar" style="height:20px; vertical-align:middle; margin-top:-2px;"></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://zenodo.org/search?q=metadata.creators.person_or_org.name%3A%22Chu%2C%20Dingjin%22&amp;l=list&amp;p=1&amp;s=10&amp;sort=bestmatch"> 
+<span class="menu-text"><img src="photo/zenodo_logo.svg" alt="Zenodo" style="height:20px; vertical-align:middle; margin-top:-2px;"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">LiDAR Metric Calculation: Canopy Structure, Complexity, and Urban Buildings</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">LiDAR</div>
+    <div class="quarto-category">3DEP</div>
+    <div class="quarto-category">Metrics</div>
+    <div class="quarto-category">Canopy</div>
+    <div class="quarto-category">Urban</div>
+    <div class="quarto-category">R</div>
+    <div class="quarto-category">Tutorial</div>
+  </div>
+  </div>
+
+<div>
+  <div class="description">
+    A comprehensive guide to computing LiDAR structural metrics in R using lidR — canopy height percentiles, complexity indices (Rumple, VCI, CRR), density profiles, and building-specific metrics for urban morphology analysis.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Dingjin Chu </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">March 10, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Following the <a href="../../posts/lidar-preprocessing/index.html">pre-processing pipeline</a>, this post covers the extraction of structural metrics from the cleaned, height-normalized point cloud. Metrics are computed using <code>lidR::cloud_metrics()</code> (plot or tile level) and <code>lidR::pixel_metrics()</code> (rasterised, grid level). All examples assume the <code>Height</code> attribute has been saved as described in Stage 3 of the pipeline.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lidR)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(terra)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>las <span class="ot">&lt;-</span> <span class="fu">readLAS</span>(<span class="st">"clean_normalized.laz"</span>, <span class="at">select =</span> <span class="st">"xyzrncH"</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># x, y, z (raw), r (ReturnNumber), n (NumberOfReturns),</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># c (Classification), H (Height above ground)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<hr>
+<section id="height" class="level2">
+<h2 class="anchored" data-anchor-id="height">Part 1 — Canopy Height Metrics</h2>
+<p>Height percentiles are the backbone of LiDAR-based AGB and canopy height modelling. They characterise the vertical distribution of the canopy from the ground upward.</p>
+<section id="height-percentiles-and-basic-statistics" class="level3">
+<h3 class="anchored" data-anchor-id="height-percentiles-and-basic-statistics">1.1 Height Percentiles and Basic Statistics</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>height_metrics <span class="ot">&lt;-</span> <span class="cf">function</span>(z) {</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  p  <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">25</span>, <span class="dv">50</span>, <span class="dv">75</span>, <span class="dv">90</span>, <span class="dv">95</span>, <span class="dv">99</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  hp <span class="ot">&lt;-</span> <span class="fu">as.list</span>(<span class="fu">quantile</span>(z, p <span class="sc">/</span> <span class="dv">100</span>))</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">names</span>(hp) <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">"H"</span>, p)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    hp,</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">Hmean =</span> <span class="fu">mean</span>(z),</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">Hmax  =</span> <span class="fu">max</span>(z),</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">Hsd   =</span> <span class="fu">sd</span>(z),</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">Hcv   =</span> <span class="fu">sd</span>(z) <span class="sc">/</span> <span class="fu">mean</span>(z),         <span class="co"># coefficient of variation</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">Hskew =</span> moments<span class="sc">::</span><span class="fu">skewness</span>(z),     <span class="co"># skewness</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">Hkurt =</span> moments<span class="sc">::</span><span class="fu">kurtosis</span>(z),     <span class="co"># kurtosis</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">Hqm   =</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>(z<span class="sc">^</span><span class="dv">2</span>))           <span class="co"># quadratic mean height</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply at pixel level (20 × 20 m grid)</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>metrics_grid <span class="ot">&lt;-</span> <span class="fu">pixel_metrics</span>(las, <span class="sc">~</span><span class="fu">height_metrics</span>(Height[Height <span class="sc">&gt;</span> <span class="dv">2</span>]), <span class="at">res =</span> <span class="dv">20</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 22%">
+<col style="width: 25%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Metric</th>
+<th>Formula</th>
+<th>Ecological meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>H50</td>
+<td>50th percentile</td>
+<td>Median canopy height — robust central tendency</td>
+</tr>
+<tr class="even">
+<td>H75</td>
+<td>75th percentile</td>
+<td>Upper canopy layer indicator</td>
+</tr>
+<tr class="odd">
+<td>H95 / H99</td>
+<td>95th / 99th percentile</td>
+<td>Dominant / emergent height; proxy for top-of-canopy</td>
+</tr>
+<tr class="even">
+<td>Hmean</td>
+<td><span class="math inline">\(\bar{H}\)</span></td>
+<td>Mean canopy height — strongly correlated with AGB</td>
+</tr>
+<tr class="odd">
+<td>Hsd</td>
+<td><span class="math inline">\(\sigma_H\)</span></td>
+<td>Vertical spread — indicator of structural heterogeneity</td>
+</tr>
+<tr class="even">
+<td>Hcv</td>
+<td><span class="math inline">\(\sigma_H / \bar{H}\)</span></td>
+<td>Scale-free variability — useful across biomes</td>
+</tr>
+<tr class="odd">
+<td>Hskew</td>
+<td><span class="math inline">\(\mu_3 / \sigma^3\)</span></td>
+<td>Positive skew = bottom-heavy profile (young/regrowth)</td>
+</tr>
+<tr class="even">
+<td>Hkurt</td>
+<td><span class="math inline">\(\mu_4 / \sigma^4\)</span></td>
+<td>Peakedness of height distribution</td>
+</tr>
+<tr class="odd">
+<td>Hqm</td>
+<td><span class="math inline">\(\sqrt{\bar{H^2}}\)</span></td>
+<td>Quadratic mean — more sensitive to tall trees than Hmean</td>
+</tr>
+</tbody>
+</table>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>H99 vs Hmax:</strong> <code>Hmax</code> is the single tallest point and is highly susceptible to surviving noise; <code>H99</code> is far more robust. Most published AGB models use H99 or H95 as the maximum height proxy.</p>
+</div>
+</div>
+</section>
+<section id="canopy-cover-and-gap-fraction" class="level3">
+<h3 class="anchored" data-anchor-id="canopy-cover-and-gap-fraction">1.2 Canopy Cover and Gap Fraction</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>cover_metrics <span class="ot">&lt;-</span> <span class="cf">function</span>(z, <span class="at">threshold =</span> <span class="dv">2</span>) {</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  n_total <span class="ot">&lt;-</span> <span class="fu">length</span>(z)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  n_above <span class="ot">&lt;-</span> <span class="fu">sum</span>(z <span class="sc">&gt;=</span> threshold)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">CC      =</span> n_above <span class="sc">/</span> n_total,                  <span class="co"># canopy cover (fraction)</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">GF      =</span> <span class="dv">1</span> <span class="sc">-</span> n_above <span class="sc">/</span> n_total,              <span class="co"># gap fraction</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">CC_first =</span> <span class="fu">sum</span>(z[ReturnNumber <span class="sc">==</span> <span class="dv">1</span>] <span class="sc">&gt;=</span> threshold) <span class="sc">/</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>               <span class="fu">sum</span>(ReturnNumber <span class="sc">==</span> <span class="dv">1</span>)              <span class="co"># first-return cover</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Canopy cover (CC) from LiDAR:</p>
+<p><span class="math display">\[CC = \frac{n_{\text{returns} \geq h_t}}{n_{\text{total returns}}} \times 100\%\]</span></p>
+<p>where <span class="math inline">\(h_t\)</span> is the cover threshold (commonly 2 m to exclude understorey). Gap fraction (GF = 1 − CC) is directly related to Beer-Lambert light extinction and is used as a proxy for leaf area index:</p>
+<p><span class="math display">\[\text{LAI} \approx -\frac{\ln(\text{GF})}{k}\]</span></p>
+<p>where <span class="math inline">\(k \approx 0.5\)</span> for spherically distributed foliage.</p>
+<hr>
+</section>
+</section>
+<section id="density" class="level2">
+<h2 class="anchored" data-anchor-id="density">Part 2 — Vertical Density and Profile Metrics</h2>
+<section id="density-by-height-stratum" class="level3">
+<h3 class="anchored" data-anchor-id="density-by-height-stratum">2.1 Density by Height Stratum</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>density_profile <span class="ot">&lt;-</span> <span class="cf">function</span>(z) {</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  breaks <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.5</span>, <span class="dv">2</span>, <span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">30</span>, <span class="cn">Inf</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  labels <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"G"</span>, <span class="st">"S0.5"</span>, <span class="st">"S2"</span>, <span class="st">"S5"</span>, <span class="st">"S10"</span>, <span class="st">"S20"</span>, <span class="st">"S30"</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  strata <span class="ot">&lt;-</span> <span class="fu">cut</span>(z[z <span class="sc">&gt;=</span> <span class="dv">0</span>], <span class="at">breaks =</span> breaks, <span class="at">labels =</span> labels, <span class="at">right =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  tab    <span class="ot">&lt;-</span> <span class="fu">table</span>(strata)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  prop   <span class="ot">&lt;-</span> <span class="fu">as.list</span>(<span class="fu">prop.table</span>(tab))</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">names</span>(prop) <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">"D_"</span>, <span class="fu">names</span>(prop))</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  prop</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The relative return density in each height stratum characterises the vertical foliage profile. Key derived ratios:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Ratio</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>D_S10 + D_S20 + D_S30</td>
+<td>Upper canopy dominance</td>
+</tr>
+<tr class="even">
+<td>D_G + D_S0.5</td>
+<td>Ground / near-ground proportion (bare soil indicator)</td>
+</tr>
+<tr class="odd">
+<td>D_S2 / D_S10</td>
+<td>Understory-to-upper-canopy ratio</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="canopy-layer-separation" class="level3">
+<h3 class="anchored" data-anchor-id="canopy-layer-separation">2.2 Canopy Layer Separation</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>layer_metrics <span class="ot">&lt;-</span> <span class="cf">function</span>(z) {</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># proportion above commonly used layer thresholds</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">P_above2  =</span> <span class="fu">mean</span>(z <span class="sc">&gt;=</span> <span class="dv">2</span>),</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">P_above10 =</span> <span class="fu">mean</span>(z <span class="sc">&gt;=</span> <span class="dv">10</span>),</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">P_above20 =</span> <span class="fu">mean</span>(z <span class="sc">&gt;=</span> <span class="dv">20</span>),</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">ratio_sub =</span> <span class="fu">mean</span>(z <span class="sc">&gt;=</span> <span class="dv">2</span> <span class="sc">&amp;</span> z <span class="sc">&lt;</span> <span class="dv">10</span>) <span class="sc">/</span> <span class="fu">max</span>(<span class="fu">mean</span>(z <span class="sc">&gt;=</span> <span class="dv">10</span>), <span class="fl">1e-6</span>)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>ratio_sub</code> (sub-canopy to upper-canopy ratio) distinguishes single-layer even-aged stands (low ratio) from multi-layered old-growth or mixed forests (high ratio).</p>
+<hr>
+</section>
+</section>
+<section id="complexity" class="level2">
+<h2 class="anchored" data-anchor-id="complexity">Part 3 — Structural Complexity Metrics</h2>
+<p>These metrics quantify how geometrically heterogeneous and structurally complex a canopy is — properties closely linked to biodiversity, microclimate buffering, and habitat quality.</p>
+<section id="rumple-index-ri" class="level3">
+<h3 class="anchored" data-anchor-id="rumple-index-ri">3.1 Rumple Index (RI)</h3>
+<p>The Rumple Index measures <strong>canopy surface rugosity</strong>: the ratio of the 3D canopy surface area to its 2D projected ground area.</p>
+<p><span class="math display">\[RI = \frac{A_{3D}}{A_{2D}}\]</span></p>
+<p><span class="math inline">\(A_{3D}\)</span> is computed by triangulating the canopy surface (TIN from first returns); <span class="math inline">\(A_{2D}\)</span> is the projected footprint area of those triangles onto the horizontal plane. A flat, uniform canopy has <span class="math inline">\(RI \approx 1\)</span>; a complex, multi-layered canopy with deep gaps and tall emergents has <span class="math inline">\(RI \gg 1\)</span>.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># lidR computes RI from a Canopy Height Model raster</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>chm <span class="ot">&lt;-</span> <span class="fu">rasterize_canopy</span>(las, <span class="at">res =</span> <span class="dv">1</span>, <span class="at">algorithm =</span> <span class="fu">p2r</span>(<span class="at">subcircle =</span> <span class="fl">0.2</span>))</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>ri  <span class="ot">&lt;-</span> <span class="fu">rumple_index</span>(chm)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Interpretation:</strong></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>RI value</th>
+<th>Canopy type</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1.0–1.1</td>
+<td>Flat agricultural / grassland</td>
+</tr>
+<tr class="even">
+<td>1.1–1.3</td>
+<td>Young even-aged plantation</td>
+</tr>
+<tr class="odd">
+<td>1.3–1.6</td>
+<td>Mature mixed forest</td>
+</tr>
+<tr class="even">
+<td>&gt; 1.6</td>
+<td>Old-growth, multi-layered, high structural complexity</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Ecological relevance:</strong> RI is one of the strongest single-metric predictors of bird species richness and above-ground carbon in temperate and tropical forests. It captures both horizontal canopy gaps and vertical height variation simultaneously.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>RI is <strong>resolution-sensitive</strong>: a 0.25 m CHM resolves fine-scale branch-level rugosity; a 5 m CHM smooths it out. Always report the CHM resolution alongside RI, and use consistent resolution when comparing across sites.</p>
+</div>
+</div>
+<hr>
+</section>
+<section id="canopy-relief-ratio-crr" class="level3">
+<h3 class="anchored" data-anchor-id="canopy-relief-ratio-crr">3.2 Canopy Relief Ratio (CRR)</h3>
+<p><span class="math display">\[CRR = \frac{\bar{H} - H_{\min}}{H_{\max} - H_{\min}}\]</span></p>
+<p>CRR ranges from 0 to 1. Low CRR (&lt; 0.4) indicates a bottom-heavy height distribution with most mass near the ground — typical of low-stature or open canopies. High CRR (&gt; 0.6) indicates a top-heavy distribution with most returns concentrated in the upper canopy — typical of dense, tall closed forests.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>crr_metric <span class="ot">&lt;-</span> <span class="cf">function</span>(z) {</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  z <span class="ot">&lt;-</span> z[z <span class="sc">&gt;=</span> <span class="dv">0</span>]</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">CRR =</span> (<span class="fu">mean</span>(z) <span class="sc">-</span> <span class="fu">min</span>(z)) <span class="sc">/</span> (<span class="fu">max</span>(z) <span class="sc">-</span> <span class="fu">min</span>(z) <span class="sc">+</span> <span class="fl">1e-6</span>))</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>CRR complements H50: two stands can have the same median height but very different vertical distributions. A stand with CRR = 0.3 and H50 = 15 m has most of its foliage low; one with CRR = 0.7 and H50 = 15 m has most foliage concentrated near the top.</p>
+<hr>
+</section>
+<section id="vertical-complexity-index-vci-shannon-entropy" class="level3">
+<h3 class="anchored" data-anchor-id="vertical-complexity-index-vci-shannon-entropy">3.3 Vertical Complexity Index (VCI) — Shannon Entropy</h3>
+<p>VCI quantifies <strong>vertical structural diversity</strong> using information entropy. Divide the height range into <span class="math inline">\(n\)</span> equal strata; compute the proportion of returns <span class="math inline">\(p_i\)</span> in each stratum:</p>
+<p><span class="math display">\[VCI = -\sum_{i=1}^{n} p_i \ln(p_i)\]</span></p>
+<p>Maximum entropy (uniform distribution across all strata) <span class="math inline">\(= \ln(n)\)</span>. Normalised VCI <span class="math inline">\(= VCI / \ln(n)\)</span> ranges from 0 (all returns in one stratum) to 1 (perfectly uniform vertical distribution).</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>vci_metric <span class="ot">&lt;-</span> <span class="cf">function</span>(z, <span class="at">n_strata =</span> <span class="dv">10</span>) {</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  z     <span class="ot">&lt;-</span> z[z <span class="sc">&gt;=</span> <span class="dv">0</span> <span class="sc">&amp;</span> z <span class="sc">&lt;</span> <span class="dv">80</span>]</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  strat <span class="ot">&lt;-</span> <span class="fu">cut</span>(z, <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">80</span>, <span class="at">length.out =</span> n_strata <span class="sc">+</span> <span class="dv">1</span>), <span class="at">include.lowest =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  p     <span class="ot">&lt;-</span> <span class="fu">prop.table</span>(<span class="fu">table</span>(strat))</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  p     <span class="ot">&lt;-</span> p[p <span class="sc">&gt;</span> <span class="dv">0</span>]</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  vci   <span class="ot">&lt;-</span> <span class="sc">-</span><span class="fu">sum</span>(p <span class="sc">*</span> <span class="fu">log</span>(p))</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">VCI =</span> vci, <span class="at">VCI_norm =</span> vci <span class="sc">/</span> <span class="fu">log</span>(n_strata))</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>VCI_norm near 0: single-layer stand (e.g., plantation). VCI_norm near 1: returns distributed across all layers (old-growth, mixed age).</p>
+<hr>
+</section>
+<section id="height-distribution-shape-metrics" class="level3">
+<h3 class="anchored" data-anchor-id="height-distribution-shape-metrics">3.4 Height Distribution Shape Metrics</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>shape_metrics <span class="ot">&lt;-</span> <span class="cf">function</span>(z) {</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  z <span class="ot">&lt;-</span> z[z <span class="sc">&gt;=</span> <span class="dv">0</span>]</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">Hskew    =</span> moments<span class="sc">::</span><span class="fu">skewness</span>(z),    <span class="co"># right-skew = dense understory</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">Hkurt    =</span> moments<span class="sc">::</span><span class="fu">kurtosis</span>(z),    <span class="co"># high = concentration around one height</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">Hbimod   =</span> <span class="fu">bimodality_coefficient</span>(z), <span class="co"># &gt; 0.555 suggests two-layer canopy</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">Hrange   =</span> <span class="fu">diff</span>(<span class="fu">range</span>(z))           <span class="co"># full height range</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Bimodality coefficient: BC = (skewness^2 + 1) / (kurtosis + 3*(n-1)^2/((n-2)*(n-3)))</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>bimodality_coefficient <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>  n <span class="ot">&lt;-</span> <span class="fu">length</span>(x)</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>  (moments<span class="sc">::</span><span class="fu">skewness</span>(x)<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> <span class="dv">1</span>) <span class="sc">/</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>  (moments<span class="sc">::</span><span class="fu">kurtosis</span>(x) <span class="sc">+</span> <span class="dv">3</span> <span class="sc">*</span> (n <span class="sc">-</span> <span class="dv">1</span>)<span class="sc">^</span><span class="dv">2</span> <span class="sc">/</span> ((n <span class="sc">-</span> <span class="dv">2</span>) <span class="sc">*</span> (n <span class="sc">-</span> <span class="dv">3</span>)))</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<hr>
+</section>
+<section id="all-complexity-metrics-together" class="level3">
+<h3 class="anchored" data-anchor-id="all-complexity-metrics-together">3.5 All Complexity Metrics Together</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>complexity_metrics <span class="ot">&lt;-</span> <span class="cf">function</span>(z) {</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  z <span class="ot">&lt;-</span> z[z <span class="sc">&gt;=</span> <span class="dv">0</span>]</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  chm_local <span class="ot">&lt;-</span> <span class="fu">rasterize_canopy</span>(...) <span class="co"># within pixel</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="at">RI  =</span> <span class="fu">rumple_index</span>(chm_local)),</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">crr_metric</span>(z),</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">vci_metric</span>(z),</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">shape_metrics</span>(z)</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Summary table:</strong></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Metric</th>
+<th>Range</th>
+<th>What it captures</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Rumple Index (RI)</td>
+<td>≥ 1</td>
+<td>3D canopy surface rugosity</td>
+</tr>
+<tr class="even">
+<td>CRR</td>
+<td>0–1</td>
+<td>Vertical centre of mass</td>
+</tr>
+<tr class="odd">
+<td>VCI (normalised)</td>
+<td>0–1</td>
+<td>Shannon diversity of height strata</td>
+</tr>
+<tr class="even">
+<td>Hskew</td>
+<td>−∞ to +∞</td>
+<td>Asymmetry of height distribution</td>
+</tr>
+<tr class="odd">
+<td>Hkurt</td>
+<td>&gt; 0</td>
+<td>Peakedness (concentration) of distribution</td>
+</tr>
+<tr class="even">
+<td>Bimodality coefficient</td>
+<td>0–1</td>
+<td>Two-layer canopy presence (&gt; 0.555)</td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+</section>
+<section id="buildings" class="level2">
+<h2 class="anchored" data-anchor-id="buildings">Part 4 — Building-Specific Metrics</h2>
+<p>In urban environments, the same point cloud contains both vegetation and buildings. After semantic segmentation (Classification: Class 6 = building, Class 5 = high vegetation), building-specific metrics can be extracted from the <strong>non-ground, non-vegetation</strong> returns.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract building points only</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>las_bld <span class="ot">&lt;-</span> <span class="fu">filter_poi</span>(las, Classification <span class="sc">==</span> LASBUILDING)   <span class="co"># Class 6</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<section id="building-height-metrics" class="level3">
+<h3 class="anchored" data-anchor-id="building-height-metrics">4.1 Building Height Metrics</h3>
+<p>Building height is not simply <code>Hmax</code> — roof geometry, chimneys, and HVAC units create outliers. Robust estimators:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>building_height_metrics <span class="ot">&lt;-</span> <span class="cf">function</span>(z) {</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">Bh_p95   =</span> <span class="fu">quantile</span>(z, <span class="fl">0.95</span>),   <span class="co"># robust maximum → eave / parapet height</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">Bh_p99   =</span> <span class="fu">quantile</span>(z, <span class="fl">0.99</span>),   <span class="co"># tallest structural element</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">Bh_range =</span> <span class="fu">diff</span>(<span class="fu">range</span>(z)),       <span class="co"># full height span (multi-floor buildings)</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">Bh_floor =</span> <span class="fu">quantile</span>(z, <span class="fl">0.95</span>) <span class="sc">/</span> <span class="dv">3</span> <span class="co"># estimated floor count (3 m per floor)</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 34%">
+<col style="width: 65%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Metric</th>
+<th>Interpretation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>H95 (building)</td>
+<td>Eave or parapet height — most common published building height</td>
+</tr>
+<tr class="even">
+<td>H99 (building)</td>
+<td>Chimney, rooftop equipment, or top of gable</td>
+</tr>
+<tr class="odd">
+<td>Height range</td>
+<td>Multi-storey span — useful for stepped or mixed-use buildings</td>
+</tr>
+<tr class="even">
+<td>Floor count</td>
+<td><span class="math inline">\(\approx H_{95} / 3\)</span> — rough estimate, varies by construction era</td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+<section id="roof-geometry-and-complexity" class="level3">
+<h3 class="anchored" data-anchor-id="roof-geometry-and-complexity">4.2 Roof Geometry and Complexity</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>roof_metrics <span class="ot">&lt;-</span> <span class="cf">function</span>(x, y, z) {</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Fit plane to roof returns (PCA-based)</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  pts  <span class="ot">&lt;-</span> <span class="fu">cbind</span>(x, y, z)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  cov  <span class="ot">&lt;-</span> <span class="fu">cov</span>(pts)</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  eig  <span class="ot">&lt;-</span> <span class="fu">eigen</span>(cov)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Normal vector = eigenvector of smallest eigenvalue</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  normal    <span class="ot">&lt;-</span> eig<span class="sc">$</span>vectors[, <span class="dv">3</span>]</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  slope_deg <span class="ot">&lt;-</span> <span class="fu">acos</span>(<span class="fu">abs</span>(normal[<span class="dv">3</span>])) <span class="sc">*</span> <span class="dv">180</span> <span class="sc">/</span> pi</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Roof slope variability (SD of per-triangle slopes from TIN)</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>  tin_slopes <span class="ot">&lt;-</span> <span class="fu">compute_tin_slopes</span>(x, y, z)   <span class="co"># custom helper</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">roof_slope_mean =</span> slope_deg,</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">roof_slope_sd   =</span> <span class="fu">sd</span>(tin_slopes),          <span class="co"># planarity: low SD = flat roof</span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">roof_roughness  =</span> <span class="fu">sd</span>(z <span class="sc">-</span> <span class="fu">mean</span>(z)),          <span class="co"># height residuals from mean roof plane</span></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">roof_pts_density =</span> <span class="fu">length</span>(z) <span class="sc">/</span></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>      <span class="fu">as.numeric</span>(<span class="fu">st_area</span>(<span class="fu">st_convex_hull</span>(         <span class="co"># pts per m² on roof</span></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>        <span class="fu">st_sfc</span>(<span class="fu">st_multipoint</span>(<span class="fu">cbind</span>(x, y))))))</span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 35%">
+<col style="width: 38%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Metric</th>
+<th>Low value</th>
+<th>High value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>roof_slope_mean</code></td>
+<td>Flat roof (commercial)</td>
+<td>Steep gable/hip (residential)</td>
+</tr>
+<tr class="even">
+<td><code>roof_slope_sd</code></td>
+<td>Simple planar roof</td>
+<td>Complex multi-facet roof</td>
+</tr>
+<tr class="odd">
+<td><code>roof_roughness</code></td>
+<td>Smooth surface</td>
+<td>Rough / cluttered roof</td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+<section id="building-footprint-and-volume" class="level3">
+<h3 class="anchored" data-anchor-id="building-footprint-and-volume">4.3 Building Footprint and Volume</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>building_footprint_metrics <span class="ot">&lt;-</span> <span class="cf">function</span>(x, y, z) {</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  pts2d <span class="ot">&lt;-</span> <span class="fu">st_sfc</span>(<span class="fu">st_multipoint</span>(<span class="fu">cbind</span>(x, y)))</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  hull  <span class="ot">&lt;-</span> <span class="fu">st_convex_hull</span>(pts2d)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  footprint_area  <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">st_area</span>(hull))</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  perimeter       <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">st_length</span>(<span class="fu">st_cast</span>(hull, <span class="st">"MULTILINESTRING"</span>)))</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  height_p95      <span class="ot">&lt;-</span> <span class="fu">quantile</span>(z, <span class="fl">0.95</span>)</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  volume_approx   <span class="ot">&lt;-</span> footprint_area <span class="sc">*</span> height_p95   <span class="co"># box approximation</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Compactness: circle has compactness = 1; elongated shapes &lt; 1</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>  compactness <span class="ot">&lt;-</span> <span class="dv">4</span> <span class="sc">*</span> pi <span class="sc">*</span> footprint_area <span class="sc">/</span> perimeter<span class="sc">^</span><span class="dv">2</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">footprint_m2  =</span> footprint_area,</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">perimeter_m   =</span> perimeter,</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">compactness   =</span> compactness,</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">volume_m3     =</span> volume_approx,</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">FAR           =</span> volume_approx <span class="sc">/</span> footprint_area  <span class="co"># Floor Area Ratio proxy</span></span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<hr>
+</section>
+<section id="sky-view-factor-svf-and-urban-canyon-geometry" class="level3">
+<h3 class="anchored" data-anchor-id="sky-view-factor-svf-and-urban-canyon-geometry">4.4 Sky View Factor (SVF) and Urban Canyon Geometry</h3>
+<p>SVF quantifies what fraction of the hemisphere above a street-level point is open sky — a critical driver of urban thermal environment and cooling by urban green space.</p>
+<p><span class="math display">\[SVF = 1 - \frac{1}{2\pi} \int_0^{2\pi} \sin^2\left(\theta(\phi)\right) d\phi\]</span></p>
+<p>where <span class="math inline">\(\theta(\phi)\)</span> is the elevation angle to the tallest obstruction at azimuth <span class="math inline">\(\phi\)</span>.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Approximate SVF from rasterised DSM and DTM</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>dsm <span class="ot">&lt;-</span> <span class="fu">rasterize_canopy</span>(las, <span class="at">res =</span> <span class="dv">1</span>, <span class="at">algorithm =</span> <span class="fu">p2r</span>())</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>dtm <span class="ot">&lt;-</span> <span class="fu">rasterize_terrain</span>(las, <span class="at">res =</span> <span class="dv">1</span>, <span class="at">algorithm =</span> <span class="fu">knnidw</span>())</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>ndsm <span class="ot">&lt;-</span> dsm <span class="sc">-</span> dtm   <span class="co"># normalised DSM = height above ground</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="co"># SVF via horizon angle scanning (using svf package or SAGA GIS)</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="co"># library(svf)</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="co"># svf_raster &lt;- svf(ndsm, radius = 50, directions = 36)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>H/W Ratio (Height-to-Width):</strong> for urban canyons (street flanked by buildings):</p>
+<p><span class="math display">\[H/W = \frac{H_{\text{building}}}{W_{\text{street}}}\]</span></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>H/W</th>
+<th>Urban canyon type</th>
+<th>Thermal effect</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>&lt; 0.5</td>
+<td>Open street</td>
+<td>Low trapping; better sky access</td>
+</tr>
+<tr class="even">
+<td>0.5–2.0</td>
+<td>Moderate canyon</td>
+<td>Intermediate</td>
+</tr>
+<tr class="odd">
+<td>&gt; 2.0</td>
+<td>Deep canyon</td>
+<td>High heat trapping; reduced SVF</td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+<section id="building-level-metrics-vs.-vegetation-metrics-comparison" class="level3">
+<h3 class="anchored" data-anchor-id="building-level-metrics-vs.-vegetation-metrics-comparison">4.5 Building-Level Metrics vs.&nbsp;Vegetation Metrics — Comparison</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 17%">
+<col style="width: 23%">
+<col style="width: 23%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Metric</th>
+<th>Vegetation</th>
+<th>Buildings</th>
+<th>Key difference</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>H95</td>
+<td>Top-of-canopy height</td>
+<td>Eave/parapet height</td>
+<td>Same formula; different semantic meaning</td>
+</tr>
+<tr class="even">
+<td>Rumple Index</td>
+<td>Canopy rugosity</td>
+<td>Roof complexity</td>
+<td>RI &gt; 1.5 = complex canopy OR multi-facet roof</td>
+</tr>
+<tr class="odd">
+<td>Vertical entropy (VCI)</td>
+<td>Foliage layering</td>
+<td>Floor distribution</td>
+<td>VCI useful for multi-storey detection</td>
+</tr>
+<tr class="even">
+<td>Cover fraction</td>
+<td>Canopy cover</td>
+<td>Building coverage ratio</td>
+<td>BCR = building footprint / plot area</td>
+</tr>
+<tr class="odd">
+<td>Volume</td>
+<td>Stem + crown volume</td>
+<td>Gross building volume</td>
+<td>Building volume used for FAR estimation</td>
+</tr>
+<tr class="even">
+<td>Density profile</td>
+<td>Understory / canopy strata</td>
+<td>Per-floor point density</td>
+<td>Building has regular vertical clustering at ~3 m intervals</td>
+</tr>
+</tbody>
+</table>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A key challenge in urban LiDAR analysis is <strong>co-classification error</strong>: tall trees adjacent to buildings share similar height and point density statistics. Always segment by classification (Class 5 = vegetation, Class 6 = building) before computing class-specific metrics. If classification is absent, use <code>segment_trees()</code> combined with geometric regularity tests (low Hsd within a building footprint = flat roof; high RI = vegetation).</p>
+</div>
+</div>
+<hr>
+</section>
+<section id="full-urban-metrics-pipeline" class="level3">
+<h3 class="anchored" data-anchor-id="full-urban-metrics-pipeline">4.6 Full Urban Metrics Pipeline</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>urban_metrics <span class="ot">&lt;-</span> <span class="cf">function</span>(las_tile) {</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Separate by class</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  las_veg <span class="ot">&lt;-</span> <span class="fu">filter_poi</span>(las_tile, Classification <span class="sc">%in%</span> <span class="fu">c</span>(LASVEGETATION, LASHIGHVEGETATION))</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  las_bld <span class="ot">&lt;-</span> <span class="fu">filter_poi</span>(las_tile, Classification <span class="sc">==</span> LASBUILDING)</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  veg_m <span class="ot">&lt;-</span> <span class="fu">cloud_metrics</span>(las_veg, <span class="sc">~</span>{</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    z <span class="ot">&lt;-</span> Height[Height <span class="sc">&gt;=</span> <span class="dv">0</span>]</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>      <span class="at">H95        =</span> <span class="fu">quantile</span>(z, .<span class="dv">95</span>),</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">Hmean      =</span> <span class="fu">mean</span>(z),</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">Hsd        =</span> <span class="fu">sd</span>(z),</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>      <span class="at">CC         =</span> <span class="fu">mean</span>(z <span class="sc">&gt;=</span> <span class="dv">2</span>),</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>      <span class="at">VCI        =</span> <span class="fu">vci_metric</span>(z)<span class="sc">$</span>VCI_norm,</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>      <span class="at">CRR        =</span> <span class="fu">crr_metric</span>(z)<span class="sc">$</span>CRR</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>  bld_m <span class="ot">&lt;-</span> <span class="fu">cloud_metrics</span>(las_bld, <span class="sc">~</span>{</span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(</span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>      <span class="at">Bh_p95       =</span> <span class="fu">quantile</span>(Z, .<span class="dv">95</span>),</span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>      <span class="at">Bh_floor     =</span> <span class="fu">quantile</span>(Z, .<span class="dv">95</span>) <span class="sc">/</span> <span class="dv">3</span>,</span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>      <span class="at">roof_slope   =</span> <span class="fu">roof_metrics</span>(X, Y, Z)<span class="sc">$</span>roof_slope_mean,</span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>      <span class="at">roof_rough   =</span> <span class="fu">roof_metrics</span>(X, Y, Z)<span class="sc">$</span>roof_roughness,</span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>      <span class="at">footprint    =</span> <span class="fu">building_footprint_metrics</span>(X, Y, Z)<span class="sc">$</span>footprint_m2,</span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>      <span class="at">volume       =</span> <span class="fu">building_footprint_metrics</span>(X, Y, Z)<span class="sc">$</span>volume_m3,</span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>      <span class="at">compactness  =</span> <span class="fu">building_footprint_metrics</span>(X, Y, Z)<span class="sc">$</span>compactness</span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">vegetation =</span> veg_m, <span class="at">buildings =</span> bld_m)</span>
+<span id="cb16-31"><a href="#cb16-31" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<hr>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The previous post covers the <a href="../../posts/lidar-preprocessing/index.html">pre-processing pipeline</a> required before metric computation. The next post applies these metrics to real GEDI L2A and 3DEP data over NEON SCBI.</p>
+</div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<canvas id="bg-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none;"></canvas>
+
+<script>
+(function () {
+  var canvas = document.getElementById('bg-canvas');
+  var ctx = canvas.getContext('2d');
+  var particles = [];
+  var N = 90;
+  var maxDist = 130;
+
+  /* ── Detect dark mode ─────────────────────────────────── */
+  function isDark() {
+    return document.documentElement.getAttribute('data-bs-theme') === 'dark' ||
+           document.body.classList.contains('quarto-dark') ||
+           window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+
+  function dotColor()  { return isDark() ? 'rgba(130,190,255,0.75)' : 'rgba(50,120,200,0.55)'; }
+  function lineColor(a){ return isDark() ? 'rgba(130,190,255,'+a+')' : 'rgba(50,120,200,'+a+')'; }
+
+  /* ── Particle constructor ─────────────────────────────── */
+  function Particle() {
+    this.reset(true);
+  }
+  Particle.prototype.reset = function (initial) {
+    this.x  = Math.random() * canvas.width;
+    this.y  = initial ? Math.random() * canvas.height : -5;
+    this.vx = (Math.random() - 0.5) * 0.45;
+    this.vy = (Math.random() - 0.5) * 0.45;
+    this.r  = Math.random() * 1.8 + 0.8;
+  };
+
+  /* ── Init / resize ────────────────────────────────────── */
+  function init() {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+    if (particles.length === 0) {
+      for (var i = 0; i < N; i++) particles.push(new Particle());
+    }
+  }
+
+  /* ── Animation loop ───────────────────────────────────── */
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    /* connections */
+    for (var i = 0; i < N; i++) {
+      for (var j = i + 1; j < N; j++) {
+        var dx   = particles[i].x - particles[j].x;
+        var dy   = particles[i].y - particles[j].y;
+        var dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < maxDist) {
+          var alpha = (1 - dist / maxDist) * 0.28;
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = lineColor(alpha);
+          ctx.lineWidth   = 0.6;
+          ctx.stroke();
+        }
+      }
+    }
+
+    /* dots */
+    ctx.fillStyle = dotColor();
+    for (var k = 0; k < N; k++) {
+      var p = particles[k];
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fill();
+
+      p.x += p.vx;
+      p.y += p.vy;
+
+      if (p.x < -10) p.x = canvas.width  + 5;
+      if (p.x > canvas.width  + 10) p.x = -5;
+      if (p.y < -10) p.y = canvas.height + 5;
+      if (p.y > canvas.height + 10) p.y = -5;
+    }
+
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', function () {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+  });
+
+  init();
+  draw();
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+
+  /* ── Block right-click context menu ──────────────────────── */
+  document.addEventListener("contextmenu", function (e) {
+    e.preventDefault();
+    return false;
+  });
+
+  /* ── Block copy-related keyboard shortcuts ───────────────── */
+  document.addEventListener("keydown", function (e) {
+    var ctrl = e.ctrlKey || e.metaKey; // Ctrl on Win/Linux, Cmd on Mac
+
+    if (ctrl) {
+      switch (e.key.toLowerCase()) {
+        case "c":  // Copy
+        case "a":  // Select All
+        case "x":  // Cut
+        case "u":  // View Source
+        case "s":  // Save Page
+        case "p":  // Print
+          e.preventDefault();
+          return false;
+      }
+      // Ctrl+Shift+I/J/C — DevTools
+      if (e.shiftKey && ["i", "j", "c"].includes(e.key.toLowerCase())) {
+        e.preventDefault();
+        return false;
+      }
+    }
+
+    // F12 — DevTools
+    if (e.key === "F12") {
+      e.preventDefault();
+      return false;
+    }
+  });
+
+  /* ── Block drag-and-drop of text / images ────────────────── */
+  document.addEventListener("dragstart", function (e) {
+    e.preventDefault();
+    return false;
+  });
+
+  /* ── Block copy event directly ───────────────────────────── */
+  document.addEventListener("copy", function (e) {
+    e.preventDefault();
+    return false;
+  });
+
+  /* ── Block cut event ─────────────────────────────────────── */
+  document.addEventListener("cut", function (e) {
+    e.preventDefault();
+    return false;
+  });
+})();
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/Programmer112321\.github\.io\/dingjin\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+<p>© 2026 Dingjin Chu</p>
+</div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>
