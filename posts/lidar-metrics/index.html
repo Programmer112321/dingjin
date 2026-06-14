@@ -1249,6 +1249,382 @@ Important
 </table>
 <hr>
 </section>
+<section id="entropy" class="level3">
+<h3 class="anchored" data-anchor-id="entropy">3.6 Advanced Complexity: Adaptive KDE Entropy (Liu et al.&nbsp;2022)</h3>
+<p>Simple height-bin VCI is sensitive to point density gradients that often exist across a tile due to scan-angle variation. The Liu et al.&nbsp;(2022) approach removes this bias before computing entropy:</p>
+<ol type="1">
+<li><strong><code>avg_point_dist</code></strong> — compute mean nearest-neighbour distance per 1 m height layer to quantify the vertical density gradient.</li>
+<li><strong><code>adaptative_resample</code></strong> — iteratively coarsen voxel size until a Mann-Kendall trend test finds no significant vertical density trend (p &gt; α), then return the resampled cloud.</li>
+<li><strong><code>canopy_entropy</code></strong> — project the resampled cloud onto three orthogonal planes (XY, XZ, YZ), fit a KDE on each, compute Shannon entropy <span class="math inline">\(H = -\sum p \ln(p) \cdot dA\)</span>, and return <span class="math inline">\(H_{XYZ} = \sqrt{H_{XY}^2 + H_{XZ}^2 + H_{YZ}^2}\)</span>.</li>
+</ol>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-11-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-11-1" role="tab" aria-controls="tabset-11-1" aria-selected="true" href="">lidR</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-11-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-11-2" role="tab" aria-controls="tabset-11-2" aria-selected="false" href="">lasR</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-11-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-11-3" role="tab" aria-controls="tabset-11-3" aria-selected="false" href="">Python</a></li></ul>
+<div class="tab-content">
+<div id="tabset-11-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-11-1-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lidR)</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(data.table)</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(nabor)      <span class="co"># fast kNN</span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(TreeLS)     <span class="co"># las2xyz helper</span></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ks)         <span class="co"># kernel density estimation</span></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(trend)      <span class="co"># Mann-Kendall test</span></span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a><span class="co"># ── 1. Average nearest-neighbour distance per vertical layer ───────</span></span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>avg_point_dist <span class="ot">&lt;-</span> <span class="cf">function</span>(las, <span class="at">thickness =</span> <span class="dv">1</span>) {</span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>  n_pts <span class="ot">&lt;-</span> <span class="fu">nrow</span>(las<span class="sc">@</span>data)</span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (n_pts <span class="sc">&lt;</span> <span class="dv">2</span>) {</span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(<span class="fu">data.table</span>(<span class="at">layer =</span> <span class="dv">0</span>L, <span class="at">dist =</span> <span class="cn">NA_real_</span>))</span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a>  las<span class="sc">@</span>data<span class="sc">$</span>MinDist <span class="ot">&lt;-</span> nabor<span class="sc">::</span><span class="fu">knn</span>(TreeLS<span class="sc">:::</span><span class="fu">las2xyz</span>(las), <span class="at">k =</span> <span class="dv">2</span>)<span class="sc">$</span>nn.dist[, <span class="dv">2</span>]</span>
+<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a>  z_pts            <span class="ot">&lt;-</span> las<span class="sc">$</span>Z <span class="sc">-</span> <span class="fu">min</span>(las<span class="sc">$</span>Z)</span>
+<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a>  las<span class="sc">@</span>data<span class="sc">$</span>layer   <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(z_pts <span class="sc">/</span> thickness)</span>
+<span id="cb31-17"><a href="#cb31-17" aria-hidden="true" tabindex="-1"></a>  las<span class="sc">@</span>data[<span class="fu">order</span>(layer), .(<span class="at">dist =</span> <span class="fu">mean</span>(MinDist, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)), by <span class="ot">=</span> layer]</span>
+<span id="cb31-18"><a href="#cb31-18" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb31-19"><a href="#cb31-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-20"><a href="#cb31-20" aria-hidden="true" tabindex="-1"></a><span class="co"># ── 2. Adaptive voxel resampling ───────────────────────────────────</span></span>
+<span id="cb31-21"><a href="#cb31-21" aria-hidden="true" tabindex="-1"></a>adaptative_resample <span class="ot">&lt;-</span> <span class="cf">function</span>(las, <span class="at">thickness =</span> <span class="dv">1</span>, <span class="at">alpha =</span> <span class="fl">0.05</span>, <span class="at">step =</span> <span class="fl">0.1</span>) {</span>
+<span id="cb31-22"><a href="#cb31-22" aria-hidden="true" tabindex="-1"></a>  avg_dst <span class="ot">&lt;-</span> <span class="fu">avg_point_dist</span>(las, thickness)</span>
+<span id="cb31-23"><a href="#cb31-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-24"><a href="#cb31-24" aria-hidden="true" tabindex="-1"></a>  noise_tol <span class="ot">&lt;-</span> <span class="fu">mean</span>(avg_dst<span class="sc">$</span>dist, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">+</span> <span class="dv">2</span> <span class="sc">*</span> <span class="fu">sd</span>(avg_dst<span class="sc">$</span>dist, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb31-25"><a href="#cb31-25" aria-hidden="true" tabindex="-1"></a>  avg_dst   <span class="ot">&lt;-</span> avg_dst[<span class="sc">!</span><span class="fu">is.na</span>(dist) <span class="sc">&amp;</span> dist <span class="sc">&lt;</span> noise_tol]</span>
+<span id="cb31-26"><a href="#cb31-26" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">nrow</span>(avg_dst) <span class="sc">&lt;</span> <span class="dv">3</span>) <span class="fu">return</span>(<span class="cn">NULL</span>)</span>
+<span id="cb31-27"><a href="#cb31-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-28"><a href="#cb31-28" aria-hidden="true" tabindex="-1"></a>  max_dst <span class="ot">&lt;-</span> <span class="fu">max</span>(avg_dst<span class="sc">$</span>dist)</span>
+<span id="cb31-29"><a href="#cb31-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-30"><a href="#cb31-30" aria-hidden="true" tabindex="-1"></a>  vlas <span class="ot">&lt;-</span> las</span>
+<span id="cb31-31"><a href="#cb31-31" aria-hidden="true" tabindex="-1"></a>  mkt  <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
+<span id="cb31-32"><a href="#cb31-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-33"><a href="#cb31-33" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (ratio <span class="cf">in</span> <span class="fu">seq</span>(<span class="dv">2</span>, <span class="dv">5</span>, step)) {</span>
+<span id="cb31-34"><a href="#cb31-34" aria-hidden="true" tabindex="-1"></a>    vox     <span class="ot">&lt;-</span> ratio <span class="sc">*</span> max_dst</span>
+<span id="cb31-35"><a href="#cb31-35" aria-hidden="true" tabindex="-1"></a>    vlas    <span class="ot">&lt;-</span> TreeLS<span class="sc">::</span><span class="fu">tlsSample</span>(las, <span class="fu">smp.voxelize</span>(vox))</span>
+<span id="cb31-36"><a href="#cb31-36" aria-hidden="true" tabindex="-1"></a>    avg_dst <span class="ot">&lt;-</span> <span class="fu">avg_point_dist</span>(vlas, thickness)</span>
+<span id="cb31-37"><a href="#cb31-37" aria-hidden="true" tabindex="-1"></a>    avg_dst <span class="ot">&lt;-</span> avg_dst[<span class="sc">!</span><span class="fu">is.na</span>(dist)]</span>
+<span id="cb31-38"><a href="#cb31-38" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="fu">nrow</span>(avg_dst) <span class="sc">&lt;</span> <span class="dv">3</span>) <span class="cf">break</span></span>
+<span id="cb31-39"><a href="#cb31-39" aria-hidden="true" tabindex="-1"></a>    mkt <span class="ot">&lt;-</span> trend<span class="sc">::</span><span class="fu">mk.test</span>(avg_dst<span class="sc">$</span>dist)</span>
+<span id="cb31-40"><a href="#cb31-40" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (mkt<span class="sc">$</span>p.value <span class="sc">&gt;</span> alpha) <span class="cf">break</span></span>
+<span id="cb31-41"><a href="#cb31-41" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb31-42"><a href="#cb31-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-43"><a href="#cb31-43" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.null</span>(mkt)) <span class="fu">return</span>(<span class="cn">NULL</span>)</span>
+<span id="cb31-44"><a href="#cb31-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">las =</span> vlas, <span class="at">ratio =</span> ratio, <span class="at">vox =</span> vox, <span class="at">dist =</span> avg_dst, <span class="at">mk.test =</span> mkt)</span>
+<span id="cb31-45"><a href="#cb31-45" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb31-46"><a href="#cb31-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-47"><a href="#cb31-47" aria-hidden="true" tabindex="-1"></a><span class="co"># ── 3. KDE Shannon entropy in XY, XZ, YZ planes ───────────────────</span></span>
+<span id="cb31-48"><a href="#cb31-48" aria-hidden="true" tabindex="-1"></a>canopy_entropy <span class="ot">&lt;-</span> <span class="cf">function</span>(las, <span class="at">bw =</span> <span class="fl">0.2</span>, <span class="at">grid_size =</span> <span class="fl">0.1</span>) {</span>
+<span id="cb31-49"><a href="#cb31-49" aria-hidden="true" tabindex="-1"></a>  bounds <span class="ot">&lt;-</span> <span class="fu">apply</span>(las<span class="sc">@</span>data[, .(X, Y, Z)], <span class="dv">2</span>, range)</span>
+<span id="cb31-50"><a href="#cb31-50" aria-hidden="true" tabindex="-1"></a>  ce     <span class="ot">&lt;-</span> <span class="fu">numeric</span>(<span class="dv">3</span>L)</span>
+<span id="cb31-51"><a href="#cb31-51" aria-hidden="true" tabindex="-1"></a>  <span class="fu">names</span>(ce) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"XY"</span>, <span class="st">"XZ"</span>, <span class="st">"YZ"</span>)</span>
+<span id="cb31-52"><a href="#cb31-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-53"><a href="#cb31-53" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (ij <span class="cf">in</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">"X"</span>, <span class="st">"Y"</span>), <span class="fu">c</span>(<span class="st">"X"</span>, <span class="st">"Z"</span>), <span class="fu">c</span>(<span class="st">"Y"</span>, <span class="st">"Z"</span>))) {</span>
+<span id="cb31-54"><a href="#cb31-54" aria-hidden="true" tabindex="-1"></a>    i <span class="ot">&lt;-</span> ij[<span class="dv">1</span>]; j <span class="ot">&lt;-</span> ij[<span class="dv">2</span>]</span>
+<span id="cb31-55"><a href="#cb31-55" aria-hidden="true" tabindex="-1"></a>    key   <span class="ot">&lt;-</span> <span class="fu">paste</span>(ij, <span class="at">collapse =</span> <span class="st">""</span>)</span>
+<span id="cb31-56"><a href="#cb31-56" aria-hidden="true" tabindex="-1"></a>    plane <span class="ot">&lt;-</span> las<span class="sc">@</span>data[, ..ij]</span>
+<span id="cb31-57"><a href="#cb31-57" aria-hidden="true" tabindex="-1"></a>    ni   <span class="ot">&lt;-</span> <span class="dv">2</span>L <span class="sc">+</span> <span class="fu">as.integer</span>((<span class="fu">diff</span>(bounds[, i]) <span class="sc">+</span> <span class="dv">8</span> <span class="sc">*</span> bw) <span class="sc">%/%</span> grid_size)</span>
+<span id="cb31-58"><a href="#cb31-58" aria-hidden="true" tabindex="-1"></a>    nj   <span class="ot">&lt;-</span> <span class="dv">2</span>L <span class="sc">+</span> <span class="fu">as.integer</span>((<span class="fu">diff</span>(bounds[, j]) <span class="sc">+</span> <span class="dv">8</span> <span class="sc">*</span> bw) <span class="sc">%/%</span> grid_size)</span>
+<span id="cb31-59"><a href="#cb31-59" aria-hidden="true" tabindex="-1"></a>    lims <span class="ot">&lt;-</span> <span class="fu">c</span>(bounds[, ij]) <span class="sc">+</span> (bw <span class="sc">*</span> <span class="dv">4</span> <span class="sc">+</span> grid_size <span class="sc">/</span> <span class="dv">2</span>) <span class="sc">*</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>)</span>
+<span id="cb31-60"><a href="#cb31-60" aria-hidden="true" tabindex="-1"></a>    den  <span class="ot">&lt;-</span> ks<span class="sc">::</span><span class="fu">kde</span>(plane, <span class="at">h =</span> bw,</span>
+<span id="cb31-61"><a href="#cb31-61" aria-hidden="true" tabindex="-1"></a>                    <span class="at">gridsize =</span> <span class="fu">c</span>(ni, nj),</span>
+<span id="cb31-62"><a href="#cb31-62" aria-hidden="true" tabindex="-1"></a>                    <span class="at">xmin     =</span> lims[<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>)],</span>
+<span id="cb31-63"><a href="#cb31-63" aria-hidden="true" tabindex="-1"></a>                    <span class="at">xmax     =</span> lims[<span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">4</span>)])<span class="sc">$</span>estimate</span>
+<span id="cb31-64"><a href="#cb31-64" aria-hidden="true" tabindex="-1"></a>    den        <span class="ot">&lt;-</span> den[den <span class="sc">&gt;</span> <span class="dv">0</span>]</span>
+<span id="cb31-65"><a href="#cb31-65" aria-hidden="true" tabindex="-1"></a>    ce[key]    <span class="ot">&lt;-</span> <span class="sc">-</span><span class="fu">sum</span>(den <span class="sc">*</span> <span class="fu">log</span>(den) <span class="sc">*</span> grid_size<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb31-66"><a href="#cb31-66" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb31-67"><a href="#cb31-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-68"><a href="#cb31-68" aria-hidden="true" tabindex="-1"></a>  ce[<span class="st">"XYZ"</span>] <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="fu">sum</span>(ce<span class="sc">^</span><span class="dv">2</span>))</span>
+<span id="cb31-69"><a href="#cb31-69" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.data.frame</span>(<span class="fu">t</span>(ce))</span>
+<span id="cb31-70"><a href="#cb31-70" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb31-71"><a href="#cb31-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-72"><a href="#cb31-72" aria-hidden="true" tabindex="-1"></a><span class="co"># ── 4. Entropy wrapper with adaptive resampling ────────────────────</span></span>
+<span id="cb31-73"><a href="#cb31-73" aria-hidden="true" tabindex="-1"></a>get_entropy <span class="ot">&lt;-</span> <span class="cf">function</span>(las, <span class="at">thickness =</span> <span class="dv">1</span>) {</span>
+<span id="cb31-74"><a href="#cb31-74" aria-hidden="true" tabindex="-1"></a>  las<span class="sc">@</span>data<span class="sc">$</span>Z <span class="ot">&lt;-</span> las<span class="sc">@</span>data<span class="sc">$</span>Height   <span class="co"># use HAG geometry (Liu et al. 2022)</span></span>
+<span id="cb31-75"><a href="#cb31-75" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">&lt;-</span> <span class="fu">adaptative_resample</span>(las, thickness)</span>
+<span id="cb31-76"><a href="#cb31-76" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.null</span>(res)) <span class="fu">return</span>(<span class="cn">NULL</span>)</span>
+<span id="cb31-77"><a href="#cb31-77" aria-hidden="true" tabindex="-1"></a>  ent       <span class="ot">&lt;-</span> <span class="fu">canopy_entropy</span>(res<span class="sc">$</span>las)</span>
+<span id="cb31-78"><a href="#cb31-78" aria-hidden="true" tabindex="-1"></a>  ent<span class="sc">$</span>p     <span class="ot">&lt;-</span> res<span class="sc">$</span>mk.test<span class="sc">$</span>p.value</span>
+<span id="cb31-79"><a href="#cb31-79" aria-hidden="true" tabindex="-1"></a>  ent<span class="sc">$</span>vox   <span class="ot">&lt;-</span> res<span class="sc">$</span>vox</span>
+<span id="cb31-80"><a href="#cb31-80" aria-hidden="true" tabindex="-1"></a>  ent</span>
+<span id="cb31-81"><a href="#cb31-81" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb31-82"><a href="#cb31-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-83"><a href="#cb31-83" aria-hidden="true" tabindex="-1"></a><span class="co"># ── 5. Pixel-level complexity — called inside pixel_metrics() ──────</span></span>
+<span id="cb31-84"><a href="#cb31-84" aria-hidden="true" tabindex="-1"></a>pix_complexity <span class="ot">&lt;-</span> <span class="cf">function</span>(x, y, z, h) {</span>
+<span id="cb31-85"><a href="#cb31-85" aria-hidden="true" tabindex="-1"></a>  keep <span class="ot">&lt;-</span> h <span class="sc">&gt;=</span> <span class="dv">1</span></span>
+<span id="cb31-86"><a href="#cb31-86" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">sum</span>(keep) <span class="sc">&lt;</span> <span class="dv">10</span>L) <span class="fu">return</span>(<span class="cn">NULL</span>)</span>
+<span id="cb31-87"><a href="#cb31-87" aria-hidden="true" tabindex="-1"></a>  las <span class="ot">&lt;-</span> <span class="fu">suppressMessages</span>(</span>
+<span id="cb31-88"><a href="#cb31-88" aria-hidden="true" tabindex="-1"></a>    <span class="fu">LAS</span>(<span class="fu">data.table</span>(<span class="at">X =</span> x[keep], <span class="at">Y =</span> y[keep],</span>
+<span id="cb31-89"><a href="#cb31-89" aria-hidden="true" tabindex="-1"></a>                   <span class="at">Z =</span> z[keep], <span class="at">Height =</span> h[keep]),</span>
+<span id="cb31-90"><a href="#cb31-90" aria-hidden="true" tabindex="-1"></a>        <span class="at">check =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb31-91"><a href="#cb31-91" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb31-92"><a href="#cb31-92" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.empty</span>(las)) <span class="fu">return</span>(<span class="cn">NULL</span>)</span>
+<span id="cb31-93"><a href="#cb31-93" aria-hidden="true" tabindex="-1"></a>  ce <span class="ot">&lt;-</span> <span class="fu">tryCatch</span>(<span class="fu">get_entropy</span>(las),</span>
+<span id="cb31-94"><a href="#cb31-94" aria-hidden="true" tabindex="-1"></a>                 <span class="at">error =</span> <span class="cf">function</span>(e) {</span>
+<span id="cb31-95"><a href="#cb31-95" aria-hidden="true" tabindex="-1"></a>                   <span class="fu">warning</span>(<span class="st">"get_entropy failed: "</span>, <span class="fu">conditionMessage</span>(e))</span>
+<span id="cb31-96"><a href="#cb31-96" aria-hidden="true" tabindex="-1"></a>                   <span class="cn">NULL</span></span>
+<span id="cb31-97"><a href="#cb31-97" aria-hidden="true" tabindex="-1"></a>                 })</span>
+<span id="cb31-98"><a href="#cb31-98" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(ce)) <span class="fu">as.list</span>(ce) <span class="cf">else</span> <span class="cn">NULL</span></span>
+<span id="cb31-99"><a href="#cb31-99" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb31-100"><a href="#cb31-100" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-101"><a href="#cb31-101" aria-hidden="true" tabindex="-1"></a><span class="co"># Run at 20 m pixel level</span></span>
+<span id="cb31-102"><a href="#cb31-102" aria-hidden="true" tabindex="-1"></a>entropy_grid <span class="ot">&lt;-</span> <span class="fu">pixel_metrics</span>(</span>
+<span id="cb31-103"><a href="#cb31-103" aria-hidden="true" tabindex="-1"></a>  las,</span>
+<span id="cb31-104"><a href="#cb31-104" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span><span class="fu">pix_complexity</span>(X, Y, Z, Height),</span>
+<span id="cb31-105"><a href="#cb31-105" aria-hidden="true" tabindex="-1"></a>  <span class="at">res =</span> <span class="dv">20</span></span>
+<span id="cb31-106"><a href="#cb31-106" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="tabset-11-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-11-2-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># All five helper functions (avg_point_dist, adaptative_resample,</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="co"># canopy_entropy, get_entropy, pix_complexity) are pure R and can be</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="co"># evaluated inside lasR's rasterize() stage per cell.</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Required packages: nabor, TreeLS, ks, trend, data.table</span></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a><span class="co"># These must be installed separately — lasR does not install them.</span></span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"entropy_helpers.R"</span>)   <span class="co"># load the five functions above</span></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>pipeline <span class="ot">&lt;-</span></span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">reader_las</span>() <span class="sc">+</span></span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rasterize</span>(</span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">res     =</span> <span class="dv">20</span>,</span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">metrics =</span> <span class="sc">~</span><span class="fu">pix_complexity</span>(X, Y, Z, Height),</span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">ofile   =</span> <span class="st">"entropy_complexity_20m.tif"</span></span>
+<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-17"><a href="#cb32-17" aria-hidden="true" tabindex="-1"></a><span class="fu">exec</span>(pipeline,</span>
+<span id="cb32-18"><a href="#cb32-18" aria-hidden="true" tabindex="-1"></a>     <span class="at">on     =</span> <span class="st">"path/to/folder/"</span>,</span>
+<span id="cb32-19"><a href="#cb32-19" aria-hidden="true" tabindex="-1"></a>     <span class="at">ncores =</span> <span class="dv">4</span>L,</span>
+<span id="cb32-20"><a href="#cb32-20" aria-hidden="true" tabindex="-1"></a>     <span class="at">chunk  =</span> <span class="dv">500</span>,</span>
+<span id="cb32-21"><a href="#cb32-21" aria-hidden="true" tabindex="-1"></a>     <span class="at">buffer =</span> <span class="dv">10</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Warning
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>lasR caveat:</strong> <code>TreeLS:::las2xyz</code> is an internal (triple-colon) function. If TreeLS is not fully loaded in each worker thread, the call may fail. Test on a single tile first with <code>ncores = 1L</code>. If it fails, switch to the lidR <code>pixel_metrics()</code> route for this metric.</p>
+</div>
+</div>
+</div>
+<div id="tabset-11-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-11-3-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># pip install pymannkendall</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="co"># scipy, numpy required</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy <span class="im">import</span> stats</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.spatial <span class="im">import</span> cKDTree</span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.stats <span class="im">import</span> gaussian_kde</span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pymannkendall <span class="im">as</span> mk   <span class="co"># pip install pymannkendall</span></span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a><span class="co"># ── 1. Average nearest-neighbour distance per vertical layer ───────</span></span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> avg_point_dist(x, y, z, thickness<span class="op">=</span><span class="fl">1.0</span>):</span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Mean NN-distance (k=2) per height layer of `thickness` m."""</span></span>
+<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a>    pts  <span class="op">=</span> np.column_stack([x, y, z])</span>
+<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a>    tree <span class="op">=</span> cKDTree(pts)</span>
+<span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a>    d, _ <span class="op">=</span> tree.query(pts, k<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb33-15"><a href="#cb33-15" aria-hidden="true" tabindex="-1"></a>    nn   <span class="op">=</span> d[:, <span class="dv">1</span>]              <span class="co"># distance to nearest neighbour (exclude self)</span></span>
+<span id="cb33-16"><a href="#cb33-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-17"><a href="#cb33-17" aria-hidden="true" tabindex="-1"></a>    z0     <span class="op">=</span> z <span class="op">-</span> z.<span class="bu">min</span>()</span>
+<span id="cb33-18"><a href="#cb33-18" aria-hidden="true" tabindex="-1"></a>    layers <span class="op">=</span> (z0 <span class="op">/</span> thickness).astype(<span class="bu">int</span>)</span>
+<span id="cb33-19"><a href="#cb33-19" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> {}</span>
+<span id="cb33-20"><a href="#cb33-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> lyr <span class="kw">in</span> np.unique(layers):</span>
+<span id="cb33-21"><a href="#cb33-21" aria-hidden="true" tabindex="-1"></a>        m <span class="op">=</span> layers <span class="op">==</span> lyr</span>
+<span id="cb33-22"><a href="#cb33-22" aria-hidden="true" tabindex="-1"></a>        result[lyr] <span class="op">=</span> nn[m].mean()</span>
+<span id="cb33-23"><a href="#cb33-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> result   <span class="co"># {layer_id: mean_dist}</span></span>
+<span id="cb33-24"><a href="#cb33-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-25"><a href="#cb33-25" aria-hidden="true" tabindex="-1"></a><span class="co"># ── 2. Adaptive voxel resampling ───────────────────────────────────</span></span>
+<span id="cb33-26"><a href="#cb33-26" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> adaptative_resample(x, y, z, thickness<span class="op">=</span><span class="fl">1.0</span>, alpha<span class="op">=</span><span class="fl">0.05</span>, step<span class="op">=</span><span class="fl">0.1</span>):</span>
+<span id="cb33-27"><a href="#cb33-27" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Coarsen voxel size until Mann-Kendall finds no vertical density trend."""</span></span>
+<span id="cb33-28"><a href="#cb33-28" aria-hidden="true" tabindex="-1"></a>    ld <span class="op">=</span> avg_point_dist(x, y, z, thickness)</span>
+<span id="cb33-29"><a href="#cb33-29" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">len</span>(ld) <span class="op">&lt;</span> <span class="dv">3</span>:</span>
+<span id="cb33-30"><a href="#cb33-30" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">None</span></span>
+<span id="cb33-31"><a href="#cb33-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-32"><a href="#cb33-32" aria-hidden="true" tabindex="-1"></a>    d_arr <span class="op">=</span> np.array(<span class="bu">list</span>(ld.values()))</span>
+<span id="cb33-33"><a href="#cb33-33" aria-hidden="true" tabindex="-1"></a>    tol   <span class="op">=</span> d_arr.mean() <span class="op">+</span> <span class="dv">2</span> <span class="op">*</span> d_arr.std()</span>
+<span id="cb33-34"><a href="#cb33-34" aria-hidden="true" tabindex="-1"></a>    d_arr <span class="op">=</span> d_arr[d_arr <span class="op">&lt;</span> tol]</span>
+<span id="cb33-35"><a href="#cb33-35" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">len</span>(d_arr) <span class="op">&lt;</span> <span class="dv">3</span>:</span>
+<span id="cb33-36"><a href="#cb33-36" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">None</span></span>
+<span id="cb33-37"><a href="#cb33-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-38"><a href="#cb33-38" aria-hidden="true" tabindex="-1"></a>    max_dst <span class="op">=</span> d_arr.<span class="bu">max</span>()</span>
+<span id="cb33-39"><a href="#cb33-39" aria-hidden="true" tabindex="-1"></a>    rx, ry, rz <span class="op">=</span> x.copy(), y.copy(), z.copy()</span>
+<span id="cb33-40"><a href="#cb33-40" aria-hidden="true" tabindex="-1"></a>    mkt_p <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb33-41"><a href="#cb33-41" aria-hidden="true" tabindex="-1"></a>    final_vox <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb33-42"><a href="#cb33-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-43"><a href="#cb33-43" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> ratio <span class="kw">in</span> np.arange(<span class="fl">2.0</span>, <span class="fl">5.0</span> <span class="op">+</span> step, step):</span>
+<span id="cb33-44"><a href="#cb33-44" aria-hidden="true" tabindex="-1"></a>        vox <span class="op">=</span> ratio <span class="op">*</span> max_dst</span>
+<span id="cb33-45"><a href="#cb33-45" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Voxel decimation: keep one point per vox×vox×vox cell</span></span>
+<span id="cb33-46"><a href="#cb33-46" aria-hidden="true" tabindex="-1"></a>        key <span class="op">=</span> (np.floor(x <span class="op">/</span> vox).astype(np.int64) <span class="op">*</span> <span class="dv">1_000_000_007</span> <span class="op">+</span></span>
+<span id="cb33-47"><a href="#cb33-47" aria-hidden="true" tabindex="-1"></a>               np.floor(y <span class="op">/</span> vox).astype(np.int64) <span class="op">*</span> <span class="dv">7001</span> <span class="op">+</span></span>
+<span id="cb33-48"><a href="#cb33-48" aria-hidden="true" tabindex="-1"></a>               np.floor(z <span class="op">/</span> vox).astype(np.int64))</span>
+<span id="cb33-49"><a href="#cb33-49" aria-hidden="true" tabindex="-1"></a>        _, idx <span class="op">=</span> np.unique(key, return_index<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb33-50"><a href="#cb33-50" aria-hidden="true" tabindex="-1"></a>        rx, ry, rz <span class="op">=</span> x[idx], y[idx], z[idx]</span>
+<span id="cb33-51"><a href="#cb33-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-52"><a href="#cb33-52" aria-hidden="true" tabindex="-1"></a>        ld2 <span class="op">=</span> avg_point_dist(rx, ry, rz, thickness)</span>
+<span id="cb33-53"><a href="#cb33-53" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">len</span>(ld2) <span class="op">&lt;</span> <span class="dv">3</span>:</span>
+<span id="cb33-54"><a href="#cb33-54" aria-hidden="true" tabindex="-1"></a>            <span class="cf">break</span></span>
+<span id="cb33-55"><a href="#cb33-55" aria-hidden="true" tabindex="-1"></a>        d2 <span class="op">=</span> np.array(<span class="bu">list</span>(ld2.values()))</span>
+<span id="cb33-56"><a href="#cb33-56" aria-hidden="true" tabindex="-1"></a>        d2 <span class="op">=</span> d2[<span class="op">~</span>np.isnan(d2)]</span>
+<span id="cb33-57"><a href="#cb33-57" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">len</span>(d2) <span class="op">&lt;</span> <span class="dv">3</span>:</span>
+<span id="cb33-58"><a href="#cb33-58" aria-hidden="true" tabindex="-1"></a>            <span class="cf">break</span></span>
+<span id="cb33-59"><a href="#cb33-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-60"><a href="#cb33-60" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Mann-Kendall trend test (scipy kendalltau ≈ mk.test)</span></span>
+<span id="cb33-61"><a href="#cb33-61" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Use pymannkendall for a closer match to R's trend::mk.test</span></span>
+<span id="cb33-62"><a href="#cb33-62" aria-hidden="true" tabindex="-1"></a>        res_mk <span class="op">=</span> mk.original_test(d2)</span>
+<span id="cb33-63"><a href="#cb33-63" aria-hidden="true" tabindex="-1"></a>        mkt_p  <span class="op">=</span> res_mk.p</span>
+<span id="cb33-64"><a href="#cb33-64" aria-hidden="true" tabindex="-1"></a>        final_vox <span class="op">=</span> vox</span>
+<span id="cb33-65"><a href="#cb33-65" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> mkt_p <span class="op">&gt;</span> alpha:</span>
+<span id="cb33-66"><a href="#cb33-66" aria-hidden="true" tabindex="-1"></a>            <span class="cf">break</span></span>
+<span id="cb33-67"><a href="#cb33-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-68"><a href="#cb33-68" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> mkt_p <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb33-69"><a href="#cb33-69" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">None</span></span>
+<span id="cb33-70"><a href="#cb33-70" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {<span class="st">"x"</span>: rx, <span class="st">"y"</span>: ry, <span class="st">"z"</span>: rz, <span class="st">"vox"</span>: final_vox, <span class="st">"p"</span>: mkt_p}</span>
+<span id="cb33-71"><a href="#cb33-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-72"><a href="#cb33-72" aria-hidden="true" tabindex="-1"></a><span class="co"># ── 3. KDE Shannon entropy in XY, XZ, YZ planes ───────────────────</span></span>
+<span id="cb33-73"><a href="#cb33-73" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> canopy_entropy(x, y, z, bw<span class="op">=</span><span class="fl">0.2</span>, grid_size<span class="op">=</span><span class="fl">0.1</span>):</span>
+<span id="cb33-74"><a href="#cb33-74" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb33-75"><a href="#cb33-75" aria-hidden="true" tabindex="-1"></a><span class="co">    KDE Shannon entropy in three orthogonal planes (Liu et al. 2022).</span></span>
+<span id="cb33-76"><a href="#cb33-76" aria-hidden="true" tabindex="-1"></a><span class="co">    Note: scipy gaussian_kde uses a bandwidth *factor* of data std;</span></span>
+<span id="cb33-77"><a href="#cb33-77" aria-hidden="true" tabindex="-1"></a><span class="co">    to approximate the absolute bw=0.2 m used by ks::kde in R, we</span></span>
+<span id="cb33-78"><a href="#cb33-78" aria-hidden="true" tabindex="-1"></a><span class="co">    scale by the per-plane std. Results are numerically close but not</span></span>
+<span id="cb33-79"><a href="#cb33-79" aria-hidden="true" tabindex="-1"></a><span class="co">    identical to the R implementation.</span></span>
+<span id="cb33-80"><a href="#cb33-80" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb33-81"><a href="#cb33-81" aria-hidden="true" tabindex="-1"></a>    planes <span class="op">=</span> {<span class="st">"XY"</span>: (x, y), <span class="st">"XZ"</span>: (x, z), <span class="st">"YZ"</span>: (y, z)}</span>
+<span id="cb33-82"><a href="#cb33-82" aria-hidden="true" tabindex="-1"></a>    ce <span class="op">=</span> {}</span>
+<span id="cb33-83"><a href="#cb33-83" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> name, (a, b) <span class="kw">in</span> planes.items():</span>
+<span id="cb33-84"><a href="#cb33-84" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Approximate absolute bandwidth: bw_factor = bw / data_std</span></span>
+<span id="cb33-85"><a href="#cb33-85" aria-hidden="true" tabindex="-1"></a>        std_a <span class="op">=</span> a.std() <span class="kw">or</span> <span class="fl">1.0</span></span>
+<span id="cb33-86"><a href="#cb33-86" aria-hidden="true" tabindex="-1"></a>        std_b <span class="op">=</span> b.std() <span class="kw">or</span> <span class="fl">1.0</span></span>
+<span id="cb33-87"><a href="#cb33-87" aria-hidden="true" tabindex="-1"></a>        bw_f  <span class="op">=</span> bw <span class="op">/</span> ((std_a <span class="op">+</span> std_b) <span class="op">/</span> <span class="dv">2</span>)</span>
+<span id="cb33-88"><a href="#cb33-88" aria-hidden="true" tabindex="-1"></a>        kde   <span class="op">=</span> gaussian_kde(np.vstack([a, b]), bw_method<span class="op">=</span>bw_f)</span>
+<span id="cb33-89"><a href="#cb33-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-90"><a href="#cb33-90" aria-hidden="true" tabindex="-1"></a>        g_a <span class="op">=</span> np.arange(a.<span class="bu">min</span>() <span class="op">-</span> <span class="dv">4</span><span class="op">*</span>bw, a.<span class="bu">max</span>() <span class="op">+</span> <span class="dv">4</span><span class="op">*</span>bw, grid_size)</span>
+<span id="cb33-91"><a href="#cb33-91" aria-hidden="true" tabindex="-1"></a>        g_b <span class="op">=</span> np.arange(b.<span class="bu">min</span>() <span class="op">-</span> <span class="dv">4</span><span class="op">*</span>bw, b.<span class="bu">max</span>() <span class="op">+</span> <span class="dv">4</span><span class="op">*</span>bw, grid_size)</span>
+<span id="cb33-92"><a href="#cb33-92" aria-hidden="true" tabindex="-1"></a>        ga, gb <span class="op">=</span> np.meshgrid(g_a, g_b)</span>
+<span id="cb33-93"><a href="#cb33-93" aria-hidden="true" tabindex="-1"></a>        density <span class="op">=</span> kde(np.vstack([ga.ravel(), gb.ravel()]))</span>
+<span id="cb33-94"><a href="#cb33-94" aria-hidden="true" tabindex="-1"></a>        density <span class="op">=</span> density[density <span class="op">&gt;</span> <span class="dv">0</span>]</span>
+<span id="cb33-95"><a href="#cb33-95" aria-hidden="true" tabindex="-1"></a>        ce[name] <span class="op">=</span> <span class="op">-</span>np.<span class="bu">sum</span>(density <span class="op">*</span> np.log(density) <span class="op">*</span> grid_size<span class="op">**</span><span class="dv">2</span>)</span>
+<span id="cb33-96"><a href="#cb33-96" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-97"><a href="#cb33-97" aria-hidden="true" tabindex="-1"></a>    ce[<span class="st">"XYZ"</span>] <span class="op">=</span> np.sqrt(ce[<span class="st">"XY"</span>]<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> ce[<span class="st">"XZ"</span>]<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> ce[<span class="st">"YZ"</span>]<span class="op">**</span><span class="dv">2</span>)</span>
+<span id="cb33-98"><a href="#cb33-98" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> ce</span>
+<span id="cb33-99"><a href="#cb33-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-100"><a href="#cb33-100" aria-hidden="true" tabindex="-1"></a><span class="co"># ── 4. Entropy wrapper with adaptive resampling ────────────────────</span></span>
+<span id="cb33-101"><a href="#cb33-101" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_entropy(x, y, h, thickness<span class="op">=</span><span class="fl">1.0</span>):</span>
+<span id="cb33-102"><a href="#cb33-102" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Use height above ground (h) for all geometry (Liu et al. 2022)."""</span></span>
+<span id="cb33-103"><a href="#cb33-103" aria-hidden="true" tabindex="-1"></a>    res <span class="op">=</span> adaptative_resample(x, y, h, thickness)</span>
+<span id="cb33-104"><a href="#cb33-104" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> res <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb33-105"><a href="#cb33-105" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">None</span></span>
+<span id="cb33-106"><a href="#cb33-106" aria-hidden="true" tabindex="-1"></a>    ent <span class="op">=</span> canopy_entropy(res[<span class="st">"x"</span>], res[<span class="st">"y"</span>], res[<span class="st">"z"</span>])</span>
+<span id="cb33-107"><a href="#cb33-107" aria-hidden="true" tabindex="-1"></a>    ent[<span class="st">"p"</span>]   <span class="op">=</span> res[<span class="st">"p"</span>]</span>
+<span id="cb33-108"><a href="#cb33-108" aria-hidden="true" tabindex="-1"></a>    ent[<span class="st">"vox"</span>] <span class="op">=</span> res[<span class="st">"vox"</span>]</span>
+<span id="cb33-109"><a href="#cb33-109" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> ent</span>
+<span id="cb33-110"><a href="#cb33-110" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-111"><a href="#cb33-111" aria-hidden="true" tabindex="-1"></a><span class="co"># ── 5. Pixel-level complexity ──────────────────────────────────────</span></span>
+<span id="cb33-112"><a href="#cb33-112" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> pix_complexity(x_cell, y_cell, z_cell, h_cell):</span>
+<span id="cb33-113"><a href="#cb33-113" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Pixel-level wrapper — mirrors lidR pix_complexity."""</span></span>
+<span id="cb33-114"><a href="#cb33-114" aria-hidden="true" tabindex="-1"></a>    keep <span class="op">=</span> h_cell <span class="op">&gt;=</span> <span class="fl">1.0</span></span>
+<span id="cb33-115"><a href="#cb33-115" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> keep.<span class="bu">sum</span>() <span class="op">&lt;</span> <span class="dv">10</span>:</span>
+<span id="cb33-116"><a href="#cb33-116" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">None</span></span>
+<span id="cb33-117"><a href="#cb33-117" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
+<span id="cb33-118"><a href="#cb33-118" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> get_entropy(x_cell[keep], y_cell[keep], h_cell[keep])</span>
+<span id="cb33-119"><a href="#cb33-119" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> <span class="pp">Exception</span> <span class="im">as</span> e:</span>
+<span id="cb33-120"><a href="#cb33-120" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"get_entropy failed: </span><span class="sc">{</span>e<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb33-121"><a href="#cb33-121" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">None</span></span>
+<span id="cb33-122"><a href="#cb33-122" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-123"><a href="#cb33-123" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply over 20 m grid using the pixel_metrics() helper from Section 1.1</span></span>
+<span id="cb33-124"><a href="#cb33-124" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> pixel_entropy(x, y, H, res<span class="op">=</span><span class="dv">20</span>):</span>
+<span id="cb33-125"><a href="#cb33-125" aria-hidden="true" tabindex="-1"></a>    xmin, xmax <span class="op">=</span> x.<span class="bu">min</span>(), x.<span class="bu">max</span>()</span>
+<span id="cb33-126"><a href="#cb33-126" aria-hidden="true" tabindex="-1"></a>    ymin, ymax <span class="op">=</span> y.<span class="bu">min</span>(), y.<span class="bu">max</span>()</span>
+<span id="cb33-127"><a href="#cb33-127" aria-hidden="true" tabindex="-1"></a>    cols <span class="op">=</span> <span class="bu">max</span>(<span class="dv">1</span>, <span class="bu">int</span>(np.ceil((xmax <span class="op">-</span> xmin) <span class="op">/</span> res)))</span>
+<span id="cb33-128"><a href="#cb33-128" aria-hidden="true" tabindex="-1"></a>    rows <span class="op">=</span> <span class="bu">max</span>(<span class="dv">1</span>, <span class="bu">int</span>(np.ceil((ymax <span class="op">-</span> ymin) <span class="op">/</span> res)))</span>
+<span id="cb33-129"><a href="#cb33-129" aria-hidden="true" tabindex="-1"></a>    ci <span class="op">=</span> np.clip(((x <span class="op">-</span> xmin) <span class="op">/</span> res).astype(<span class="bu">int</span>), <span class="dv">0</span>, cols <span class="op">-</span> <span class="dv">1</span>)</span>
+<span id="cb33-130"><a href="#cb33-130" aria-hidden="true" tabindex="-1"></a>    ri <span class="op">=</span> np.clip(((ymax <span class="op">-</span> y) <span class="op">/</span> res).astype(<span class="bu">int</span>), <span class="dv">0</span>, rows <span class="op">-</span> <span class="dv">1</span>)</span>
+<span id="cb33-131"><a href="#cb33-131" aria-hidden="true" tabindex="-1"></a>    out <span class="op">=</span> {}</span>
+<span id="cb33-132"><a href="#cb33-132" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> r <span class="kw">in</span> <span class="bu">range</span>(rows):</span>
+<span id="cb33-133"><a href="#cb33-133" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> c <span class="kw">in</span> <span class="bu">range</span>(cols):</span>
+<span id="cb33-134"><a href="#cb33-134" aria-hidden="true" tabindex="-1"></a>            mask <span class="op">=</span> (ri <span class="op">==</span> r) <span class="op">&amp;</span> (ci <span class="op">==</span> c)</span>
+<span id="cb33-135"><a href="#cb33-135" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> mask.<span class="bu">sum</span>() <span class="op">&lt;</span> <span class="dv">10</span>:</span>
+<span id="cb33-136"><a href="#cb33-136" aria-hidden="true" tabindex="-1"></a>                <span class="cf">continue</span></span>
+<span id="cb33-137"><a href="#cb33-137" aria-hidden="true" tabindex="-1"></a>            m <span class="op">=</span> pix_complexity(x[mask], y[mask], z[mask], H[mask])</span>
+<span id="cb33-138"><a href="#cb33-138" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> m <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb33-139"><a href="#cb33-139" aria-hidden="true" tabindex="-1"></a>                <span class="cf">continue</span></span>
+<span id="cb33-140"><a href="#cb33-140" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> k, v <span class="kw">in</span> m.items():</span>
+<span id="cb33-141"><a href="#cb33-141" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> k <span class="kw">not</span> <span class="kw">in</span> out:</span>
+<span id="cb33-142"><a href="#cb33-142" aria-hidden="true" tabindex="-1"></a>                    out[k] <span class="op">=</span> np.full((rows, cols), np.nan)</span>
+<span id="cb33-143"><a href="#cb33-143" aria-hidden="true" tabindex="-1"></a>                out[k][r, c] <span class="op">=</span> v</span>
+<span id="cb33-144"><a href="#cb33-144" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> out</span>
+<span id="cb33-145"><a href="#cb33-145" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-146"><a href="#cb33-146" aria-hidden="true" tabindex="-1"></a>entropy_grid <span class="op">=</span> pixel_entropy(x, y, H, res<span class="op">=</span><span class="dv">20</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Key differences — Adaptive KDE Entropy
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 4%">
+<col style="width: 28%">
+<col style="width: 28%">
+<col style="width: 38%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>lidR</th>
+<th>lasR</th>
+<th>Python</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>kNN</strong></td>
+<td><code>nabor::knn</code> (C++ FLANN)</td>
+<td>Same (called inside rasterize)</td>
+<td><code>scipy.cKDTree</code> (C++) — equally fast</td>
+</tr>
+<tr class="even">
+<td><strong>Voxel resampling</strong></td>
+<td><code>TreeLS::tlsSample(smp.voxelize())</code></td>
+<td>Same</td>
+<td>numpy voxel grid (manual)</td>
+</tr>
+<tr class="odd">
+<td><strong>Mann-Kendall test</strong></td>
+<td><code>trend::mk.test</code> (exact S statistic)</td>
+<td>Same</td>
+<td><code>pymannkendall.original_test</code> (direct port) or <code>scipy.stats.kendalltau</code> (approx.)</td>
+</tr>
+<tr class="even">
+<td><strong>KDE</strong></td>
+<td><code>ks::kde</code> (bandwidth matrix, exact grid)</td>
+<td>Same</td>
+<td><code>scipy.stats.gaussian_kde</code> — bandwidth is a factor of data std; requires scaling to match R’s absolute bw</td>
+</tr>
+<tr class="odd">
+<td><strong>Pixel dispatch</strong></td>
+<td><code>pixel_metrics(~pix_complexity(...))</code></td>
+<td><code>rasterize(~pix_complexity(...))</code></td>
+<td>Manual grid loop</td>
+</tr>
+<tr class="even">
+<td><strong>Runtime</strong></td>
+<td>Slowest (R kNN + R KDE per pixel)</td>
+<td>Faster (multi-threaded C++ tile loop; R functions still called per cell)</td>
+<td>Comparable to lidR for small tiles; numpy voxel is faster than TreeLS for large tiles</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<hr>
+</section>
 </section>
 <section id="buildings" class="level2">
 <h2 class="anchored" data-anchor-id="buildings">Part 4 — Building-Specific Metrics</h2>
@@ -1256,53 +1632,53 @@ Important
 <section id="building-height-metrics" class="level3">
 <h3 class="anchored" data-anchor-id="building-height-metrics">4.1 Building Height Metrics</h3>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-11-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-11-1" role="tab" aria-controls="tabset-11-1" aria-selected="true" href="">lidR</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-11-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-11-2" role="tab" aria-controls="tabset-11-2" aria-selected="false" href="">lasR</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-11-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-11-3" role="tab" aria-controls="tabset-11-3" aria-selected="false" href="">Python</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-12-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-12-1" role="tab" aria-controls="tabset-12-1" aria-selected="true" href="">lidR</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-12-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-12-2" role="tab" aria-controls="tabset-12-2" aria-selected="false" href="">lasR</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-12-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-12-3" role="tab" aria-controls="tabset-12-3" aria-selected="false" href="">Python</a></li></ul>
 <div class="tab-content">
-<div id="tabset-11-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-11-1-tab">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>las_bld <span class="ot">&lt;-</span> <span class="fu">filter_poi</span>(las, Classification <span class="sc">==</span> LASBUILDING)   <span class="co"># Class 6</span></span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>building_height_metrics <span class="ot">&lt;-</span> <span class="cf">function</span>(z) {</span>
-<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(</span>
-<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">Bh_p95   =</span> <span class="fu">quantile</span>(z, <span class="fl">0.95</span>),</span>
-<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">Bh_p99   =</span> <span class="fu">quantile</span>(z, <span class="fl">0.99</span>),</span>
-<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">Bh_range =</span> <span class="fu">diff</span>(<span class="fu">range</span>(z)),</span>
-<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">Bh_floor =</span> <span class="fu">quantile</span>(z, <span class="fl">0.95</span>) <span class="sc">/</span> <span class="dv">3</span></span>
-<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a><span class="fu">cloud_metrics</span>(las_bld, <span class="sc">~</span><span class="fu">building_height_metrics</span>(Height))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="tabset-12-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-12-1-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>las_bld <span class="ot">&lt;-</span> <span class="fu">filter_poi</span>(las, Classification <span class="sc">==</span> LASBUILDING)   <span class="co"># Class 6</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>building_height_metrics <span class="ot">&lt;-</span> <span class="cf">function</span>(z) {</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">Bh_p95   =</span> <span class="fu">quantile</span>(z, <span class="fl">0.95</span>),</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">Bh_p99   =</span> <span class="fu">quantile</span>(z, <span class="fl">0.99</span>),</span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">Bh_range =</span> <span class="fu">diff</span>(<span class="fu">range</span>(z)),</span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">Bh_floor =</span> <span class="fu">quantile</span>(z, <span class="fl">0.95</span>) <span class="sc">/</span> <span class="dv">3</span></span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a><span class="fu">cloud_metrics</span>(las_bld, <span class="sc">~</span><span class="fu">building_height_metrics</span>(Height))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="tabset-11-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-11-2-tab">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>pipeline <span class="ot">&lt;-</span></span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">reader_las</span>(<span class="at">filter =</span> <span class="st">"-keep_class 6"</span>) <span class="sc">+</span></span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rasterize</span>(</span>
-<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">res     =</span> <span class="dv">20</span>,</span>
-<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">metrics =</span> <span class="sc">~</span><span class="fu">list</span>(</span>
-<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">Bh_p95   =</span> <span class="fu">quantile</span>(Height, <span class="fl">0.95</span>),</span>
-<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">Bh_p99   =</span> <span class="fu">quantile</span>(Height, <span class="fl">0.99</span>),</span>
-<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">Bh_range =</span> <span class="fu">diff</span>(<span class="fu">range</span>(Height)),</span>
-<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>      <span class="at">Bh_floor =</span> <span class="fu">quantile</span>(Height, <span class="fl">0.95</span>) <span class="sc">/</span> <span class="dv">3</span></span>
-<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">ofile   =</span> <span class="st">"building_height_20m.tif"</span></span>
-<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a><span class="fu">exec</span>(pipeline, <span class="at">on =</span> <span class="st">"path/to/folder/"</span>, <span class="at">ncores =</span> <span class="dv">4</span>L)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="tabset-12-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-12-2-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>pipeline <span class="ot">&lt;-</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">reader_las</span>(<span class="at">filter =</span> <span class="st">"-keep_class 6"</span>) <span class="sc">+</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rasterize</span>(</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">res     =</span> <span class="dv">20</span>,</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">metrics =</span> <span class="sc">~</span><span class="fu">list</span>(</span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">Bh_p95   =</span> <span class="fu">quantile</span>(Height, <span class="fl">0.95</span>),</span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">Bh_p99   =</span> <span class="fu">quantile</span>(Height, <span class="fl">0.99</span>),</span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">Bh_range =</span> <span class="fu">diff</span>(<span class="fu">range</span>(Height)),</span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>      <span class="at">Bh_floor =</span> <span class="fu">quantile</span>(Height, <span class="fl">0.95</span>) <span class="sc">/</span> <span class="dv">3</span></span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">ofile   =</span> <span class="st">"building_height_20m.tif"</span></span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a><span class="fu">exec</span>(pipeline, <span class="at">on =</span> <span class="st">"path/to/folder/"</span>, <span class="at">ncores =</span> <span class="dv">4</span>L)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="tabset-11-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-11-3-tab">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>bld_mask <span class="op">=</span> cls <span class="op">==</span> <span class="dv">6</span>   <span class="co"># ASPRS Class 6 = building</span></span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>H_bld    <span class="op">=</span> H[bld_mask]</span>
-<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> building_height_metrics(h):</span>
-<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">len</span>(h) <span class="op">&lt;</span> <span class="dv">5</span>:</span>
-<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">None</span></span>
-<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>    p95 <span class="op">=</span> np.percentile(h, <span class="dv">95</span>)</span>
-<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {</span>
-<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Bh_p95"</span>:   p95,</span>
-<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Bh_p99"</span>:   np.percentile(h, <span class="dv">99</span>),</span>
-<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Bh_range"</span>: h.<span class="bu">max</span>() <span class="op">-</span> h.<span class="bu">min</span>(),</span>
-<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Bh_floor"</span>: p95 <span class="op">/</span> <span class="fl">3.0</span></span>
-<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-15"><a href="#cb33-15" aria-hidden="true" tabindex="-1"></a>bld_hm <span class="op">=</span> building_height_metrics(H_bld)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="tabset-12-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-12-3-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>bld_mask <span class="op">=</span> cls <span class="op">==</span> <span class="dv">6</span>   <span class="co"># ASPRS Class 6 = building</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>H_bld    <span class="op">=</span> H[bld_mask]</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> building_height_metrics(h):</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">len</span>(h) <span class="op">&lt;</span> <span class="dv">5</span>:</span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">None</span></span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>    p95 <span class="op">=</span> np.percentile(h, <span class="dv">95</span>)</span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {</span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Bh_p95"</span>:   p95,</span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Bh_p99"</span>:   np.percentile(h, <span class="dv">99</span>),</span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Bh_range"</span>: h.<span class="bu">max</span>() <span class="op">-</span> h.<span class="bu">min</span>(),</span>
+<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Bh_floor"</span>: p95 <span class="op">/</span> <span class="fl">3.0</span></span>
+<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb36-14"><a href="#cb36-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-15"><a href="#cb36-15" aria-hidden="true" tabindex="-1"></a>bld_hm <span class="op">=</span> building_height_metrics(H_bld)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </div>
 </div>
@@ -1341,55 +1717,55 @@ Important
 <section id="roof-geometry-and-complexity" class="level3">
 <h3 class="anchored" data-anchor-id="roof-geometry-and-complexity">4.2 Roof Geometry and Complexity</h3>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-12-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-12-1" role="tab" aria-controls="tabset-12-1" aria-selected="true" href="">lidR</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-12-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-12-2" role="tab" aria-controls="tabset-12-2" aria-selected="false" href="">lasR</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-12-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-12-3" role="tab" aria-controls="tabset-12-3" aria-selected="false" href="">Python</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-13-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-13-1" role="tab" aria-controls="tabset-13-1" aria-selected="true" href="">lidR</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-13-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-13-2" role="tab" aria-controls="tabset-13-2" aria-selected="false" href="">lasR</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-13-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-13-3" role="tab" aria-controls="tabset-13-3" aria-selected="false" href="">Python</a></li></ul>
 <div class="tab-content">
-<div id="tabset-12-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-12-1-tab">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>roof_metrics <span class="ot">&lt;-</span> <span class="cf">function</span>(x, y, z) {</span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  pts      <span class="ot">&lt;-</span> <span class="fu">cbind</span>(x, y, z)</span>
-<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  eig      <span class="ot">&lt;-</span> <span class="fu">eigen</span>(<span class="fu">cov</span>(pts))</span>
-<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>  normal   <span class="ot">&lt;-</span> eig<span class="sc">$</span>vectors[, <span class="dv">3</span>]</span>
-<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>  slope    <span class="ot">&lt;-</span> <span class="fu">acos</span>(<span class="fu">abs</span>(normal[<span class="dv">3</span>])) <span class="sc">*</span> <span class="dv">180</span> <span class="sc">/</span> pi</span>
-<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(</span>
-<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">roof_slope_mean =</span> slope,</span>
-<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">roof_roughness  =</span> <span class="fu">sd</span>(z <span class="sc">-</span> <span class="fu">mean</span>(z))</span>
-<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a><span class="fu">cloud_metrics</span>(las_bld, <span class="sc">~</span><span class="fu">roof_metrics</span>(X, Y, Height))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="tabset-13-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-13-1-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>roof_metrics <span class="ot">&lt;-</span> <span class="cf">function</span>(x, y, z) {</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  pts      <span class="ot">&lt;-</span> <span class="fu">cbind</span>(x, y, z)</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  eig      <span class="ot">&lt;-</span> <span class="fu">eigen</span>(<span class="fu">cov</span>(pts))</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>  normal   <span class="ot">&lt;-</span> eig<span class="sc">$</span>vectors[, <span class="dv">3</span>]</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>  slope    <span class="ot">&lt;-</span> <span class="fu">acos</span>(<span class="fu">abs</span>(normal[<span class="dv">3</span>])) <span class="sc">*</span> <span class="dv">180</span> <span class="sc">/</span> pi</span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(</span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">roof_slope_mean =</span> slope,</span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">roof_roughness  =</span> <span class="fu">sd</span>(z <span class="sc">-</span> <span class="fu">mean</span>(z))</span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a><span class="fu">cloud_metrics</span>(las_bld, <span class="sc">~</span><span class="fu">roof_metrics</span>(X, Y, Height))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="tabset-12-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-12-2-tab">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># PCA-based roof slope requires per-building point sets.</span></span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="co"># lasR does not support per-object metric computation natively;</span></span>
-<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="co"># use segment_shape() or post-process individual building</span></span>
-<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a><span class="co"># footprints extracted from a vector layer.</span></span>
-<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>pipeline <span class="ot">&lt;-</span></span>
-<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">reader_las</span>(<span class="at">filter =</span> <span class="st">"-keep_class 6"</span>) <span class="sc">+</span></span>
-<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rasterize</span>(</span>
-<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">res     =</span> <span class="dv">5</span>,   <span class="co"># fine grid for roof detail</span></span>
-<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">metrics =</span> <span class="sc">~</span><span class="fu">list</span>(</span>
-<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">roof_roughness =</span> <span class="fu">sd</span>(Height <span class="sc">-</span> <span class="fu">mean</span>(Height)),</span>
-<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a>      <span class="at">roof_range     =</span> <span class="fu">diff</span>(<span class="fu">range</span>(Height))</span>
-<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">ofile   =</span> <span class="st">"roof_roughness_5m.tif"</span></span>
-<span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb35-16"><a href="#cb35-16" aria-hidden="true" tabindex="-1"></a><span class="fu">exec</span>(pipeline, <span class="at">on =</span> <span class="st">"path/to/folder/"</span>, <span class="at">ncores =</span> <span class="dv">4</span>L)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="tabset-13-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-13-2-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="co"># PCA-based roof slope requires per-building point sets.</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="co"># lasR does not support per-object metric computation natively;</span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="co"># use segment_shape() or post-process individual building</span></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a><span class="co"># footprints extracted from a vector layer.</span></span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>pipeline <span class="ot">&lt;-</span></span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">reader_las</span>(<span class="at">filter =</span> <span class="st">"-keep_class 6"</span>) <span class="sc">+</span></span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rasterize</span>(</span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">res     =</span> <span class="dv">5</span>,   <span class="co"># fine grid for roof detail</span></span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">metrics =</span> <span class="sc">~</span><span class="fu">list</span>(</span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">roof_roughness =</span> <span class="fu">sd</span>(Height <span class="sc">-</span> <span class="fu">mean</span>(Height)),</span>
+<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a>      <span class="at">roof_range     =</span> <span class="fu">diff</span>(<span class="fu">range</span>(Height))</span>
+<span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb38-14"><a href="#cb38-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">ofile   =</span> <span class="st">"roof_roughness_5m.tif"</span></span>
+<span id="cb38-15"><a href="#cb38-15" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb38-16"><a href="#cb38-16" aria-hidden="true" tabindex="-1"></a><span class="fu">exec</span>(pipeline, <span class="at">on =</span> <span class="st">"path/to/folder/"</span>, <span class="at">ncores =</span> <span class="dv">4</span>L)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="tabset-12-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-12-3-tab">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> roof_metrics(x, y, h):</span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">len</span>(h) <span class="op">&lt;</span> <span class="dv">6</span>:</span>
-<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">None</span></span>
-<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>    pts    <span class="op">=</span> np.column_stack([x, y, h])</span>
-<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># PCA: eigenvector of smallest eigenvalue = surface normal</span></span>
-<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>    _, evecs <span class="op">=</span> np.linalg.eigh(np.cov(pts.T))</span>
-<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>    normal   <span class="op">=</span> evecs[:, <span class="dv">0</span>]</span>
-<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>    slope    <span class="op">=</span> np.degrees(np.arccos(np.<span class="bu">abs</span>(normal[<span class="dv">2</span>])))</span>
-<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {</span>
-<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">"roof_slope_mean"</span>: slope,</span>
-<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a>        <span class="st">"roof_roughness"</span>:  np.std(h <span class="op">-</span> h.mean())</span>
-<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-14"><a href="#cb36-14" aria-hidden="true" tabindex="-1"></a>rm <span class="op">=</span> roof_metrics(x[bld_mask], y[bld_mask], H[bld_mask])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="tabset-13-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-13-3-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> roof_metrics(x, y, h):</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">len</span>(h) <span class="op">&lt;</span> <span class="dv">6</span>:</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">None</span></span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>    pts    <span class="op">=</span> np.column_stack([x, y, h])</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># PCA: eigenvector of smallest eigenvalue = surface normal</span></span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>    _, evecs <span class="op">=</span> np.linalg.eigh(np.cov(pts.T))</span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>    normal   <span class="op">=</span> evecs[:, <span class="dv">0</span>]</span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a>    slope    <span class="op">=</span> np.degrees(np.arccos(np.<span class="bu">abs</span>(normal[<span class="dv">2</span>])))</span>
+<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {</span>
+<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">"roof_slope_mean"</span>: slope,</span>
+<span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a>        <span class="st">"roof_roughness"</span>:  np.std(h <span class="op">-</span> h.mean())</span>
+<span id="cb39-12"><a href="#cb39-12" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb39-13"><a href="#cb39-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-14"><a href="#cb39-14" aria-hidden="true" tabindex="-1"></a>rm <span class="op">=</span> roof_metrics(x[bld_mask], y[bld_mask], H[bld_mask])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </div>
 </div>
@@ -1424,63 +1800,63 @@ Important
 <section id="building-footprint-and-volume" class="level3">
 <h3 class="anchored" data-anchor-id="building-footprint-and-volume">4.3 Building Footprint and Volume</h3>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-13-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-13-1" role="tab" aria-controls="tabset-13-1" aria-selected="true" href="">lidR</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-13-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-13-2" role="tab" aria-controls="tabset-13-2" aria-selected="false" href="">lasR</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-13-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-13-3" role="tab" aria-controls="tabset-13-3" aria-selected="false" href="">Python</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-14-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-14-1" role="tab" aria-controls="tabset-14-1" aria-selected="true" href="">lidR</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-14-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-14-2" role="tab" aria-controls="tabset-14-2" aria-selected="false" href="">lasR</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-14-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-14-3" role="tab" aria-controls="tabset-14-3" aria-selected="false" href="">Python</a></li></ul>
 <div class="tab-content">
-<div id="tabset-13-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-13-1-tab">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>building_footprint_metrics <span class="ot">&lt;-</span> <span class="cf">function</span>(x, y, z) {</span>
-<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  pts2d          <span class="ot">&lt;-</span> <span class="fu">st_sfc</span>(<span class="fu">st_multipoint</span>(<span class="fu">cbind</span>(x, y)))</span>
-<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  hull           <span class="ot">&lt;-</span> <span class="fu">st_convex_hull</span>(pts2d)</span>
-<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>  footprint_area <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">st_area</span>(hull))</span>
-<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>  perimeter      <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(</span>
-<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">st_length</span>(<span class="fu">st_cast</span>(hull, <span class="st">"MULTILINESTRING"</span>)))</span>
-<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>  height_p95     <span class="ot">&lt;-</span> <span class="fu">quantile</span>(z, <span class="fl">0.95</span>)</span>
-<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>  volume         <span class="ot">&lt;-</span> footprint_area <span class="sc">*</span> height_p95</span>
-<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>  compactness    <span class="ot">&lt;-</span> <span class="dv">4</span> <span class="sc">*</span> pi <span class="sc">*</span> footprint_area <span class="sc">/</span> perimeter<span class="sc">^</span><span class="dv">2</span></span>
-<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(</span>
-<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">footprint_m2 =</span> footprint_area,</span>
-<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">perimeter_m  =</span> perimeter,</span>
-<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">compactness  =</span> compactness,</span>
-<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">volume_m3    =</span> volume,</span>
-<span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">FAR          =</span> volume <span class="sc">/</span> footprint_area</span>
-<span id="cb37-16"><a href="#cb37-16" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb37-17"><a href="#cb37-17" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb37-18"><a href="#cb37-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-19"><a href="#cb37-19" aria-hidden="true" tabindex="-1"></a><span class="fu">cloud_metrics</span>(las_bld, <span class="sc">~</span><span class="fu">building_footprint_metrics</span>(X, Y, Height))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="tabset-14-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-14-1-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>building_footprint_metrics <span class="ot">&lt;-</span> <span class="cf">function</span>(x, y, z) {</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>  pts2d          <span class="ot">&lt;-</span> <span class="fu">st_sfc</span>(<span class="fu">st_multipoint</span>(<span class="fu">cbind</span>(x, y)))</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>  hull           <span class="ot">&lt;-</span> <span class="fu">st_convex_hull</span>(pts2d)</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>  footprint_area <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">st_area</span>(hull))</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>  perimeter      <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">st_length</span>(<span class="fu">st_cast</span>(hull, <span class="st">"MULTILINESTRING"</span>)))</span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>  height_p95     <span class="ot">&lt;-</span> <span class="fu">quantile</span>(z, <span class="fl">0.95</span>)</span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>  volume         <span class="ot">&lt;-</span> footprint_area <span class="sc">*</span> height_p95</span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a>  compactness    <span class="ot">&lt;-</span> <span class="dv">4</span> <span class="sc">*</span> pi <span class="sc">*</span> footprint_area <span class="sc">/</span> perimeter<span class="sc">^</span><span class="dv">2</span></span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(</span>
+<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">footprint_m2 =</span> footprint_area,</span>
+<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">perimeter_m  =</span> perimeter,</span>
+<span id="cb40-13"><a href="#cb40-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">compactness  =</span> compactness,</span>
+<span id="cb40-14"><a href="#cb40-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">volume_m3    =</span> volume,</span>
+<span id="cb40-15"><a href="#cb40-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">FAR          =</span> volume <span class="sc">/</span> footprint_area</span>
+<span id="cb40-16"><a href="#cb40-16" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb40-17"><a href="#cb40-17" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb40-18"><a href="#cb40-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-19"><a href="#cb40-19" aria-hidden="true" tabindex="-1"></a><span class="fu">cloud_metrics</span>(las_bld, <span class="sc">~</span><span class="fu">building_footprint_metrics</span>(X, Y, Height))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="tabset-13-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-13-2-tab">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Footprint / volume require 2D convex hull per building — not</span></span>
-<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="co"># directly supported inside rasterize(). Typical workflow:</span></span>
-<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   1) Run exec() to get the CHM and a classified raster.</span></span>
-<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   2) Vectorise building blobs with terra::patches() or sf operations.</span></span>
-<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a><span class="co">#   3) For each polygon, extract building points and compute metrics in R.</span></span>
-<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>bld_raster  <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">rast</span>(<span class="st">"building_height_20m.tif"</span>)</span>
-<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>bld_polys   <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">as.polygons</span>(bld_raster <span class="sc">&gt;</span> <span class="dv">0</span>)   <span class="co"># rough footprint mask</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="tabset-14-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-14-2-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Footprint / volume require 2D convex hull per building — not</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="co"># directly supported inside rasterize(). Typical workflow:</span></span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   1) Run exec() to get the CHM and a classified raster.</span></span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   2) Vectorise building blobs with terra::patches() or sf operations.</span></span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a><span class="co">#   3) For each polygon, extract building points and compute metrics in R.</span></span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>bld_raster  <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">rast</span>(<span class="st">"building_height_20m.tif"</span>)</span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>bld_polys   <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">as.polygons</span>(bld_raster <span class="sc">&gt;</span> <span class="dv">0</span>)   <span class="co"># rough footprint mask</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="tabset-13-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-13-3-tab">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> building_footprint_metrics(x, y, h):</span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">len</span>(h) <span class="op">&lt;</span> <span class="dv">4</span>:</span>
-<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">None</span></span>
-<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>    pts2d <span class="op">=</span> np.column_stack([x, y])</span>
-<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
-<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>        hull <span class="op">=</span> ConvexHull(pts2d)</span>
-<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> <span class="pp">Exception</span>:</span>
-<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">None</span></span>
-<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># In scipy 2D ConvexHull: hull.volume = area, hull.area = perimeter</span></span>
-<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a>    footprint_area <span class="op">=</span> hull.volume</span>
-<span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a>    perimeter      <span class="op">=</span> hull.area</span>
-<span id="cb39-12"><a href="#cb39-12" aria-hidden="true" tabindex="-1"></a>    h_p95          <span class="op">=</span> np.percentile(h, <span class="dv">95</span>)</span>
-<span id="cb39-13"><a href="#cb39-13" aria-hidden="true" tabindex="-1"></a>    volume         <span class="op">=</span> footprint_area <span class="op">*</span> h_p95</span>
-<span id="cb39-14"><a href="#cb39-14" aria-hidden="true" tabindex="-1"></a>    compactness    <span class="op">=</span> <span class="dv">4</span> <span class="op">*</span> np.pi <span class="op">*</span> footprint_area <span class="op">/</span> perimeter<span class="op">**</span><span class="dv">2</span></span>
-<span id="cb39-15"><a href="#cb39-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {</span>
-<span id="cb39-16"><a href="#cb39-16" aria-hidden="true" tabindex="-1"></a>        <span class="st">"footprint_m2"</span>: footprint_area,</span>
-<span id="cb39-17"><a href="#cb39-17" aria-hidden="true" tabindex="-1"></a>        <span class="st">"perimeter_m"</span>:  perimeter,</span>
-<span id="cb39-18"><a href="#cb39-18" aria-hidden="true" tabindex="-1"></a>        <span class="st">"compactness"</span>:  compactness,</span>
-<span id="cb39-19"><a href="#cb39-19" aria-hidden="true" tabindex="-1"></a>        <span class="st">"volume_m3"</span>:    volume,</span>
-<span id="cb39-20"><a href="#cb39-20" aria-hidden="true" tabindex="-1"></a>        <span class="st">"FAR"</span>:          volume <span class="op">/</span> footprint_area</span>
-<span id="cb39-21"><a href="#cb39-21" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb39-22"><a href="#cb39-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-23"><a href="#cb39-23" aria-hidden="true" tabindex="-1"></a>fm <span class="op">=</span> building_footprint_metrics(x[bld_mask], y[bld_mask], H[bld_mask])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="tabset-14-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-14-3-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> building_footprint_metrics(x, y, h):</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">len</span>(h) <span class="op">&lt;</span> <span class="dv">4</span>:</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">None</span></span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>    pts2d <span class="op">=</span> np.column_stack([x, y])</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>        hull <span class="op">=</span> ConvexHull(pts2d)</span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> <span class="pp">Exception</span>:</span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">None</span></span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># In scipy 2D ConvexHull: hull.volume = area, hull.area = perimeter</span></span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a>    footprint_area <span class="op">=</span> hull.volume</span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a>    perimeter      <span class="op">=</span> hull.area</span>
+<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a>    h_p95          <span class="op">=</span> np.percentile(h, <span class="dv">95</span>)</span>
+<span id="cb42-13"><a href="#cb42-13" aria-hidden="true" tabindex="-1"></a>    volume         <span class="op">=</span> footprint_area <span class="op">*</span> h_p95</span>
+<span id="cb42-14"><a href="#cb42-14" aria-hidden="true" tabindex="-1"></a>    compactness    <span class="op">=</span> <span class="dv">4</span> <span class="op">*</span> np.pi <span class="op">*</span> footprint_area <span class="op">/</span> perimeter<span class="op">**</span><span class="dv">2</span></span>
+<span id="cb42-15"><a href="#cb42-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {</span>
+<span id="cb42-16"><a href="#cb42-16" aria-hidden="true" tabindex="-1"></a>        <span class="st">"footprint_m2"</span>: footprint_area,</span>
+<span id="cb42-17"><a href="#cb42-17" aria-hidden="true" tabindex="-1"></a>        <span class="st">"perimeter_m"</span>:  perimeter,</span>
+<span id="cb42-18"><a href="#cb42-18" aria-hidden="true" tabindex="-1"></a>        <span class="st">"compactness"</span>:  compactness,</span>
+<span id="cb42-19"><a href="#cb42-19" aria-hidden="true" tabindex="-1"></a>        <span class="st">"volume_m3"</span>:    volume,</span>
+<span id="cb42-20"><a href="#cb42-20" aria-hidden="true" tabindex="-1"></a>        <span class="st">"FAR"</span>:          volume <span class="op">/</span> footprint_area</span>
+<span id="cb42-21"><a href="#cb42-21" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb42-22"><a href="#cb42-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-23"><a href="#cb42-23" aria-hidden="true" tabindex="-1"></a>fm <span class="op">=</span> building_footprint_metrics(x[bld_mask], y[bld_mask], H[bld_mask])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </div>
 </div>
@@ -1490,61 +1866,61 @@ Important
 <h3 class="anchored" data-anchor-id="sky-view-factor-svf-and-urban-canyon-geometry">4.4 Sky View Factor (SVF) and Urban Canyon Geometry</h3>
 <p><span class="math display">\[SVF = 1 - \frac{1}{2\pi} \int_0^{2\pi} \sin^2\!\left(\theta(\phi)\right) d\phi\]</span></p>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-14-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-14-1" role="tab" aria-controls="tabset-14-1" aria-selected="true" href="">lidR</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-14-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-14-2" role="tab" aria-controls="tabset-14-2" aria-selected="false" href="">lasR</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-14-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-14-3" role="tab" aria-controls="tabset-14-3" aria-selected="false" href="">Python</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-15-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-15-1" role="tab" aria-controls="tabset-15-1" aria-selected="true" href="">lidR</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-15-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-15-2" role="tab" aria-controls="tabset-15-2" aria-selected="false" href="">lasR</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-15-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-15-3" role="tab" aria-controls="tabset-15-3" aria-selected="false" href="">Python</a></li></ul>
 <div class="tab-content">
-<div id="tabset-14-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-14-1-tab">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>dsm  <span class="ot">&lt;-</span> <span class="fu">rasterize_canopy</span>(las, <span class="at">res =</span> <span class="dv">1</span>, <span class="at">algorithm =</span> <span class="fu">p2r</span>())</span>
-<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>dtm  <span class="ot">&lt;-</span> <span class="fu">rasterize_terrain</span>(las, <span class="at">res =</span> <span class="dv">1</span>, <span class="at">algorithm =</span> <span class="fu">knnidw</span>())</span>
-<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>ndsm <span class="ot">&lt;-</span> dsm <span class="sc">-</span> dtm</span>
-<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a><span class="co"># SVF via external package or SAGA GIS</span></span>
-<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a><span class="co"># library(svf)</span></span>
-<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a><span class="co"># svf_raster &lt;- svf(ndsm, radius = 50, directions = 36)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="tabset-15-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-15-1-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>dsm  <span class="ot">&lt;-</span> <span class="fu">rasterize_canopy</span>(las, <span class="at">res =</span> <span class="dv">1</span>, <span class="at">algorithm =</span> <span class="fu">p2r</span>())</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>dtm  <span class="ot">&lt;-</span> <span class="fu">rasterize_terrain</span>(las, <span class="at">res =</span> <span class="dv">1</span>, <span class="at">algorithm =</span> <span class="fu">knnidw</span>())</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>ndsm <span class="ot">&lt;-</span> dsm <span class="sc">-</span> dtm</span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a><span class="co"># SVF via external package or SAGA GIS</span></span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a><span class="co"># library(svf)</span></span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a><span class="co"># svf_raster &lt;- svf(ndsm, radius = 50, directions = 36)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="tabset-14-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-14-2-tab">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>pipeline <span class="ot">&lt;-</span></span>
-<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">reader_las</span>() <span class="sc">+</span></span>
-<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">chm</span>(<span class="at">res =</span> <span class="dv">1</span>, <span class="at">ofile =</span> <span class="st">"dsm_1m.tif"</span>) <span class="sc">+</span></span>
-<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">dtm</span>(<span class="at">res =</span> <span class="dv">1</span>, <span class="at">algorithm =</span> <span class="fu">knnidw</span>(), <span class="at">ofile =</span> <span class="st">"dtm_1m.tif"</span>)</span>
-<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a><span class="fu">exec</span>(pipeline, <span class="at">on =</span> <span class="st">"path/to/folder/"</span>, <span class="at">ncores =</span> <span class="dv">4</span>L)</span>
-<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute nDSM and SVF post-pipeline</span></span>
-<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>dsm_r  <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">rast</span>(<span class="st">"dsm_1m.tif"</span>)</span>
-<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a>dtm_r  <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">rast</span>(<span class="st">"dtm_1m.tif"</span>)</span>
-<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a>ndsm_r <span class="ot">&lt;-</span> dsm_r <span class="sc">-</span> dtm_r</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="tabset-15-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-15-2-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>pipeline <span class="ot">&lt;-</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">reader_las</span>() <span class="sc">+</span></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">chm</span>(<span class="at">res =</span> <span class="dv">1</span>, <span class="at">ofile =</span> <span class="st">"dsm_1m.tif"</span>) <span class="sc">+</span></span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">dtm</span>(<span class="at">res =</span> <span class="dv">1</span>, <span class="at">algorithm =</span> <span class="fu">knnidw</span>(), <span class="at">ofile =</span> <span class="st">"dtm_1m.tif"</span>)</span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a><span class="fu">exec</span>(pipeline, <span class="at">on =</span> <span class="st">"path/to/folder/"</span>, <span class="at">ncores =</span> <span class="dv">4</span>L)</span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute nDSM and SVF post-pipeline</span></span>
+<span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a>dsm_r  <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">rast</span>(<span class="st">"dsm_1m.tif"</span>)</span>
+<span id="cb44-10"><a href="#cb44-10" aria-hidden="true" tabindex="-1"></a>dtm_r  <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">rast</span>(<span class="st">"dtm_1m.tif"</span>)</span>
+<span id="cb44-11"><a href="#cb44-11" aria-hidden="true" tabindex="-1"></a>ndsm_r <span class="ot">&lt;-</span> dsm_r <span class="sc">-</span> dtm_r</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="tabset-14-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-14-3-tab">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> rasterio</span>
-<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Load previously computed DSM and DTM</span></span>
-<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> rasterio.<span class="bu">open</span>(<span class="st">"dsm_1m.tif"</span>) <span class="im">as</span> src:</span>
-<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>    dsm_arr <span class="op">=</span> src.read(<span class="dv">1</span>).astype(<span class="bu">float</span>)</span>
-<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>    profile <span class="op">=</span> src.profile</span>
-<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> rasterio.<span class="bu">open</span>(<span class="st">"dtm_1m.tif"</span>) <span class="im">as</span> src:</span>
-<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>    dtm_arr <span class="op">=</span> src.read(<span class="dv">1</span>).astype(<span class="bu">float</span>)</span>
-<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a>ndsm_arr <span class="op">=</span> dsm_arr <span class="op">-</span> dtm_arr   <span class="co"># height above ground surface</span></span>
-<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb42-13"><a href="#cb42-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Approximate SVF via horizon scanning (simplified)</span></span>
-<span id="cb42-14"><a href="#cb42-14" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> svf_approx(ndsm, radius_px<span class="op">=</span><span class="dv">50</span>, n_dirs<span class="op">=</span><span class="dv">36</span>):</span>
-<span id="cb42-15"><a href="#cb42-15" aria-hidden="true" tabindex="-1"></a>    rows, cols <span class="op">=</span> ndsm.shape</span>
-<span id="cb42-16"><a href="#cb42-16" aria-hidden="true" tabindex="-1"></a>    svf_out    <span class="op">=</span> np.full_like(ndsm, np.nan, dtype<span class="op">=</span><span class="bu">float</span>)</span>
-<span id="cb42-17"><a href="#cb42-17" aria-hidden="true" tabindex="-1"></a>    angles     <span class="op">=</span> np.linspace(<span class="dv">0</span>, <span class="dv">2</span> <span class="op">*</span> np.pi, n_dirs, endpoint<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb42-18"><a href="#cb42-18" aria-hidden="true" tabindex="-1"></a>    r_range    <span class="op">=</span> np.arange(<span class="dv">1</span>, radius_px <span class="op">+</span> <span class="dv">1</span>)</span>
-<span id="cb42-19"><a href="#cb42-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(rows):</span>
-<span id="cb42-20"><a href="#cb42-20" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(cols):</span>
-<span id="cb42-21"><a href="#cb42-21" aria-hidden="true" tabindex="-1"></a>            max_sin2 <span class="op">=</span> <span class="fl">0.0</span></span>
-<span id="cb42-22"><a href="#cb42-22" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> a <span class="kw">in</span> angles:</span>
-<span id="cb42-23"><a href="#cb42-23" aria-hidden="true" tabindex="-1"></a>                ri <span class="op">=</span> (i <span class="op">+</span> r_range <span class="op">*</span> np.sin(a)).astype(<span class="bu">int</span>)</span>
-<span id="cb42-24"><a href="#cb42-24" aria-hidden="true" tabindex="-1"></a>                ci <span class="op">=</span> (j <span class="op">+</span> r_range <span class="op">*</span> np.cos(a)).astype(<span class="bu">int</span>)</span>
-<span id="cb42-25"><a href="#cb42-25" aria-hidden="true" tabindex="-1"></a>                valid <span class="op">=</span> (ri <span class="op">&gt;=</span> <span class="dv">0</span>) <span class="op">&amp;</span> (ri <span class="op">&lt;</span> rows) <span class="op">&amp;</span> (ci <span class="op">&gt;=</span> <span class="dv">0</span>) <span class="op">&amp;</span> (ci <span class="op">&lt;</span> cols)</span>
-<span id="cb42-26"><a href="#cb42-26" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> valid.<span class="bu">any</span>():</span>
-<span id="cb42-27"><a href="#cb42-27" aria-hidden="true" tabindex="-1"></a>                    elev <span class="op">=</span> ndsm[ri[valid], ci[valid]] <span class="op">/</span> r_range[valid]</span>
-<span id="cb42-28"><a href="#cb42-28" aria-hidden="true" tabindex="-1"></a>                    max_sin2 <span class="op">+=</span> np.sin(np.arctan(elev.<span class="bu">max</span>()))<span class="op">**</span><span class="dv">2</span></span>
-<span id="cb42-29"><a href="#cb42-29" aria-hidden="true" tabindex="-1"></a>            svf_out[i, j] <span class="op">=</span> <span class="dv">1</span> <span class="op">-</span> max_sin2 <span class="op">/</span> n_dirs</span>
-<span id="cb42-30"><a href="#cb42-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> svf_out</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="tabset-15-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-15-3-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb45"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> rasterio</span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Load previously computed DSM and DTM</span></span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> rasterio.<span class="bu">open</span>(<span class="st">"dsm_1m.tif"</span>) <span class="im">as</span> src:</span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>    dsm_arr <span class="op">=</span> src.read(<span class="dv">1</span>).astype(<span class="bu">float</span>)</span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>    profile <span class="op">=</span> src.profile</span>
+<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> rasterio.<span class="bu">open</span>(<span class="st">"dtm_1m.tif"</span>) <span class="im">as</span> src:</span>
+<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a>    dtm_arr <span class="op">=</span> src.read(<span class="dv">1</span>).astype(<span class="bu">float</span>)</span>
+<span id="cb45-10"><a href="#cb45-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-11"><a href="#cb45-11" aria-hidden="true" tabindex="-1"></a>ndsm_arr <span class="op">=</span> dsm_arr <span class="op">-</span> dtm_arr   <span class="co"># height above ground surface</span></span>
+<span id="cb45-12"><a href="#cb45-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-13"><a href="#cb45-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Approximate SVF via horizon scanning (simplified)</span></span>
+<span id="cb45-14"><a href="#cb45-14" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> svf_approx(ndsm, radius_px<span class="op">=</span><span class="dv">50</span>, n_dirs<span class="op">=</span><span class="dv">36</span>):</span>
+<span id="cb45-15"><a href="#cb45-15" aria-hidden="true" tabindex="-1"></a>    rows, cols <span class="op">=</span> ndsm.shape</span>
+<span id="cb45-16"><a href="#cb45-16" aria-hidden="true" tabindex="-1"></a>    svf_out    <span class="op">=</span> np.full_like(ndsm, np.nan, dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb45-17"><a href="#cb45-17" aria-hidden="true" tabindex="-1"></a>    angles     <span class="op">=</span> np.linspace(<span class="dv">0</span>, <span class="dv">2</span> <span class="op">*</span> np.pi, n_dirs, endpoint<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb45-18"><a href="#cb45-18" aria-hidden="true" tabindex="-1"></a>    r_range    <span class="op">=</span> np.arange(<span class="dv">1</span>, radius_px <span class="op">+</span> <span class="dv">1</span>)</span>
+<span id="cb45-19"><a href="#cb45-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(rows):</span>
+<span id="cb45-20"><a href="#cb45-20" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(cols):</span>
+<span id="cb45-21"><a href="#cb45-21" aria-hidden="true" tabindex="-1"></a>            max_sin2 <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb45-22"><a href="#cb45-22" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> a <span class="kw">in</span> angles:</span>
+<span id="cb45-23"><a href="#cb45-23" aria-hidden="true" tabindex="-1"></a>                ri <span class="op">=</span> (i <span class="op">+</span> r_range <span class="op">*</span> np.sin(a)).astype(<span class="bu">int</span>)</span>
+<span id="cb45-24"><a href="#cb45-24" aria-hidden="true" tabindex="-1"></a>                ci <span class="op">=</span> (j <span class="op">+</span> r_range <span class="op">*</span> np.cos(a)).astype(<span class="bu">int</span>)</span>
+<span id="cb45-25"><a href="#cb45-25" aria-hidden="true" tabindex="-1"></a>                valid <span class="op">=</span> (ri <span class="op">&gt;=</span> <span class="dv">0</span>) <span class="op">&amp;</span> (ri <span class="op">&lt;</span> rows) <span class="op">&amp;</span> (ci <span class="op">&gt;=</span> <span class="dv">0</span>) <span class="op">&amp;</span> (ci <span class="op">&lt;</span> cols)</span>
+<span id="cb45-26"><a href="#cb45-26" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> valid.<span class="bu">any</span>():</span>
+<span id="cb45-27"><a href="#cb45-27" aria-hidden="true" tabindex="-1"></a>                    elev <span class="op">=</span> ndsm[ri[valid], ci[valid]] <span class="op">/</span> r_range[valid]</span>
+<span id="cb45-28"><a href="#cb45-28" aria-hidden="true" tabindex="-1"></a>                    max_sin2 <span class="op">+=</span> np.sin(np.arctan(elev.<span class="bu">max</span>()))<span class="op">**</span><span class="dv">2</span></span>
+<span id="cb45-29"><a href="#cb45-29" aria-hidden="true" tabindex="-1"></a>            svf_out[i, j] <span class="op">=</span> <span class="dv">1</span> <span class="op">-</span> max_sin2 <span class="op">/</span> n_dirs</span>
+<span id="cb45-30"><a href="#cb45-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> svf_out</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </div>
 </div>
@@ -1580,101 +1956,101 @@ Important
 <section id="full-urban-metrics-pipeline" class="level3">
 <h3 class="anchored" data-anchor-id="full-urban-metrics-pipeline">4.5 Full Urban Metrics Pipeline</h3>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-15-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-15-1" role="tab" aria-controls="tabset-15-1" aria-selected="true" href="">lidR</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-15-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-15-2" role="tab" aria-controls="tabset-15-2" aria-selected="false" href="">lasR</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-15-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-15-3" role="tab" aria-controls="tabset-15-3" aria-selected="false" href="">Python</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-16-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-16-1" role="tab" aria-controls="tabset-16-1" aria-selected="true" href="">lidR</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-16-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-16-2" role="tab" aria-controls="tabset-16-2" aria-selected="false" href="">lasR</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-16-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-16-3" role="tab" aria-controls="tabset-16-3" aria-selected="false" href="">Python</a></li></ul>
 <div class="tab-content">
-<div id="tabset-15-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-15-1-tab">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>urban_metrics <span class="ot">&lt;-</span> <span class="cf">function</span>(las_tile) {</span>
-<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>  las_veg <span class="ot">&lt;-</span> <span class="fu">filter_poi</span>(las_tile, Classification <span class="sc">%in%</span></span>
-<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>                          <span class="fu">c</span>(LASVEGETATION, LASHIGHVEGETATION))</span>
-<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>  las_bld <span class="ot">&lt;-</span> <span class="fu">filter_poi</span>(las_tile, Classification <span class="sc">==</span> LASBUILDING)</span>
-<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>  veg_m <span class="ot">&lt;-</span> <span class="fu">cloud_metrics</span>(las_veg, <span class="sc">~</span>{</span>
-<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>    z <span class="ot">&lt;-</span> Height[Height <span class="sc">&gt;=</span> <span class="dv">0</span>]</span>
-<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="at">H95 =</span> <span class="fu">quantile</span>(z,.<span class="dv">95</span>), <span class="at">Hmean =</span> <span class="fu">mean</span>(z), <span class="at">Hsd =</span> <span class="fu">sd</span>(z),</span>
-<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">CC  =</span> <span class="fu">mean</span>(z <span class="sc">&gt;=</span> <span class="dv">2</span>),</span>
-<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">VCI =</span> <span class="fu">vci_metric</span>(z)<span class="sc">$</span>VCI_norm,</span>
-<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">CRR =</span> <span class="fu">crr_metric</span>(z)<span class="sc">$</span>CRR)</span>
-<span id="cb43-12"><a href="#cb43-12" aria-hidden="true" tabindex="-1"></a>  })</span>
-<span id="cb43-13"><a href="#cb43-13" aria-hidden="true" tabindex="-1"></a>  bld_m <span class="ot">&lt;-</span> <span class="fu">cloud_metrics</span>(las_bld, <span class="sc">~</span>{</span>
-<span id="cb43-14"><a href="#cb43-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(</span>
-<span id="cb43-15"><a href="#cb43-15" aria-hidden="true" tabindex="-1"></a>      <span class="at">Bh_p95      =</span> <span class="fu">quantile</span>(Height,.<span class="dv">95</span>),</span>
-<span id="cb43-16"><a href="#cb43-16" aria-hidden="true" tabindex="-1"></a>      <span class="at">Bh_floor    =</span> <span class="fu">quantile</span>(Height,.<span class="dv">95</span>) <span class="sc">/</span> <span class="dv">3</span>,</span>
-<span id="cb43-17"><a href="#cb43-17" aria-hidden="true" tabindex="-1"></a>      <span class="at">roof_slope  =</span> <span class="fu">roof_metrics</span>(X, Y, Height)<span class="sc">$</span>roof_slope_mean,</span>
-<span id="cb43-18"><a href="#cb43-18" aria-hidden="true" tabindex="-1"></a>      <span class="at">roof_rough  =</span> <span class="fu">roof_metrics</span>(X, Y, Height)<span class="sc">$</span>roof_roughness,</span>
-<span id="cb43-19"><a href="#cb43-19" aria-hidden="true" tabindex="-1"></a>      <span class="at">footprint   =</span> <span class="fu">building_footprint_metrics</span>(X, Y, Height)<span class="sc">$</span>footprint_m2,</span>
-<span id="cb43-20"><a href="#cb43-20" aria-hidden="true" tabindex="-1"></a>      <span class="at">volume      =</span> <span class="fu">building_footprint_metrics</span>(X, Y, Height)<span class="sc">$</span>volume_m3,</span>
-<span id="cb43-21"><a href="#cb43-21" aria-hidden="true" tabindex="-1"></a>      <span class="at">compactness =</span> <span class="fu">building_footprint_metrics</span>(X, Y, Height)<span class="sc">$</span>compactness</span>
-<span id="cb43-22"><a href="#cb43-22" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb43-23"><a href="#cb43-23" aria-hidden="true" tabindex="-1"></a>  })</span>
-<span id="cb43-24"><a href="#cb43-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">vegetation =</span> veg_m, <span class="at">buildings =</span> bld_m)</span>
-<span id="cb43-25"><a href="#cb43-25" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb43-26"><a href="#cb43-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb43-27"><a href="#cb43-27" aria-hidden="true" tabindex="-1"></a><span class="fu">opt_output_files</span>(ctg) <span class="ot">&lt;-</span> <span class="st">"output/{*}_metrics.rds"</span></span>
-<span id="cb43-28"><a href="#cb43-28" aria-hidden="true" tabindex="-1"></a><span class="fu">catalog_apply</span>(ctg, urban_metrics)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="tabset-16-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-16-1-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>urban_metrics <span class="ot">&lt;-</span> <span class="cf">function</span>(las_tile) {</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>  las_veg <span class="ot">&lt;-</span> <span class="fu">filter_poi</span>(las_tile, Classification <span class="sc">%in%</span></span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>                          <span class="fu">c</span>(LASVEGETATION, LASHIGHVEGETATION))</span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>  las_bld <span class="ot">&lt;-</span> <span class="fu">filter_poi</span>(las_tile, Classification <span class="sc">==</span> LASBUILDING)</span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>  veg_m <span class="ot">&lt;-</span> <span class="fu">cloud_metrics</span>(las_veg, <span class="sc">~</span>{</span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>    z <span class="ot">&lt;-</span> Height[Height <span class="sc">&gt;=</span> <span class="dv">0</span>]</span>
+<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="at">H95 =</span> <span class="fu">quantile</span>(z,.<span class="dv">95</span>), <span class="at">Hmean =</span> <span class="fu">mean</span>(z), <span class="at">Hsd =</span> <span class="fu">sd</span>(z),</span>
+<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">CC  =</span> <span class="fu">mean</span>(z <span class="sc">&gt;=</span> <span class="dv">2</span>),</span>
+<span id="cb46-10"><a href="#cb46-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">VCI =</span> <span class="fu">vci_metric</span>(z)<span class="sc">$</span>VCI_norm,</span>
+<span id="cb46-11"><a href="#cb46-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">CRR =</span> <span class="fu">crr_metric</span>(z)<span class="sc">$</span>CRR)</span>
+<span id="cb46-12"><a href="#cb46-12" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb46-13"><a href="#cb46-13" aria-hidden="true" tabindex="-1"></a>  bld_m <span class="ot">&lt;-</span> <span class="fu">cloud_metrics</span>(las_bld, <span class="sc">~</span>{</span>
+<span id="cb46-14"><a href="#cb46-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(</span>
+<span id="cb46-15"><a href="#cb46-15" aria-hidden="true" tabindex="-1"></a>      <span class="at">Bh_p95      =</span> <span class="fu">quantile</span>(Height,.<span class="dv">95</span>),</span>
+<span id="cb46-16"><a href="#cb46-16" aria-hidden="true" tabindex="-1"></a>      <span class="at">Bh_floor    =</span> <span class="fu">quantile</span>(Height,.<span class="dv">95</span>) <span class="sc">/</span> <span class="dv">3</span>,</span>
+<span id="cb46-17"><a href="#cb46-17" aria-hidden="true" tabindex="-1"></a>      <span class="at">roof_slope  =</span> <span class="fu">roof_metrics</span>(X, Y, Height)<span class="sc">$</span>roof_slope_mean,</span>
+<span id="cb46-18"><a href="#cb46-18" aria-hidden="true" tabindex="-1"></a>      <span class="at">roof_rough  =</span> <span class="fu">roof_metrics</span>(X, Y, Height)<span class="sc">$</span>roof_roughness,</span>
+<span id="cb46-19"><a href="#cb46-19" aria-hidden="true" tabindex="-1"></a>      <span class="at">footprint   =</span> <span class="fu">building_footprint_metrics</span>(X, Y, Height)<span class="sc">$</span>footprint_m2,</span>
+<span id="cb46-20"><a href="#cb46-20" aria-hidden="true" tabindex="-1"></a>      <span class="at">volume      =</span> <span class="fu">building_footprint_metrics</span>(X, Y, Height)<span class="sc">$</span>volume_m3,</span>
+<span id="cb46-21"><a href="#cb46-21" aria-hidden="true" tabindex="-1"></a>      <span class="at">compactness =</span> <span class="fu">building_footprint_metrics</span>(X, Y, Height)<span class="sc">$</span>compactness</span>
+<span id="cb46-22"><a href="#cb46-22" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb46-23"><a href="#cb46-23" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb46-24"><a href="#cb46-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">vegetation =</span> veg_m, <span class="at">buildings =</span> bld_m)</span>
+<span id="cb46-25"><a href="#cb46-25" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb46-26"><a href="#cb46-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-27"><a href="#cb46-27" aria-hidden="true" tabindex="-1"></a><span class="fu">opt_output_files</span>(ctg) <span class="ot">&lt;-</span> <span class="st">"output/{*}_metrics.rds"</span></span>
+<span id="cb46-28"><a href="#cb46-28" aria-hidden="true" tabindex="-1"></a><span class="fu">catalog_apply</span>(ctg, urban_metrics)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="tabset-15-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-15-2-tab">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>pipeline <span class="ot">&lt;-</span></span>
-<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">reader_las</span>() <span class="sc">+</span></span>
-<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Vegetation metrics (Classes 4 &amp; 5)</span></span>
-<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rasterize</span>(</span>
-<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">res     =</span> <span class="dv">20</span>,</span>
-<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">metrics =</span> <span class="sc">~</span>{</span>
-<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a>      veg <span class="ot">&lt;-</span> Classification <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">4</span>L, <span class="dv">5</span>L)</span>
-<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a>      z   <span class="ot">&lt;-</span> Height[veg <span class="sc">&amp;</span> Height <span class="sc">&gt;=</span> <span class="dv">0</span>]</span>
-<span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a>      <span class="fu">list</span>(<span class="at">H95  =</span> <span class="fu">quantile</span>(z,.<span class="dv">95</span>), <span class="at">Hmean =</span> <span class="fu">mean</span>(z), <span class="at">Hsd =</span> <span class="fu">sd</span>(z),</span>
-<span id="cb44-10"><a href="#cb44-10" aria-hidden="true" tabindex="-1"></a>           <span class="at">CC   =</span> <span class="fu">mean</span>(z <span class="sc">&gt;=</span> <span class="dv">2</span>),</span>
-<span id="cb44-11"><a href="#cb44-11" aria-hidden="true" tabindex="-1"></a>           <span class="at">VCI  =</span> <span class="fu">vci_metric</span>(z)<span class="sc">$</span>VCI_norm,</span>
-<span id="cb44-12"><a href="#cb44-12" aria-hidden="true" tabindex="-1"></a>           <span class="at">CRR  =</span> <span class="fu">crr_metric</span>(z)<span class="sc">$</span>CRR)</span>
-<span id="cb44-13"><a href="#cb44-13" aria-hidden="true" tabindex="-1"></a>    },</span>
-<span id="cb44-14"><a href="#cb44-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">ofile =</span> <span class="st">"veg_metrics_20m.tif"</span></span>
-<span id="cb44-15"><a href="#cb44-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb44-16"><a href="#cb44-16" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Building height metrics (Class 6)</span></span>
-<span id="cb44-17"><a href="#cb44-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rasterize</span>(</span>
-<span id="cb44-18"><a href="#cb44-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">res     =</span> <span class="dv">20</span>,</span>
-<span id="cb44-19"><a href="#cb44-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">metrics =</span> <span class="sc">~</span>{</span>
-<span id="cb44-20"><a href="#cb44-20" aria-hidden="true" tabindex="-1"></a>      bld <span class="ot">&lt;-</span> Classification <span class="sc">==</span> <span class="dv">6</span>L</span>
-<span id="cb44-21"><a href="#cb44-21" aria-hidden="true" tabindex="-1"></a>      h   <span class="ot">&lt;-</span> Height[bld]</span>
-<span id="cb44-22"><a href="#cb44-22" aria-hidden="true" tabindex="-1"></a>      <span class="fu">list</span>(<span class="at">Bh_p95      =</span> <span class="fu">quantile</span>(h,.<span class="dv">95</span>),</span>
-<span id="cb44-23"><a href="#cb44-23" aria-hidden="true" tabindex="-1"></a>           <span class="at">Bh_floor    =</span> <span class="fu">quantile</span>(h,.<span class="dv">95</span>) <span class="sc">/</span> <span class="dv">3</span>,</span>
-<span id="cb44-24"><a href="#cb44-24" aria-hidden="true" tabindex="-1"></a>           <span class="at">roof_rough  =</span> <span class="fu">sd</span>(h <span class="sc">-</span> <span class="fu">mean</span>(h)))</span>
-<span id="cb44-25"><a href="#cb44-25" aria-hidden="true" tabindex="-1"></a>    },</span>
-<span id="cb44-26"><a href="#cb44-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">ofile =</span> <span class="st">"bld_metrics_20m.tif"</span></span>
-<span id="cb44-27"><a href="#cb44-27" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb44-28"><a href="#cb44-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">chm</span>(<span class="at">res =</span> <span class="dv">1</span>, <span class="at">ofile =</span> <span class="st">"chm_1m.tif"</span>) <span class="sc">+</span></span>
-<span id="cb44-29"><a href="#cb44-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">dtm</span>(<span class="at">res =</span> <span class="dv">1</span>, <span class="at">ofile =</span> <span class="st">"dtm_1m.tif"</span>)</span>
-<span id="cb44-30"><a href="#cb44-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb44-31"><a href="#cb44-31" aria-hidden="true" tabindex="-1"></a><span class="fu">exec</span>(pipeline, <span class="at">on =</span> <span class="st">"path/to/folder/"</span>, <span class="at">ncores =</span> <span class="dv">4</span>L, <span class="at">chunk =</span> <span class="dv">500</span>, <span class="at">buffer =</span> <span class="dv">10</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="tabset-16-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-16-2-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>pipeline <span class="ot">&lt;-</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">reader_las</span>() <span class="sc">+</span></span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Vegetation metrics (Classes 4 &amp; 5)</span></span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rasterize</span>(</span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">res     =</span> <span class="dv">20</span>,</span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">metrics =</span> <span class="sc">~</span>{</span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a>      veg <span class="ot">&lt;-</span> Classification <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">4</span>L, <span class="dv">5</span>L)</span>
+<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a>      z   <span class="ot">&lt;-</span> Height[veg <span class="sc">&amp;</span> Height <span class="sc">&gt;=</span> <span class="dv">0</span>]</span>
+<span id="cb47-9"><a href="#cb47-9" aria-hidden="true" tabindex="-1"></a>      <span class="fu">list</span>(<span class="at">H95  =</span> <span class="fu">quantile</span>(z,.<span class="dv">95</span>), <span class="at">Hmean =</span> <span class="fu">mean</span>(z), <span class="at">Hsd =</span> <span class="fu">sd</span>(z),</span>
+<span id="cb47-10"><a href="#cb47-10" aria-hidden="true" tabindex="-1"></a>           <span class="at">CC   =</span> <span class="fu">mean</span>(z <span class="sc">&gt;=</span> <span class="dv">2</span>),</span>
+<span id="cb47-11"><a href="#cb47-11" aria-hidden="true" tabindex="-1"></a>           <span class="at">VCI  =</span> <span class="fu">vci_metric</span>(z)<span class="sc">$</span>VCI_norm,</span>
+<span id="cb47-12"><a href="#cb47-12" aria-hidden="true" tabindex="-1"></a>           <span class="at">CRR  =</span> <span class="fu">crr_metric</span>(z)<span class="sc">$</span>CRR)</span>
+<span id="cb47-13"><a href="#cb47-13" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb47-14"><a href="#cb47-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">ofile =</span> <span class="st">"veg_metrics_20m.tif"</span></span>
+<span id="cb47-15"><a href="#cb47-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb47-16"><a href="#cb47-16" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Building height metrics (Class 6)</span></span>
+<span id="cb47-17"><a href="#cb47-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rasterize</span>(</span>
+<span id="cb47-18"><a href="#cb47-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">res     =</span> <span class="dv">20</span>,</span>
+<span id="cb47-19"><a href="#cb47-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">metrics =</span> <span class="sc">~</span>{</span>
+<span id="cb47-20"><a href="#cb47-20" aria-hidden="true" tabindex="-1"></a>      bld <span class="ot">&lt;-</span> Classification <span class="sc">==</span> <span class="dv">6</span>L</span>
+<span id="cb47-21"><a href="#cb47-21" aria-hidden="true" tabindex="-1"></a>      h   <span class="ot">&lt;-</span> Height[bld]</span>
+<span id="cb47-22"><a href="#cb47-22" aria-hidden="true" tabindex="-1"></a>      <span class="fu">list</span>(<span class="at">Bh_p95      =</span> <span class="fu">quantile</span>(h,.<span class="dv">95</span>),</span>
+<span id="cb47-23"><a href="#cb47-23" aria-hidden="true" tabindex="-1"></a>           <span class="at">Bh_floor    =</span> <span class="fu">quantile</span>(h,.<span class="dv">95</span>) <span class="sc">/</span> <span class="dv">3</span>,</span>
+<span id="cb47-24"><a href="#cb47-24" aria-hidden="true" tabindex="-1"></a>           <span class="at">roof_rough  =</span> <span class="fu">sd</span>(h <span class="sc">-</span> <span class="fu">mean</span>(h)))</span>
+<span id="cb47-25"><a href="#cb47-25" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb47-26"><a href="#cb47-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">ofile =</span> <span class="st">"bld_metrics_20m.tif"</span></span>
+<span id="cb47-27"><a href="#cb47-27" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb47-28"><a href="#cb47-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">chm</span>(<span class="at">res =</span> <span class="dv">1</span>, <span class="at">ofile =</span> <span class="st">"chm_1m.tif"</span>) <span class="sc">+</span></span>
+<span id="cb47-29"><a href="#cb47-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">dtm</span>(<span class="at">res =</span> <span class="dv">1</span>, <span class="at">ofile =</span> <span class="st">"dtm_1m.tif"</span>)</span>
+<span id="cb47-30"><a href="#cb47-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-31"><a href="#cb47-31" aria-hidden="true" tabindex="-1"></a><span class="fu">exec</span>(pipeline, <span class="at">on =</span> <span class="st">"path/to/folder/"</span>, <span class="at">ncores =</span> <span class="dv">4</span>L, <span class="at">chunk =</span> <span class="dv">500</span>, <span class="at">buffer =</span> <span class="dv">10</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="tabset-15-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-15-3-tab">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb45"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> compute_urban_metrics(las):</span>
-<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>    x   <span class="op">=</span> np.array(las.x)</span>
-<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>    y   <span class="op">=</span> np.array(las.y)</span>
-<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>    H   <span class="op">=</span> np.array(las.Height)</span>
-<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>    cls <span class="op">=</span> np.array(las.classification)</span>
-<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>    veg_mask <span class="op">=</span> np.isin(cls, [<span class="dv">4</span>, <span class="dv">5</span>])</span>
-<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a>    bld_mask <span class="op">=</span> cls <span class="op">==</span> <span class="dv">6</span></span>
-<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-10"><a href="#cb45-10" aria-hidden="true" tabindex="-1"></a>    H_veg <span class="op">=</span> H[veg_mask <span class="op">&amp;</span> (H <span class="op">&gt;=</span> <span class="dv">0</span>)]</span>
-<span id="cb45-11"><a href="#cb45-11" aria-hidden="true" tabindex="-1"></a>    H_bld <span class="op">=</span> H[bld_mask]</span>
-<span id="cb45-12"><a href="#cb45-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-13"><a href="#cb45-13" aria-hidden="true" tabindex="-1"></a>    veg_m <span class="op">=</span> {</span>
-<span id="cb45-14"><a href="#cb45-14" aria-hidden="true" tabindex="-1"></a>        <span class="st">"H95"</span>:   np.percentile(H_veg, <span class="dv">95</span>) <span class="cf">if</span> <span class="bu">len</span>(H_veg) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">else</span> np.nan,</span>
-<span id="cb45-15"><a href="#cb45-15" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Hmean"</span>: H_veg.mean() <span class="cf">if</span> <span class="bu">len</span>(H_veg) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">else</span> np.nan,</span>
-<span id="cb45-16"><a href="#cb45-16" aria-hidden="true" tabindex="-1"></a>        <span class="st">"CC"</span>:    np.mean(H_veg <span class="op">&gt;=</span> <span class="dv">2</span>) <span class="cf">if</span> <span class="bu">len</span>(H_veg) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">else</span> np.nan,</span>
-<span id="cb45-17"><a href="#cb45-17" aria-hidden="true" tabindex="-1"></a>        <span class="op">**</span>vci_metric(H_veg),</span>
-<span id="cb45-18"><a href="#cb45-18" aria-hidden="true" tabindex="-1"></a>        <span class="op">**</span>crr_metric(H_veg)</span>
-<span id="cb45-19"><a href="#cb45-19" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb45-20"><a href="#cb45-20" aria-hidden="true" tabindex="-1"></a>    bld_m <span class="op">=</span> {</span>
-<span id="cb45-21"><a href="#cb45-21" aria-hidden="true" tabindex="-1"></a>        <span class="op">**</span>(building_height_metrics(H_bld) <span class="kw">or</span> {}),</span>
-<span id="cb45-22"><a href="#cb45-22" aria-hidden="true" tabindex="-1"></a>        <span class="op">**</span>(roof_metrics(x[bld_mask], y[bld_mask], H_bld) <span class="kw">or</span> {}),</span>
-<span id="cb45-23"><a href="#cb45-23" aria-hidden="true" tabindex="-1"></a>        <span class="op">**</span>(building_footprint_metrics(x[bld_mask], y[bld_mask], H_bld) <span class="kw">or</span> {})</span>
-<span id="cb45-24"><a href="#cb45-24" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb45-25"><a href="#cb45-25" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {<span class="st">"vegetation"</span>: veg_m, <span class="st">"buildings"</span>: bld_m}</span>
-<span id="cb45-26"><a href="#cb45-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-27"><a href="#cb45-27" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> laz_file <span class="kw">in</span> laz_files:</span>
-<span id="cb45-28"><a href="#cb45-28" aria-hidden="true" tabindex="-1"></a>    tile <span class="op">=</span> laspy.read(laz_file)</span>
-<span id="cb45-29"><a href="#cb45-29" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> compute_urban_metrics(tile)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="tabset-16-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-16-3-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb48"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> compute_urban_metrics(las):</span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>    x   <span class="op">=</span> np.array(las.x)</span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>    y   <span class="op">=</span> np.array(las.y)</span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>    H   <span class="op">=</span> np.array(las.Height)</span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>    cls <span class="op">=</span> np.array(las.classification)</span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a>    veg_mask <span class="op">=</span> np.isin(cls, [<span class="dv">4</span>, <span class="dv">5</span>])</span>
+<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a>    bld_mask <span class="op">=</span> cls <span class="op">==</span> <span class="dv">6</span></span>
+<span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-10"><a href="#cb48-10" aria-hidden="true" tabindex="-1"></a>    H_veg <span class="op">=</span> H[veg_mask <span class="op">&amp;</span> (H <span class="op">&gt;=</span> <span class="dv">0</span>)]</span>
+<span id="cb48-11"><a href="#cb48-11" aria-hidden="true" tabindex="-1"></a>    H_bld <span class="op">=</span> H[bld_mask]</span>
+<span id="cb48-12"><a href="#cb48-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-13"><a href="#cb48-13" aria-hidden="true" tabindex="-1"></a>    veg_m <span class="op">=</span> {</span>
+<span id="cb48-14"><a href="#cb48-14" aria-hidden="true" tabindex="-1"></a>        <span class="st">"H95"</span>:   np.percentile(H_veg, <span class="dv">95</span>) <span class="cf">if</span> <span class="bu">len</span>(H_veg) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">else</span> np.nan,</span>
+<span id="cb48-15"><a href="#cb48-15" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Hmean"</span>: H_veg.mean() <span class="cf">if</span> <span class="bu">len</span>(H_veg) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">else</span> np.nan,</span>
+<span id="cb48-16"><a href="#cb48-16" aria-hidden="true" tabindex="-1"></a>        <span class="st">"CC"</span>:    np.mean(H_veg <span class="op">&gt;=</span> <span class="dv">2</span>) <span class="cf">if</span> <span class="bu">len</span>(H_veg) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">else</span> np.nan,</span>
+<span id="cb48-17"><a href="#cb48-17" aria-hidden="true" tabindex="-1"></a>        <span class="op">**</span>vci_metric(H_veg),</span>
+<span id="cb48-18"><a href="#cb48-18" aria-hidden="true" tabindex="-1"></a>        <span class="op">**</span>crr_metric(H_veg)</span>
+<span id="cb48-19"><a href="#cb48-19" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb48-20"><a href="#cb48-20" aria-hidden="true" tabindex="-1"></a>    bld_m <span class="op">=</span> {</span>
+<span id="cb48-21"><a href="#cb48-21" aria-hidden="true" tabindex="-1"></a>        <span class="op">**</span>(building_height_metrics(H_bld) <span class="kw">or</span> {}),</span>
+<span id="cb48-22"><a href="#cb48-22" aria-hidden="true" tabindex="-1"></a>        <span class="op">**</span>(roof_metrics(x[bld_mask], y[bld_mask], H_bld) <span class="kw">or</span> {}),</span>
+<span id="cb48-23"><a href="#cb48-23" aria-hidden="true" tabindex="-1"></a>        <span class="op">**</span>(building_footprint_metrics(x[bld_mask], y[bld_mask], H_bld) <span class="kw">or</span> {})</span>
+<span id="cb48-24"><a href="#cb48-24" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb48-25"><a href="#cb48-25" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {<span class="st">"vegetation"</span>: veg_m, <span class="st">"buildings"</span>: bld_m}</span>
+<span id="cb48-26"><a href="#cb48-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-27"><a href="#cb48-27" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> laz_file <span class="kw">in</span> laz_files:</span>
+<span id="cb48-28"><a href="#cb48-28" aria-hidden="true" tabindex="-1"></a>    tile <span class="op">=</span> laspy.read(laz_file)</span>
+<span id="cb48-29"><a href="#cb48-29" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> compute_urban_metrics(tile)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </div>
 </div>
@@ -1741,6 +2117,272 @@ Important
 </div>
 <div class="callout-body-container callout-body">
 <p>A key challenge is <strong>co-classification error</strong>: tall trees adjacent to buildings share similar height and density statistics. Always segment by classification (Class 5 = vegetation, Class 6 = building) before computing class-specific metrics.</p>
+</div>
+</div>
+<hr>
+</section>
+</section>
+<section id="summary" class="level2">
+<h2 class="anchored" data-anchor-id="summary">Part 5 — Tool Comparison Summary</h2>
+<section id="data-model-and-api" class="level3">
+<h3 class="anchored" data-anchor-id="data-model-and-api">5.1 Data Model and API</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 4%">
+<col style="width: 28%">
+<col style="width: 28%">
+<col style="width: 38%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>lidR</th>
+<th>lasR</th>
+<th>Python</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Point cloud object</strong></td>
+<td><code>LAS</code> (S4, data.table internally)</td>
+<td>No R object — streaming C++</td>
+<td><code>laspy.LasData</code> or numpy arrays</td>
+</tr>
+<tr class="even">
+<td><strong>Tile/catalog</strong></td>
+<td><code>LAScatalog</code> with <code>opt_*</code> settings</td>
+<td>Folder path → <code>exec()</code></td>
+<td>Manual <code>glob</code> + loop or PDAL batch</td>
+</tr>
+<tr class="odd">
+<td><strong>Metric function</strong></td>
+<td>Passed as formula to <code>pixel_metrics()</code> or <code>cloud_metrics()</code></td>
+<td>Passed as formula to <code>rasterize()</code></td>
+<td>Python function applied per cell in a loop, or PDAL <code>filters.stats</code></td>
+</tr>
+<tr class="even">
+<td><strong>Column access</strong></td>
+<td><code>Height</code>, <code>Z</code>, <code>ReturnNumber</code> (direct column names in formula)</td>
+<td>Same column names</td>
+<td><code>las.Height</code>, <code>las.z</code> (attribute access on LasData) or numpy arrays</td>
+</tr>
+<tr class="odd">
+<td><strong>Output</strong></td>
+<td><code>SpatRaster</code> (terra) or <code>data.frame</code></td>
+<td>GeoTIFF written by <code>ofile=</code></td>
+<td>numpy arrays written via <code>rasterio</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="performance" class="level3">
+<h3 class="anchored" data-anchor-id="performance">5.2 Performance</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 2%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 64%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>lidR</th>
+<th>lasR</th>
+<th>Python (laspy + numpy)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Tile loading</strong></td>
+<td>One chunk in R memory</td>
+<td>Streaming — never in memory</td>
+<td>Full tile loaded via <code>laspy.read()</code></td>
+</tr>
+<tr class="even">
+<td><strong>Parallelism</strong></td>
+<td><code>catalog_apply</code> multi-core via <code>future</code></td>
+<td><code>exec(ncores=N)</code> — C++ thread pool</td>
+<td><code>multiprocessing.Pool</code> or <code>concurrent.futures</code></td>
+</tr>
+<tr class="odd">
+<td><strong>kNN speed</strong></td>
+<td><code>nabor</code> (C++ FLANN)</td>
+<td>Same</td>
+<td><code>scipy.cKDTree</code> (C++, Cython) — comparable</td>
+</tr>
+<tr class="even">
+<td><strong>KDE speed</strong></td>
+<td><code>ks::kde</code> (C++ back-end)</td>
+<td>Same</td>
+<td><code>scipy.gaussian_kde</code> (C++) — comparable</td>
+</tr>
+<tr class="odd">
+<td><strong>Voxel resampling</strong></td>
+<td><code>TreeLS::tlsSample</code> (C++)</td>
+<td>Same</td>
+<td>numpy <code>np.unique</code> — fast for moderate sizes</td>
+</tr>
+<tr class="even">
+<td><strong>Overall for large catalogs</strong></td>
+<td>Moderate</td>
+<td>Fastest</td>
+<td>Moderate; can match lasR with PDAL pipeline</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="complex-operations" class="level3">
+<h3 class="anchored" data-anchor-id="complex-operations">5.3 Complex Operations</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 35%">
+<col style="width: 19%">
+<col style="width: 19%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Operation</th>
+<th>lidR</th>
+<th>lasR</th>
+<th>Python</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Height percentiles</td>
+<td><code>quantile(Height, p)</code></td>
+<td>Same in <code>rasterize()</code></td>
+<td><code>np.percentile(H, p)</code></td>
+</tr>
+<tr class="even">
+<td>Rumple Index</td>
+<td><code>rumple_index(chm)</code> — one line</td>
+<td>CHM via <code>chm()</code>, then <code>lidR::rumple_index()</code> post-exec</td>
+<td>scipy <code>Delaunay</code> triangulation — manual 3D area</td>
+</tr>
+<tr class="odd">
+<td>Canopy cover</td>
+<td><code>mean(H &gt;= threshold)</code></td>
+<td>Same</td>
+<td><code>np.mean(H &gt;= threshold)</code></td>
+</tr>
+<tr class="even">
+<td>VCI / Shannon entropy</td>
+<td><code>cut()</code> + <code>prop.table()</code> + entropy sum</td>
+<td>Same in <code>rasterize()</code></td>
+<td><code>np.histogram()</code> + numpy entropy sum</td>
+</tr>
+<tr class="odd">
+<td>KDE entropy (Liu 2022)</td>
+<td><code>ks::kde</code> + <code>trend::mk.test</code> — full pipeline in R</td>
+<td>Same functions inside <code>rasterize()</code></td>
+<td><code>scipy.gaussian_kde</code> + <code>pymannkendall</code> — minor bw difference</td>
+</tr>
+<tr class="even">
+<td>Building footprint</td>
+<td><code>sf::st_convex_hull()</code> + <code>st_area()</code></td>
+<td>Post-process with <code>terra::patches()</code> + sf</td>
+<td><code>scipy.ConvexHull</code> — 2D: <code>.volume</code> = area, <code>.area</code> = perimeter</td>
+</tr>
+<tr class="odd">
+<td>SVF</td>
+<td>External package (<code>svf</code>) on nDSM raster</td>
+<td>Same post-exec</td>
+<td>Rasterio + numpy horizon scan (custom)</td>
+</tr>
+<tr class="even">
+<td>Per-building roof PCA</td>
+<td><code>eigen(cov(pts))</code> inside <code>cloud_metrics()</code></td>
+<td>Not natively per-object; needs vector pre-segmentation</td>
+<td><code>np.linalg.eigh(np.cov(pts.T))</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="decision-guide" class="level3">
+<h3 class="anchored" data-anchor-id="decision-guide">5.4 Decision Guide</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 39%">
+<col style="width: 60%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Situation</th>
+<th>Recommended tool</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Exploring a new dataset, tuning parameters interactively</td>
+<td><strong>lidR</strong> — <code>cloud_metrics()</code> on a single tile, <code>plot()</code>, inspect any intermediate variable</td>
+</tr>
+<tr class="even">
+<td>Production run over large catalog (&gt; 50 GB)</td>
+<td><strong>lasR</strong> — streaming C++, multi-threaded, constant memory</td>
+</tr>
+<tr class="odd">
+<td>Metrics feed into ML models (sklearn, PyTorch, XGBoost)</td>
+<td><strong>Python</strong> — keep everything in numpy; no format conversion</td>
+</tr>
+<tr class="even">
+<td>KDE entropy (Liu et al.&nbsp;2022)</td>
+<td><strong>lidR</strong> or <strong>lasR</strong> (same R helpers); Python approximation of bw is close but not identical</td>
+</tr>
+<tr class="odd">
+<td>Building footprint / volume per polygon</td>
+<td><strong>lidR</strong> (sf integration) or <strong>Python</strong> (scipy + shapely); lasR needs post-processing step</td>
+</tr>
+<tr class="even">
+<td>Cross-platform team without R</td>
+<td><strong>Python</strong> — PDAL + laspy + scipy covers most operations</td>
+</tr>
+<tr class="odd">
+<td>GPU-accelerated kNN / entropy (very large tiles)</td>
+<td><strong>Python</strong> — cuML (RAPIDS) replaces scipy; not available in R</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="package-dependencies" class="level3">
+<h3 class="anchored" data-anchor-id="package-dependencies">5.5 Package Dependencies</h3>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-17-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-17-1" role="tab" aria-controls="tabset-17-1" aria-selected="true" href="">lidR</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-17-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-17-2" role="tab" aria-controls="tabset-17-2" aria-selected="false" href="">lasR</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-17-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-17-3" role="tab" aria-controls="tabset-17-3" aria-selected="false" href="">Python</a></li></ul>
+<div class="tab-content">
+<div id="tabset-17-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-17-1-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="fu">c</span>(</span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"lidR"</span>,      <span class="co"># core</span></span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"terra"</span>,     <span class="co"># raster output</span></span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"sf"</span>,        <span class="co"># building footprints</span></span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"moments"</span>,   <span class="co"># skewness / kurtosis</span></span>
+<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"data.table"</span>,<span class="co"># fast tables in entropy functions</span></span>
+<span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">"nabor"</span>,     <span class="co"># C++ kNN (for KDE entropy)</span></span>
+<span id="cb49-8"><a href="#cb49-8" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ks"</span>,        <span class="co"># KDE (for KDE entropy)</span></span>
+<span id="cb49-9"><a href="#cb49-9" aria-hidden="true" tabindex="-1"></a>  <span class="st">"trend"</span>      <span class="co"># Mann-Kendall test</span></span>
+<span id="cb49-10"><a href="#cb49-10" aria-hidden="true" tabindex="-1"></a>))</span>
+<span id="cb49-11"><a href="#cb49-11" aria-hidden="true" tabindex="-1"></a><span class="co"># TreeLS from GitHub: remotes::install_github("tiagodc/TreeLS")</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="tabset-17-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-17-2-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="fu">c</span>(</span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"lasR"</span>,       <span class="co"># core pipeline</span></span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"terra"</span>,      <span class="co"># post-process rasters</span></span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"sf"</span>,         <span class="co"># building polygons post-exec</span></span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"data.table"</span>, <span class="st">"nabor"</span>, <span class="st">"ks"</span>, <span class="st">"trend"</span>  <span class="co"># for KDE entropy helpers</span></span>
+<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a>))</span>
+<span id="cb50-7"><a href="#cb50-7" aria-hidden="true" tabindex="-1"></a><span class="co"># TreeLS from GitHub: remotes::install_github("tiagodc/TreeLS")</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="tabset-17-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-17-3-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb51"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install laspy<span class="pp">[</span><span class="ss">lazrs</span><span class="pp">]</span>      <span class="co"># LAS/LAZ I/O</span></span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install numpy scipy       <span class="co"># arrays, kNN, stats, KDE, ConvexHull</span></span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install shapely           <span class="co"># building polygon ops</span></span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install rasterio          <span class="co"># write GeoTIFF output</span></span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pymannkendall     <span class="co"># Mann-Kendall test (Liu 2022 entropy)</span></span>
+<span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pdal              <span class="co"># optional: pipeline-based processing</span></span>
+<span id="cb51-7"><a href="#cb51-7" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install open3d            <span class="co"># optional: 3D visualisation</span></span>
+<span id="cb51-8"><a href="#cb51-8" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install scikit-learn      <span class="co"># optional: Isolation Forest</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
 </div>
 </div>
 <hr>
