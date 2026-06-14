@@ -1,0 +1,1641 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Dingjin Chu">
+<meta name="dcterms.date" content="2026-02-01">
+<meta name="description" content="Before any processing, run these checks across lidR, lasR, and Python — CRS consistency, point density, Z-range sanity, return structure, and classification summary. Catches catalog-level problems in seconds from headers alone.">
+
+<title>Pre-Flight Quality Check for Airborne LiDAR Data – Dingjin Chu</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../photo/favicon_satellite.svg" rel="icon" type="image/svg+xml">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-b758ccaa5987ceb1b75504551e579abf.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-e31584831b205ffbb2d98406f31c2a5b.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-24772959a0e306aba8d7698078628ce7.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-e31584831b205ffbb2d98406f31c2a5b.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed fullcontent quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title"><i class="bi bi-broadcast-pin"></i> Dingjin Chu</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-research" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Research</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-research">    
+        <li>
+    <a class="dropdown-item" href="../../projects_intro.html">
+ <span class="dropdown-text">Introduction</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../projects_agb.html">
+ <span class="dropdown-text">Forest Above-Ground Biomass Estimation</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../projects_disturbance.html">
+ <span class="dropdown-text">Ecosystem Response to Disturbances</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../projects_urban.html">
+ <span class="dropdown-text">Cooling Effect of Urban Green Space</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../research_lidar_upscaling.html">
+ <span class="dropdown-text">LiDAR Upscaling Review</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-datasets" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Datasets</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-datasets">    
+        <li>
+    <a class="dropdown-item" href="../../datasets_intro.html">
+ <span class="dropdown-text">Introduction</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../datasets_lidar.html">
+ <span class="dropdown-text">LiDAR</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../datasets_optical.html">
+ <span class="dropdown-text">Optical Remote Sensing</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../datasets_radar.html">
+ <span class="dropdown-text">Radar</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../datasets_field.html">
+ <span class="dropdown-text">Field Investigation</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../datasets_derived.html">
+ <span class="dropdown-text">Derived Products</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-methods" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Methods</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-methods">    
+        <li>
+    <a class="dropdown-item" href="../../methods_intro.html">
+ <span class="dropdown-text">Introduction</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../methods_statistical.html">
+ <span class="dropdown-text">Statistical Modeling</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../methods_ml.html">
+ <span class="dropdown-text">Machine Learning</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../methods_causal.html">
+ <span class="dropdown-text">Causal Inference</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../methods_process.html">
+ <span class="dropdown-text">Process-Based Models</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../methods_assumptions.html">
+ <span class="dropdown-text">Key Assumptions</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../methods_metrics.html">
+ <span class="dropdown-text">Evaluation Metrics</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="../../cv.html"> 
+<span class="menu-text">About Me</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../news.html"> 
+<span class="menu-text">News</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog.html"> 
+<span class="menu-text">Blog/Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html#contact-me"> 
+<span class="menu-text">Contact Me</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/Programmer112321"> <i class="bi bi-github" role="img" aria-label="GitHub">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/dingjin-chu-892ba7352/"> <i class="bi bi-linkedin" role="img" aria-label="LinkedIn">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://scholar.google.com/citations?user=XzIFKvMAAAAJ&amp;hl=en"> 
+<span class="menu-text"><img src="photo/scholar_logo.svg" alt="Google Scholar" style="height:20px; vertical-align:middle; margin-top:-2px;"></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://zenodo.org/search?q=metadata.creators.person_or_org.name%3A%22Chu%2C%20Dingjin%22&amp;l=list&amp;p=1&amp;s=10&amp;sort=bestmatch"> 
+<span class="menu-text"><img src="photo/zenodo_logo.svg" alt="Zenodo" style="height:20px; vertical-align:middle; margin-top:-2px;"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Pre-Flight Quality Check for Airborne LiDAR Data</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">LiDAR</div>
+    <div class="quarto-category">3DEP</div>
+    <div class="quarto-category">Quality Control</div>
+    <div class="quarto-category">R</div>
+    <div class="quarto-category">Python</div>
+    <div class="quarto-category">Tutorial</div>
+  </div>
+  </div>
+
+<div>
+  <div class="description">
+    Before any processing, run these checks across lidR, lasR, and Python — CRS consistency, point density, Z-range sanity, return structure, and classification summary. Catches catalog-level problems in seconds from headers alone.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Dingjin Chu </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">February 1, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Airborne LiDAR tiles from 3DEP, NEON AOP, or proprietary vendors are rarely uniformly clean across a catalog. Before committing to any processing pipeline, a quick pre-flight check catches CRS mismatches, density gaps, bogus Z values, missing ground classification, and all-single-return anomalies — all from file headers alone, without loading a single point.</p>
+<p>This post is the QC step that precedes the <a href="../../posts/lidar-preprocessing/index.html">pre-processing pipeline</a>.</p>
+<hr>
+<section id="crs-validation" class="level3">
+<h3 class="anchored" data-anchor-id="crs-validation">0.1 CRS Validation</h3>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" href="">lidR</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false" href="">lasR</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false" href="">Python</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lidR)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>ctg <span class="ot">&lt;-</span> <span class="fu">readLAScatalog</span>(<span class="st">"path/to/las_folder/"</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract CRS from every tile header (fast — reads only the header, not points)</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>crs_list <span class="ot">&lt;-</span> <span class="fu">lapply</span>(ctg<span class="sc">@</span>data<span class="sc">$</span>filename, <span class="cf">function</span>(f) <span class="fu">st_crs</span>(<span class="fu">readLASheader</span>(f))<span class="sc">$</span>wkt)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>n_unique  <span class="ot">&lt;-</span> <span class="fu">length</span>(<span class="fu">unique</span>(crs_list))</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (n_unique <span class="sc">&gt;</span> <span class="dv">1</span>) {</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">warning</span>(<span class="fu">sprintf</span>(<span class="st">"CRS MISMATCH: %d different CRS found across %d tiles!"</span>,</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>                  n_unique, <span class="fu">length</span>(crs_list)))</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">message</span>(<span class="st">"CRS OK — all tiles: "</span>, <span class="fu">st_crs</span>(ctg)<span class="sc">$</span>input)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># lasR has no header-scan stage; CRS inspection is done via lidR</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># readLASheader() before building the pipeline.</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lidR)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lasR)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>headers   <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="fu">list.files</span>(<span class="st">"path/to/las_folder/"</span>, <span class="at">pattern=</span><span class="st">"</span><span class="sc">\\</span><span class="st">.la[sz]$"</span>,</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>                               <span class="at">full.names=</span><span class="cn">TRUE</span>), readLASheader)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>crs_wkts  <span class="ot">&lt;-</span> <span class="fu">sapply</span>(headers, <span class="cf">function</span>(h) <span class="fu">st_crs</span>(h)<span class="sc">$</span>wkt)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>n_unique  <span class="ot">&lt;-</span> <span class="fu">length</span>(<span class="fu">unique</span>(crs_wkts))</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (n_unique <span class="sc">&gt;</span> <span class="dv">1</span>) <span class="fu">warning</span>(<span class="st">"CRS MISMATCH: "</span>, n_unique, <span class="st">" different projections found."</span>)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span> <span class="fu">message</span>(<span class="st">"CRS OK: "</span>, <span class="fu">st_crs</span>(headers[[<span class="dv">1</span>]])<span class="sc">$</span>input)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> laspy, glob</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pyproj <span class="im">import</span> CRS</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>files <span class="op">=</span> <span class="bu">sorted</span>(glob.glob(<span class="st">"path/to/las_folder/*.laz"</span>))</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_crs(filepath):</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> laspy.<span class="bu">open</span>(filepath) <span class="im">as</span> f:</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">try</span>:</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> f.header.parse_crs().to_wkt()</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">except</span> <span class="pp">Exception</span>:</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="st">"unknown"</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>crs_list <span class="op">=</span> [get_crs(f) <span class="cf">for</span> f <span class="kw">in</span> files]</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>unique_crs <span class="op">=</span> <span class="bu">set</span>(crs_list)</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="bu">len</span>(unique_crs) <span class="op">&gt;</span> <span class="dv">1</span>:</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"CRS MISMATCH: </span><span class="sc">{</span><span class="bu">len</span>(unique_crs)<span class="sc">}</span><span class="ss"> different projections across </span><span class="sc">{</span><span class="bu">len</span>(files)<span class="sc">}</span><span class="ss"> tiles!"</span>)</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> f, c <span class="kw">in</span> <span class="bu">zip</span>(files, crs_list):</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>        name <span class="op">=</span> CRS.from_wkt(c).name <span class="cf">if</span> c <span class="op">!=</span> <span class="st">"unknown"</span> <span class="cf">else</span> <span class="st">"unknown"</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"  </span><span class="sc">{</span>f<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    crs <span class="op">=</span> CRS.from_wkt(crs_list[<span class="dv">0</span>]) <span class="cf">if</span> crs_list[<span class="dv">0</span>] <span class="op">!=</span> <span class="st">"unknown"</span> <span class="cf">else</span> <span class="va">None</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"CRS OK — all tiles: </span><span class="sc">{</span>crs<span class="sc">.</span>name <span class="cf">if</span> crs <span class="cf">else</span> <span class="st">'unknown'</span><span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</div>
+</div>
+<hr>
+</section>
+<section id="point-density" class="level3">
+<h3 class="anchored" data-anchor-id="point-density">0.2 Point Density</h3>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true" href="">lidR</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false" href="">lasR</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-3" role="tab" aria-controls="tabset-2-3" aria-selected="false" href="">Python</a></li></ul>
+<div class="tab-content">
+<div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># LAScatalog stores per-tile header stats (no points loaded)</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>dens_tbl <span class="ot">&lt;-</span> ctg<span class="sc">@</span>data</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>dens_tbl<span class="sc">$</span>area    <span class="ot">&lt;-</span> (dens_tbl<span class="sc">$</span>Max.X <span class="sc">-</span> dens_tbl<span class="sc">$</span>Min.X) <span class="sc">*</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>                    (dens_tbl<span class="sc">$</span>Max.Y <span class="sc">-</span> dens_tbl<span class="sc">$</span>Min.Y)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>dens_tbl<span class="sc">$</span>density <span class="ot">&lt;-</span> dens_tbl<span class="sc">$</span>Number.of.point.records <span class="sc">/</span> dens_tbl<span class="sc">$</span>area</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Density summary (pts/m²):</span><span class="sc">\n</span><span class="st">  min=%.1f  median=%.1f  max=%.1f</span><span class="sc">\n</span><span class="st">"</span>,</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">min</span>(dens_tbl<span class="sc">$</span>density), <span class="fu">median</span>(dens_tbl<span class="sc">$</span>density), <span class="fu">max</span>(dens_tbl<span class="sc">$</span>density)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>))</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Flag tiles below a minimum acceptable density</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>low_dens <span class="ot">&lt;-</span> dens_tbl[dens_tbl<span class="sc">$</span>density <span class="sc">&lt;</span> <span class="dv">2</span>, <span class="fu">c</span>(<span class="st">"filename"</span>, <span class="st">"density"</span>)]</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">nrow</span>(low_dens) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">warning</span>(<span class="fu">nrow</span>(low_dens), <span class="st">" tile(s) below 2 pts/m²:"</span>)</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(low_dens)</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualise density map</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(ctg, <span class="at">attribute =</span> <span class="st">"density"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Header-based density (same as lidR approach — no pipeline needed)</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lidR)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>headers <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="fu">list.files</span>(<span class="st">"path/to/las_folder/"</span>, <span class="at">pattern=</span><span class="st">"</span><span class="sc">\\</span><span class="st">.la[sz]$"</span>,</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>                             <span class="at">full.names=</span><span class="cn">TRUE</span>), readLASheader)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>dens <span class="ot">&lt;-</span> <span class="fu">sapply</span>(headers, <span class="cf">function</span>(h) {</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  pts  <span class="ot">&lt;-</span> h<span class="sc">@</span>PHB[[<span class="st">"Number of point records"</span>]]</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  area <span class="ot">&lt;-</span> (h<span class="sc">@</span>PHB[[<span class="st">"Max X"</span>]] <span class="sc">-</span> h<span class="sc">@</span>PHB[[<span class="st">"Min X"</span>]]) <span class="sc">*</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>          (h<span class="sc">@</span>PHB[[<span class="st">"Max Y"</span>]] <span class="sc">-</span> h<span class="sc">@</span>PHB[[<span class="st">"Min Y"</span>]])</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  pts <span class="sc">/</span> area</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"Density: min=%.1f  median=%.1f  max=%.1f pts/m²</span><span class="sc">\n</span><span class="st">"</span>,</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>            <span class="fu">min</span>(dens), <span class="fu">median</span>(dens), <span class="fu">max</span>(dens)))</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="co"># lasR alternative: stream a point-count raster at 10 m resolution</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lasR)</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>pipeline <span class="ot">&lt;-</span> <span class="fu">reader_las</span>() <span class="sc">+</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>            <span class="fu">rasterize</span>(<span class="dv">10</span>, <span class="sc">~</span><span class="fu">list</span>(<span class="at">n =</span> <span class="fu">length</span>(Z)), <span class="at">ofile =</span> <span class="st">"density_10m.tif"</span>)</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="fu">exec</span>(pipeline, <span class="at">on =</span> <span class="st">"path/to/las_folder/"</span>, <span class="at">ncores =</span> <span class="dv">4</span>L)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="tabset-2-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-3-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> tile_density(filepath):</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> laspy.<span class="bu">open</span>(filepath) <span class="im">as</span> f:</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>        hdr <span class="op">=</span> f.header</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>        pts <span class="op">=</span> hdr.point_count</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>        dx  <span class="op">=</span> hdr.x_max <span class="op">-</span> hdr.x_min</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>        dy  <span class="op">=</span> hdr.y_max <span class="op">-</span> hdr.y_min</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>        area <span class="op">=</span> dx <span class="op">*</span> dy</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {<span class="st">"file"</span>: Path(filepath).name,</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>            <span class="st">"n_pts"</span>: pts,</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>            <span class="st">"density"</span>: pts <span class="op">/</span> area <span class="cf">if</span> area <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">else</span> <span class="dv">0</span>,</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>            <span class="st">"area_m2"</span>: area}</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>records   <span class="op">=</span> [tile_density(f) <span class="cf">for</span> f <span class="kw">in</span> files]</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>densities <span class="op">=</span> np.array([r[<span class="st">"density"</span>] <span class="cf">for</span> r <span class="kw">in</span> records])</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Density (pts/m²): min=</span><span class="sc">{</span>densities<span class="sc">.</span><span class="bu">min</span>()<span class="sc">:.1f}</span><span class="ss">  "</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>      <span class="ss">f"median=</span><span class="sc">{</span>np<span class="sc">.</span>median(densities)<span class="sc">:.1f}</span><span class="ss">  max=</span><span class="sc">{</span>densities<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:.1f}</span><span class="ss">"</span>)</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>low <span class="op">=</span> [r <span class="cf">for</span> r <span class="kw">in</span> records <span class="cf">if</span> r[<span class="st">"density"</span>] <span class="op">&lt;</span> <span class="dv">2</span>]</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> low:</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="sc">{</span><span class="bu">len</span>(low)<span class="sc">}</span><span class="ss"> tile(s) below 2 pts/m²:"</span>)</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> r <span class="kw">in</span> low:</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"  </span><span class="sc">{</span>r[<span class="st">'file'</span>]<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>r[<span class="st">'density'</span>]<span class="sc">:.2f}</span><span class="ss"> pts/m²"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</div>
+</div>
+<hr>
+</section>
+<section id="z-range-elevation-sanity" class="level3">
+<h3 class="anchored" data-anchor-id="z-range-elevation-sanity">0.3 Z-Range / Elevation Sanity</h3>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true" href="">lidR</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false" href="">lasR</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-3" role="tab" aria-controls="tabset-3-3" aria-selected="false" href="">Python</a></li></ul>
+<div class="tab-content">
+<div id="tabset-3-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-3-1-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>z_range_tbl <span class="ot">&lt;-</span> ctg<span class="sc">@</span>data[, <span class="fu">c</span>(<span class="st">"filename"</span>, <span class="st">"Min.Z"</span>, <span class="st">"Max.Z"</span>)]</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>z_range_tbl<span class="sc">$</span>span <span class="ot">&lt;-</span> z_range_tbl<span class="sc">$</span>Max.Z <span class="sc">-</span> z_range_tbl<span class="sc">$</span>Min.Z</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>bad_z <span class="ot">&lt;-</span> z_range_tbl[</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  z_range_tbl<span class="sc">$</span>Min.Z <span class="sc">&lt;</span> <span class="sc">-</span><span class="dv">100</span> <span class="sc">|</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  z_range_tbl<span class="sc">$</span>Max.Z <span class="sc">&gt;</span> <span class="dv">5000</span> <span class="sc">|</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  z_range_tbl<span class="sc">$</span>span  <span class="sc">&lt;</span> <span class="fl">0.5</span>,</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">nrow</span>(bad_z) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">warning</span>(<span class="fu">nrow</span>(bad_z), <span class="st">" tile(s) with suspicious Z range:"</span>)</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(bad_z)</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"Z range across catalog: %.1f m — %.1f m</span><span class="sc">\n</span><span class="st">"</span>,</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>            <span class="fu">min</span>(ctg<span class="sc">@</span>data<span class="sc">$</span>Min.Z), <span class="fu">max</span>(ctg<span class="sc">@</span>data<span class="sc">$</span>Max.Z)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="tabset-3-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-2-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>z_mins <span class="ot">&lt;-</span> <span class="fu">sapply</span>(headers, <span class="cf">function</span>(h) h<span class="sc">@</span>PHB[[<span class="st">"Min Z"</span>]])</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>z_maxs <span class="ot">&lt;-</span> <span class="fu">sapply</span>(headers, <span class="cf">function</span>(h) h<span class="sc">@</span>PHB[[<span class="st">"Max Z"</span>]])</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"Z range: %.1f m — %.1f m</span><span class="sc">\n</span><span class="st">"</span>, <span class="fu">min</span>(z_mins), <span class="fu">max</span>(z_maxs)))</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>bad <span class="ot">&lt;-</span> <span class="fu">which</span>(z_mins <span class="sc">&lt;</span> <span class="sc">-</span><span class="dv">100</span> <span class="sc">|</span> z_maxs <span class="sc">&gt;</span> <span class="dv">5000</span> <span class="sc">|</span> (z_maxs <span class="sc">-</span> z_mins) <span class="sc">&lt;</span> <span class="fl">0.5</span>)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">length</span>(bad) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">warning</span>(<span class="fu">length</span>(bad), <span class="st">" tile(s) with suspicious Z range"</span>)</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> bad)</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"  %s: Z [%.1f, %.1f]</span><span class="sc">\n</span><span class="st">"</span>,</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>                <span class="fu">basename</span>(files[i]), z_mins[i], z_maxs[i]))</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="tabset-3-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-3-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> tile_z_range(filepath):</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> laspy.<span class="bu">open</span>(filepath) <span class="im">as</span> f:</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>        hdr <span class="op">=</span> f.header</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {<span class="st">"file"</span>:   Path(filepath).name,</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>            <span class="st">"z_min"</span>:  hdr.z_min,</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>            <span class="st">"z_max"</span>:  hdr.z_max,</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>            <span class="st">"z_span"</span>: hdr.z_max <span class="op">-</span> hdr.z_min}</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>z_records <span class="op">=</span> [tile_z_range(f) <span class="cf">for</span> f <span class="kw">in</span> files]</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Z range across catalog: "</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>      <span class="ss">f"</span><span class="sc">{</span><span class="bu">min</span>(r[<span class="st">'z_min'</span>] <span class="cf">for</span> r <span class="kw">in</span> z_records)<span class="sc">:.1f}</span><span class="ss"> m — "</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>      <span class="ss">f"</span><span class="sc">{</span><span class="bu">max</span>(r[<span class="st">'z_max'</span>] <span class="cf">for</span> r <span class="kw">in</span> z_records)<span class="sc">:.1f}</span><span class="ss"> m"</span>)</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>bad_z <span class="op">=</span> [r <span class="cf">for</span> r <span class="kw">in</span> z_records</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>         <span class="cf">if</span> r[<span class="st">"z_min"</span>] <span class="op">&lt;</span> <span class="op">-</span><span class="dv">100</span> <span class="kw">or</span> r[<span class="st">"z_max"</span>] <span class="op">&gt;</span> <span class="dv">5000</span> <span class="kw">or</span> r[<span class="st">"z_span"</span>] <span class="op">&lt;</span> <span class="fl">0.5</span>]</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> bad_z:</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="sc">{</span><span class="bu">len</span>(bad_z)<span class="sc">}</span><span class="ss"> tile(s) with suspicious Z range:"</span>)</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> r <span class="kw">in</span> bad_z:</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"  </span><span class="sc">{</span>r[<span class="st">'file'</span>]<span class="sc">}</span><span class="ss">: [</span><span class="sc">{</span>r[<span class="st">'z_min'</span>]<span class="sc">:.1f}</span><span class="ss">, </span><span class="sc">{</span>r[<span class="st">'z_max'</span>]<span class="sc">:.1f}</span><span class="ss">] m "</span></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>              <span class="ss">f"span=</span><span class="sc">{</span>r[<span class="st">'z_span'</span>]<span class="sc">:.1f}</span><span class="ss"> m"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</div>
+</div>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 23%">
+<col style="width: 42%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Flag</th>
+<th>Threshold</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Min.Z too low</td>
+<td>&lt; −100 m</td>
+<td>Likely corrupt or wrong vertical datum</td>
+</tr>
+<tr class="even">
+<td>Max.Z too high</td>
+<td>&gt; 5000 m</td>
+<td>Sensor artifact or wrong scale factor</td>
+</tr>
+<tr class="odd">
+<td>Z span too small</td>
+<td>&lt; 0.5 m</td>
+<td>Flat file — all ground, rasterized, or empty</td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+<section id="return-structure" class="level3">
+<h3 class="anchored" data-anchor-id="return-structure">0.4 Return Structure</h3>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-4-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-1" role="tab" aria-controls="tabset-4-1" aria-selected="true" href="">lidR</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-2" role="tab" aria-controls="tabset-4-2" aria-selected="false" href="">lasR</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-3" role="tab" aria-controls="tabset-4-3" aria-selected="false" href="">Python</a></li></ul>
+<div class="tab-content">
+<div id="tabset-4-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-4-1-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>return_qc <span class="ot">&lt;-</span> <span class="cf">function</span>(las) {</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  rn   <span class="ot">&lt;-</span> las<span class="sc">$</span>ReturnNumber</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  nr   <span class="ot">&lt;-</span> las<span class="sc">$</span>NumberOfReturns</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_total        =</span> <span class="fu">length</span>(rn),</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">pct_single     =</span> <span class="fu">mean</span>(nr <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">*</span> <span class="dv">100</span>,</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">pct_first      =</span> <span class="fu">mean</span>(rn <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">*</span> <span class="dv">100</span>,</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">pct_last       =</span> <span class="fu">mean</span>(rn <span class="sc">==</span> nr) <span class="sc">*</span> <span class="dv">100</span>,</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">max_return_num =</span> <span class="fu">max</span>(rn),</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">has_multi      =</span> <span class="fu">any</span>(nr <span class="sc">&gt;</span> <span class="dv">1</span>)</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>las_s <span class="ot">&lt;-</span> <span class="fu">readLAS</span>(ctg<span class="sc">@</span>data<span class="sc">$</span>filename[<span class="dv">1</span>])</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>rq    <span class="ot">&lt;-</span> <span class="fu">return_qc</span>(las_s)</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(rq)</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span>rq<span class="sc">$</span>has_multi)</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">warning</span>(<span class="st">"No multi-return pulses — data may be from a rasterised (gridded) source."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="tabset-4-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-2-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>pipeline <span class="ot">&lt;-</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">reader_las</span>() <span class="sc">+</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rasterize</span>(</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">res     =</span> <span class="dv">500</span>,</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">metrics =</span> <span class="sc">~</span><span class="fu">list</span>(</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">pct_single =</span> <span class="fu">mean</span>(NumberOfReturns <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">*</span> <span class="dv">100</span>,</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">max_rn     =</span> <span class="fu">max</span>(ReturnNumber),</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">has_multi  =</span> <span class="fu">as.integer</span>(<span class="fu">any</span>(NumberOfReturns <span class="sc">&gt;</span> <span class="dv">1</span>))</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">ofile =</span> <span class="st">"return_qc.tif"</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="fu">exec</span>(pipeline, <span class="at">on =</span> <span class="st">"path/to/las_folder/"</span>, <span class="at">ncores =</span> <span class="dv">4</span>L)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="tabset-4-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-3-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> return_qc(filepath):</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    las <span class="op">=</span> laspy.read(filepath)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    rn  <span class="op">=</span> np.array(las.return_number)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    nr  <span class="op">=</span> np.array(las.number_of_returns)</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"file"</span>:           Path(filepath).name,</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"n_points"</span>:       <span class="bu">len</span>(rn),</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">"pct_single"</span>:     np.mean(nr <span class="op">==</span> <span class="dv">1</span>) <span class="op">*</span> <span class="dv">100</span>,</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">"pct_first"</span>:      np.mean(rn <span class="op">==</span> <span class="dv">1</span>) <span class="op">*</span> <span class="dv">100</span>,</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">"max_return_num"</span>: <span class="bu">int</span>(rn.<span class="bu">max</span>()),</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>        <span class="st">"has_multi"</span>:      <span class="bu">bool</span>(np.<span class="bu">any</span>(nr <span class="op">&gt;</span> <span class="dv">1</span>))</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> f <span class="kw">in</span> files[:<span class="dv">5</span>]:</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>    rq   <span class="op">=</span> return_qc(f)</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>    flag <span class="op">=</span> <span class="st">" ⚠ ALL-SINGLE-RETURN"</span> <span class="cf">if</span> <span class="kw">not</span> rq[<span class="st">"has_multi"</span>] <span class="cf">else</span> <span class="st">""</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>rq[<span class="st">'file'</span>]<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>rq[<span class="st">'pct_single'</span>]<span class="sc">:.1f}</span><span class="ss">% single-return, "</span></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>          <span class="ss">f"max RN=</span><span class="sc">{</span>rq[<span class="st">'max_return_num'</span>]<span class="sc">}{</span>flag<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Warning
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>All-single-return datasets are not suitable for canopy penetration metrics, gap fraction, or multi-return structural indices. Verify with the data provider before proceeding.</p>
+</div>
+</div>
+<hr>
+</section>
+<section id="classification-summary" class="level3">
+<h3 class="anchored" data-anchor-id="classification-summary">0.5 Classification Summary</h3>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-5-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-1" role="tab" aria-controls="tabset-5-1" aria-selected="true" href="">lidR</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-5-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-2" role="tab" aria-controls="tabset-5-2" aria-selected="false" href="">lasR</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-5-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-3" role="tab" aria-controls="tabset-5-3" aria-selected="false" href="">Python</a></li></ul>
+<div class="tab-content">
+<div id="tabset-5-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-5-1-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>class_qc <span class="ot">&lt;-</span> <span class="cf">function</span>(las) {</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  cls  <span class="ot">&lt;-</span> las<span class="sc">$</span>Classification</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  tbl  <span class="ot">&lt;-</span> <span class="fu">table</span>(cls)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  prop <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">prop.table</span>(tbl) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>)</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">class =</span> <span class="fu">as.integer</span>(<span class="fu">names</span>(tbl)),</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">label =</span> LASCLASSIFICATION[<span class="fu">as.integer</span>(<span class="fu">names</span>(tbl)) <span class="sc">+</span> <span class="dv">1</span>],</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_pts =</span> <span class="fu">as.integer</span>(tbl),</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">pct   =</span> <span class="fu">as.numeric</span>(prop)</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>las_s   <span class="ot">&lt;-</span> <span class="fu">readLAS</span>(ctg<span class="sc">@</span>data<span class="sc">$</span>filename[<span class="dv">1</span>])</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>cls_tbl <span class="ot">&lt;-</span> <span class="fu">class_qc</span>(las_s)</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(cls_tbl)</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>has_ground <span class="ot">&lt;-</span> <span class="fu">any</span>(las_s<span class="sc">$</span>Classification <span class="sc">==</span> LASGROUND)</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>has_noise  <span class="ot">&lt;-</span> <span class="fu">any</span>(las_s<span class="sc">$</span>Classification <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">7</span>L, <span class="dv">18</span>L))</span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Ground classified:"</span>, has_ground, <span class="st">"</span><span class="sc">\n</span><span class="st">Noise flagged:"</span>, has_noise, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="tabset-5-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-5-2-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>pipeline <span class="ot">&lt;-</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">reader_las</span>() <span class="sc">+</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rasterize</span>(</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">res     =</span> <span class="dv">500</span>,</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">metrics =</span> <span class="sc">~</span><span class="fu">list</span>(</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">pct_ground   =</span> <span class="fu">mean</span>(Classification <span class="sc">==</span> <span class="dv">2</span>L)         <span class="sc">*</span> <span class="dv">100</span>,</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">pct_veg      =</span> <span class="fu">mean</span>(Classification <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">3</span>L,<span class="dv">4</span>L,<span class="dv">5</span>L)) <span class="sc">*</span> <span class="dv">100</span>,</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">pct_building =</span> <span class="fu">mean</span>(Classification <span class="sc">==</span> <span class="dv">6</span>L)         <span class="sc">*</span> <span class="dv">100</span>,</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>      <span class="at">pct_noise    =</span> <span class="fu">mean</span>(Classification <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">7</span>L,<span class="dv">18</span>L)) <span class="sc">*</span> <span class="dv">100</span>,</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">pct_unclass  =</span> <span class="fu">mean</span>(Classification <span class="sc">==</span> <span class="dv">1</span>L)         <span class="sc">*</span> <span class="dv">100</span>,</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">has_ground   =</span> <span class="fu">as.integer</span>(<span class="fu">any</span>(Classification <span class="sc">==</span> <span class="dv">2</span>L))</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">ofile =</span> <span class="st">"classification_qc.tif"</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a><span class="fu">exec</span>(pipeline, <span class="at">on =</span> <span class="st">"path/to/las_folder/"</span>, <span class="at">ncores =</span> <span class="dv">4</span>L)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="tabset-5-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-5-3-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>CLASS_LABELS <span class="op">=</span> {</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    <span class="dv">0</span>: <span class="st">"Never classified"</span>, <span class="dv">1</span>: <span class="st">"Unclassified"</span>,     <span class="dv">2</span>: <span class="st">"Ground"</span>,</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    <span class="dv">3</span>: <span class="st">"Low vegetation"</span>,   <span class="dv">4</span>: <span class="st">"Medium vegetation"</span>, <span class="dv">5</span>: <span class="st">"High vegetation"</span>,</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    <span class="dv">6</span>: <span class="st">"Building"</span>,         <span class="dv">7</span>: <span class="st">"Low point (noise)"</span>, <span class="dv">9</span>: <span class="st">"Water"</span>,</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    <span class="dv">17</span>: <span class="st">"Bridge deck"</span>,     <span class="dv">18</span>: <span class="st">"High noise"</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> class_qc(filepath):</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>    las <span class="op">=</span> laspy.read(filepath)</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    cls <span class="op">=</span> np.array(las.classification)</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>    unique, counts <span class="op">=</span> np.unique(cls, return_counts<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>    total <span class="op">=</span> <span class="bu">len</span>(cls)</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> [</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>        {<span class="st">"class"</span>: <span class="bu">int</span>(c),</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>         <span class="st">"label"</span>: CLASS_LABELS.get(<span class="bu">int</span>(c), <span class="ss">f"Class </span><span class="sc">{</span>c<span class="sc">}</span><span class="ss">"</span>),</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>         <span class="st">"n_pts"</span>: <span class="bu">int</span>(n),</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>         <span class="st">"pct"</span>:   <span class="bu">round</span>(n <span class="op">/</span> total <span class="op">*</span> <span class="dv">100</span>, <span class="dv">1</span>)}</span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> c, n <span class="kw">in</span> <span class="bu">zip</span>(unique, counts)</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> row <span class="kw">in</span> class_qc(files[<span class="dv">0</span>]):</span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Class </span><span class="sc">{</span>row[<span class="st">'class'</span>]<span class="sc">:2d}</span><span class="ss"> (</span><span class="sc">{</span>row[<span class="st">'label'</span>]<span class="sc">:20s}</span><span class="ss">): "</span></span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>          <span class="ss">f"</span><span class="sc">{</span>row[<span class="st">'n_pts'</span>]<span class="sc">:&gt;8,d}</span><span class="ss">  (</span><span class="sc">{</span>row[<span class="st">'pct'</span>]<span class="sc">:5.1f}</span><span class="ss">%)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</div>
+</div>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Class</th>
+<th>Label</th>
+<th>Pre-processing implication</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>Unclassified</td>
+<td>Ground classification needed (Stage 2)</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>Ground</td>
+<td>Already present — CSF can be skipped</td>
+</tr>
+<tr class="odd">
+<td>6</td>
+<td>Building</td>
+<td>Urban dataset — building metrics available</td>
+</tr>
+<tr class="even">
+<td>7 / 18</td>
+<td>Noise (low / high)</td>
+<td>Remove before normalization</td>
+</tr>
+<tr class="odd">
+<td>9</td>
+<td>Water</td>
+<td>Exclude from height normalization (flat surface)</td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+<section id="complete-qc-report" class="level3">
+<h3 class="anchored" data-anchor-id="complete-qc-report">0.6 Complete QC Report</h3>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-6-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-1" role="tab" aria-controls="tabset-6-1" aria-selected="true" href="">lidR</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-6-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-2" role="tab" aria-controls="tabset-6-2" aria-selected="false" href="">lasR</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-6-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-3" role="tab" aria-controls="tabset-6-3" aria-selected="false" href="">Python</a></li></ul>
+<div class="tab-content">
+<div id="tabset-6-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-6-1-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>qc_catalog <span class="ot">&lt;-</span> <span class="cf">function</span>(ctg) {</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  d        <span class="ot">&lt;-</span> ctg<span class="sc">@</span>data</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  d<span class="sc">$</span>area   <span class="ot">&lt;-</span> (d<span class="sc">$</span>Max.X <span class="sc">-</span> d<span class="sc">$</span>Min.X) <span class="sc">*</span> (d<span class="sc">$</span>Max.Y <span class="sc">-</span> d<span class="sc">$</span>Min.Y)</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  d<span class="sc">$</span>density <span class="ot">&lt;-</span> d<span class="sc">$</span>Number.of.point.records <span class="sc">/</span> d<span class="sc">$</span>area</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  d<span class="sc">$</span>z_span  <span class="ot">&lt;-</span> d<span class="sc">$</span>Max.Z <span class="sc">-</span> d<span class="sc">$</span>Min.Z</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  flags <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">file           =</span> <span class="fu">basename</span>(d<span class="sc">$</span>filename),</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">density        =</span> <span class="fu">round</span>(d<span class="sc">$</span>density, <span class="dv">1</span>),</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">z_min          =</span> <span class="fu">round</span>(d<span class="sc">$</span>Min.Z, <span class="dv">1</span>),</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">z_max          =</span> <span class="fu">round</span>(d<span class="sc">$</span>Max.Z, <span class="dv">1</span>),</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">z_span         =</span> <span class="fu">round</span>(d<span class="sc">$</span>z_span, <span class="dv">1</span>),</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">flag_low_dens  =</span> d<span class="sc">$</span>density <span class="sc">&lt;</span> <span class="dv">2</span>,</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">flag_bad_z     =</span> d<span class="sc">$</span>Min.Z <span class="sc">&lt;</span> <span class="sc">-</span><span class="dv">100</span> <span class="sc">|</span> d<span class="sc">$</span>Max.Z <span class="sc">&gt;</span> <span class="dv">5000</span> <span class="sc">|</span> d<span class="sc">$</span>z_span <span class="sc">&lt;</span> <span class="fl">0.5</span></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>  n_bad <span class="ot">&lt;-</span> <span class="fu">sum</span>(flags<span class="sc">$</span>flag_low_dens <span class="sc">|</span> flags<span class="sc">$</span>flag_bad_z)</span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="fu">sprintf</span>(</span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">"QC summary: %d tiles | density %.1f–%.1f pts/m² | Z %.1f–%.1f m | %d flag(s)</span><span class="sc">\n</span><span class="st">"</span>,</span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nrow</span>(d), <span class="fu">min</span>(d<span class="sc">$</span>density), <span class="fu">max</span>(d<span class="sc">$</span>density),</span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">min</span>(d<span class="sc">$</span>Min.Z), <span class="fu">max</span>(d<span class="sc">$</span>Max.Z), n_bad</span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>  ))</span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (n_bad <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="fu">print</span>(flags[flags<span class="sc">$</span>flag_low_dens <span class="sc">|</span> flags<span class="sc">$</span>flag_bad_z, ])</span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">invisible</span>(flags)</span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>flags <span class="ot">&lt;-</span> <span class="fu">qc_catalog</span>(ctg)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="tabset-6-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-6-2-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lidR); <span class="fu">library</span>(lasR)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>files   <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="st">"path/to/las_folder/"</span>, <span class="at">pattern=</span><span class="st">"</span><span class="sc">\\</span><span class="st">.la[sz]$"</span>, <span class="at">full.names=</span><span class="cn">TRUE</span>)</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>headers <span class="ot">&lt;-</span> <span class="fu">lapply</span>(files, readLASheader)</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>qc_hdr <span class="ot">&lt;-</span> <span class="fu">do.call</span>(rbind, <span class="fu">lapply</span>(<span class="fu">seq_along</span>(headers), <span class="cf">function</span>(i) {</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  h    <span class="ot">&lt;-</span> headers[[i]]</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  pts  <span class="ot">&lt;-</span> h<span class="sc">@</span>PHB[[<span class="st">"Number of point records"</span>]]</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  dx   <span class="ot">&lt;-</span> h<span class="sc">@</span>PHB[[<span class="st">"Max X"</span>]] <span class="sc">-</span> h<span class="sc">@</span>PHB[[<span class="st">"Min X"</span>]]</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>  dy   <span class="ot">&lt;-</span> h<span class="sc">@</span>PHB[[<span class="st">"Max Y"</span>]] <span class="sc">-</span> h<span class="sc">@</span>PHB[[<span class="st">"Min Y"</span>]]</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">file     =</span> <span class="fu">basename</span>(files[i]),</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">density  =</span> pts <span class="sc">/</span> (dx <span class="sc">*</span> dy),</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">z_min    =</span> h<span class="sc">@</span>PHB[[<span class="st">"Min Z"</span>]],</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">z_max    =</span> h<span class="sc">@</span>PHB[[<span class="st">"Max Z"</span>]],</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">z_span   =</span> h<span class="sc">@</span>PHB[[<span class="st">"Max Z"</span>]] <span class="sc">-</span> h<span class="sc">@</span>PHB[[<span class="st">"Min Z"</span>]]</span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>}))</span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">summary</span>(qc_hdr[, <span class="sc">-</span><span class="dv">1</span>]))</span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Stream a 10 m density raster for visual inspection</span></span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>pipeline <span class="ot">&lt;-</span> <span class="fu">reader_las</span>() <span class="sc">+</span></span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a>            <span class="fu">rasterize</span>(<span class="dv">10</span>, <span class="sc">~</span><span class="fu">list</span>(<span class="at">n =</span> <span class="fu">length</span>(Z)), <span class="at">ofile =</span> <span class="st">"density_check_10m.tif"</span>)</span>
+<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a><span class="fu">exec</span>(pipeline, <span class="at">on =</span> <span class="st">"path/to/las_folder/"</span>, <span class="at">ncores =</span> <span class="dv">4</span>L)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="tabset-6-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-6-3-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> full_qc(files, density_threshold<span class="op">=</span><span class="fl">2.0</span>, z_min_ok<span class="op">=-</span><span class="dv">100</span>, z_max_ok<span class="op">=</span><span class="dv">5000</span>):</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    records <span class="op">=</span> []</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> f <span class="kw">in</span> files:</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">with</span> laspy.<span class="bu">open</span>(f) <span class="im">as</span> lf:</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>            hdr <span class="op">=</span> lf.header</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>            pts <span class="op">=</span> hdr.point_count</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>            dx  <span class="op">=</span> hdr.x_max <span class="op">-</span> hdr.x_min</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>            dy  <span class="op">=</span> hdr.y_max <span class="op">-</span> hdr.y_min</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>        area    <span class="op">=</span> dx <span class="op">*</span> dy</span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>        density <span class="op">=</span> pts <span class="op">/</span> area <span class="cf">if</span> area <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">else</span> <span class="dv">0</span></span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>        records.append({</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>            <span class="st">"file"</span>:          Path(f).name,</span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>            <span class="st">"n_pts"</span>:         pts,</span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>            <span class="st">"density"</span>:       <span class="bu">round</span>(density, <span class="dv">2</span>),</span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>            <span class="st">"z_min"</span>:         <span class="bu">round</span>(hdr.z_min, <span class="dv">1</span>),</span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>            <span class="st">"z_max"</span>:         <span class="bu">round</span>(hdr.z_max, <span class="dv">1</span>),</span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>            <span class="st">"z_span"</span>:        <span class="bu">round</span>(hdr.z_max <span class="op">-</span> hdr.z_min, <span class="dv">1</span>),</span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>            <span class="st">"flag_low_dens"</span>: density <span class="op">&lt;</span> density_threshold,</span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>            <span class="st">"flag_bad_z"</span>:    (hdr.z_min <span class="op">&lt;</span> z_min_ok <span class="kw">or</span> hdr.z_max <span class="op">&gt;</span> z_max_ok</span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a>                              <span class="kw">or</span> (hdr.z_max <span class="op">-</span> hdr.z_min) <span class="op">&lt;</span> <span class="fl">0.5</span>)</span>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a>        })</span>
+<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a>    df      <span class="op">=</span> pd.DataFrame(records)</span>
+<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a>    flagged <span class="op">=</span> df[df[<span class="st">"flag_low_dens"</span>] <span class="op">|</span> df[<span class="st">"flag_bad_z"</span>]]</span>
+<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"QC summary: </span><span class="sc">{</span><span class="bu">len</span>(df)<span class="sc">}</span><span class="ss"> tiles | "</span></span>
+<span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a>          <span class="ss">f"density </span><span class="sc">{</span>df[<span class="st">'density'</span>]<span class="sc">.</span><span class="bu">min</span>()<span class="sc">:.1f}</span><span class="ss">–</span><span class="sc">{</span>df[<span class="st">'density'</span>]<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:.1f}</span><span class="ss"> pts/m² | "</span></span>
+<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a>          <span class="ss">f"Z </span><span class="sc">{</span>df[<span class="st">'z_min'</span>]<span class="sc">.</span><span class="bu">min</span>()<span class="sc">:.1f}</span><span class="ss">–</span><span class="sc">{</span>df[<span class="st">'z_max'</span>]<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:.1f}</span><span class="ss"> m | "</span></span>
+<span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a>          <span class="ss">f"</span><span class="sc">{</span><span class="bu">len</span>(flagged)<span class="sc">}</span><span class="ss"> flag(s)"</span>)</span>
+<span id="cb18-32"><a href="#cb18-32" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">len</span>(flagged) <span class="op">&gt;</span> <span class="dv">0</span>:</span>
+<span id="cb18-33"><a href="#cb18-33" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">Flagged tiles:"</span>)</span>
+<span id="cb18-34"><a href="#cb18-34" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(flagged.to_string(index<span class="op">=</span><span class="va">False</span>))</span>
+<span id="cb18-35"><a href="#cb18-35" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> df</span>
+<span id="cb18-36"><a href="#cb18-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-37"><a href="#cb18-37" aria-hidden="true" tabindex="-1"></a>qc_df <span class="op">=</span> full_qc(files)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</div>
+</div>
+<hr>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Recommended QC checklist before processing:</strong></p>
+<ul class="task-list">
+<li><label><input type="checkbox">All tiles share one projected CRS (UTM or state plane — not geographic WGS84)</label></li>
+<li><label><input type="checkbox">Point density ≥ 2 pts/m² (prefer ≥ 5 for canopy metrics)</label></li>
+<li><label><input type="checkbox">Z range is plausible for the landscape (no −9999 nodata placeholders)</label></li>
+<li><label><input type="checkbox">Multi-return pulses present (at least some NumberOfReturns &gt; 1)</label></li>
+<li><label><input type="checkbox">Class 2 (ground) present <strong>or</strong> ground classification planned</label></li>
+<li><label><input type="checkbox">Noise proportion (Classes 7/18) &lt; ~1% of total returns</label></li>
+</ul>
+</div>
+</div>
+<hr>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Once the catalog passes QC, proceed to the <a href="../../posts/lidar-preprocessing/index.html">pre-processing pipeline</a> for ground classification, height normalization, noise removal, and decimation.</p>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<canvas id="bg-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none;"></canvas>
+
+<script>
+(function () {
+  var canvas = document.getElementById('bg-canvas');
+  var ctx = canvas.getContext('2d');
+  var particles = [];
+  var N = 90;
+  var maxDist = 130;
+
+  /* ── Detect dark mode ─────────────────────────────────── */
+  function isDark() {
+    return document.documentElement.getAttribute('data-bs-theme') === 'dark' ||
+           document.body.classList.contains('quarto-dark') ||
+           window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+
+  function dotColor()  { return isDark() ? 'rgba(130,190,255,0.75)' : 'rgba(50,120,200,0.55)'; }
+  function lineColor(a){ return isDark() ? 'rgba(130,190,255,'+a+')' : 'rgba(50,120,200,'+a+')'; }
+
+  /* ── Particle constructor ─────────────────────────────── */
+  function Particle() {
+    this.reset(true);
+  }
+  Particle.prototype.reset = function (initial) {
+    this.x  = Math.random() * canvas.width;
+    this.y  = initial ? Math.random() * canvas.height : -5;
+    this.vx = (Math.random() - 0.5) * 0.45;
+    this.vy = (Math.random() - 0.5) * 0.45;
+    this.r  = Math.random() * 1.8 + 0.8;
+  };
+
+  /* ── Init / resize ────────────────────────────────────── */
+  function init() {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+    if (particles.length === 0) {
+      for (var i = 0; i < N; i++) particles.push(new Particle());
+    }
+  }
+
+  /* ── Animation loop ───────────────────────────────────── */
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    /* connections */
+    for (var i = 0; i < N; i++) {
+      for (var j = i + 1; j < N; j++) {
+        var dx   = particles[i].x - particles[j].x;
+        var dy   = particles[i].y - particles[j].y;
+        var dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < maxDist) {
+          var alpha = (1 - dist / maxDist) * 0.28;
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = lineColor(alpha);
+          ctx.lineWidth   = 0.6;
+          ctx.stroke();
+        }
+      }
+    }
+
+    /* dots */
+    ctx.fillStyle = dotColor();
+    for (var k = 0; k < N; k++) {
+      var p = particles[k];
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fill();
+
+      p.x += p.vx;
+      p.y += p.vy;
+
+      if (p.x < -10) p.x = canvas.width  + 5;
+      if (p.x > canvas.width  + 10) p.x = -5;
+      if (p.y < -10) p.y = canvas.height + 5;
+      if (p.y > canvas.height + 10) p.y = -5;
+    }
+
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', function () {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+  });
+
+  init();
+  draw();
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+
+  /* ── Block right-click context menu ──────────────────────── */
+  document.addEventListener("contextmenu", function (e) {
+    e.preventDefault();
+    return false;
+  });
+
+  /* ── Block copy-related keyboard shortcuts ───────────────── */
+  document.addEventListener("keydown", function (e) {
+    var ctrl = e.ctrlKey || e.metaKey; // Ctrl on Win/Linux, Cmd on Mac
+
+    if (ctrl) {
+      switch (e.key.toLowerCase()) {
+        case "c":  // Copy
+        case "a":  // Select All
+        case "x":  // Cut
+        case "u":  // View Source
+        case "s":  // Save Page
+        case "p":  // Print
+          e.preventDefault();
+          return false;
+      }
+      // Ctrl+Shift+I/J/C — DevTools
+      if (e.shiftKey && ["i", "j", "c"].includes(e.key.toLowerCase())) {
+        e.preventDefault();
+        return false;
+      }
+    }
+
+    // F12 — DevTools
+    if (e.key === "F12") {
+      e.preventDefault();
+      return false;
+    }
+  });
+
+  /* ── Block drag-and-drop of text / images ────────────────── */
+  document.addEventListener("dragstart", function (e) {
+    e.preventDefault();
+    return false;
+  });
+
+  /* ── Block copy event directly ───────────────────────────── */
+  document.addEventListener("copy", function (e) {
+    e.preventDefault();
+    return false;
+  });
+
+  /* ── Block cut event ─────────────────────────────────────── */
+  document.addEventListener("cut", function (e) {
+    e.preventDefault();
+    return false;
+  });
+})();
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/Programmer112321\.github\.io\/dingjin\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+<p>© 2026 Dingjin Chu</p>
+</div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>
