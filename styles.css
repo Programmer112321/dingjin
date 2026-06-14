@@ -160,6 +160,3 @@ a img {
   pointer-events: auto;
 }
 
-/* ── Blog Listing: hide title + thumbnail from cards ─────── */
-div.quarto-post h3.listing-title { display: none; }
-div.quarto-post .thumbnail { display: none; }

@@ -85,9 +85,9 @@ ul.task-list li input[type="checkbox"] {
     }
 
     const options = {
-      valueNames: ['listing-date','listing-description',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
+      valueNames: ['listing-date','listing-title','listing-author','listing-image','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
       
-      searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description"],
+      searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description","listing-categories"],
     };
 
     window['quarto-listings'] = window['quarto-listings'] || {};
@@ -138,7 +138,7 @@ window.Quarto = {
 <link rel="stylesheet" href="styles.css">
 <link rel="alternate" type="application/rss+xml" title="Dingjin Chu" href="blog.xml" data-external="1"></head>
 
-<body class="nav-fixed fullcontent quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+<body class="nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
     const toggleBodyColorMode = (bsSheetEl) => {
       const mode = bsSheetEl.getAttribute("data-mode");
       const bodyEl = window.document.querySelector("body");
@@ -458,7 +458,8 @@ window.Quarto = {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(8)</span></div><div class="category" data-category="M0RFUA==">3DEP <span class="quarto-category-count">(6)</span></div><div class="category" data-category="QmlvbWFzcw==">Biomass <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Q2Fub3B5">Canopy <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Q2Fub3B5JTIwSGVpZ2h0">Canopy Height <span class="quarto-category-count">(3)</span></div><div class="category" data-category="R0VESQ==">GEDI <span class="quarto-category-count">(4)</span></div><div class="category" data-category="Z2VuZXJhbA==">general <span class="quarto-category-count">(1)</span></div><div class="category" data-category="TGlEQVI=">LiDAR <span class="quarto-category-count">(7)</span></div><div class="category" data-category="TWV0cmljcw==">Metrics <span class="quarto-category-count">(1)</span></div><div class="category" data-category="TkVPTg==">NEON <span class="quarto-category-count">(2)</span></div><div class="category" data-category="UHJlLXByb2Nlc3Npbmc=">Pre-processing <span class="quarto-category-count">(1)</span></div><div class="category" data-category="UHl0aG9u">Python <span class="quarto-category-count">(3)</span></div><div class="category" data-category="UXVhbGl0eSUyMENvbnRyb2w=">Quality Control <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Ug==">R <span class="quarto-category-count">(7)</span></div><div class="category" data-category="VHV0b3JpYWw=">Tutorial <span class="quarto-category-count">(7)</span></div><div class="category" data-category="VXJiYW4=">Urban <span class="quarto-category-count">(3)</span></div></div></div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
@@ -482,96 +483,6 @@ window.Quarto = {
 </header>
 
 
-<style>
-#blog-layout {
-  display: grid;
-  grid-template-columns: 1fr 210px;
-  gap: 2.5rem;
-  align-items: start;
-}
-
-#blog-sidebar {
-  position: sticky;
-  top: 70px;
-  border-left: 2px solid #e5e7eb;
-  padding-left: 1rem;
-}
-
-#blog-sidebar .toc-label {
-  font-size: 0.68rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: #bbb;
-  margin: 0 0 0.75rem 0;
-}
-
-#blog-sidebar ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-#blog-sidebar li {
-  margin-bottom: 0.55rem;
-  padding-bottom: 0.55rem;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-#blog-sidebar li:last-child {
-  border-bottom: none;
-  padding-bottom: 0;
-}
-
-#blog-sidebar a {
-  font-size: 0.78rem;
-  color: #555;
-  line-height: 1.4;
-  display: block;
-  text-decoration: none;
-}
-
-#blog-sidebar a:hover {
-  color: #0d6efd;
-}
-</style>
-
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-  var listing = document.querySelector('.quarto-listing');
-  if (!listing) return;
-
-  var items = [];
-  document.querySelectorAll('div.quarto-post').forEach(function (post) {
-    var h3   = post.querySelector('h3.listing-title');
-    var link = post.querySelector('a.title-link');
-    if (h3 && link) {
-      var url = link.getAttribute('href');
-      items.push({ title: h3.textContent.trim(), url: url });
-      post.style.cursor = 'pointer';
-      post.addEventListener('click', function (e) {
-        if (!e.target.closest('a')) window.location.href = url;
-      });
-    }
-  });
-  if (!items.length) return;
-
-  var sidebar = document.createElement('nav');
-  sidebar.id = 'blog-sidebar';
-  sidebar.innerHTML =
-    '<p class="toc-label">Posts</p><ul>' +
-    items.map(function (p) {
-      return '<li><a href="' + p.url + '">' + p.title + '</a></li>';
-    }).join('') +
-    '</ul>';
-
-  var wrapper = document.createElement('div');
-  wrapper.id = 'blog-layout';
-  listing.parentNode.insertBefore(wrapper, listing);
-  wrapper.appendChild(listing);
-  wrapper.appendChild(sidebar);
-});
-</script>
 
 
 
@@ -579,7 +490,32 @@ document.addEventListener('DOMContentLoaded', function () {
 <div class="quarto-listing quarto-listing-container-default" id="listing-listing">
 <div class="list quarto-listing-default">
 <div class="quarto-post image-right" data-index="0" data-categories="TGlEQVIlMkNHRURJJTJDM0RFUCUyQ1VyYmFuJTJDQ2Fub3B5JTIwSGVpZ2h0JTJDUiUyQ1R1dG9yaWFs" data-listing-date-sort="1781326800000" data-listing-file-modified-sort="1781367839141" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1947">
+<div class="thumbnail"><a href="./posts/gedi-3dep-compare/index.html" class="no-external">
+
+<p class="card-img-top"><img src="posts\gedi-3dep-compare\fig_3dep_chm.png"  class="thumbnail-image card-img"/></p>
+
+</a></div>
 <div class="body">
+<h3 class="no-anchor listing-title">
+<a href="./posts/gedi-3dep-compare/index.html" class="no-external">Multi-Source Urban Heights: GEDI L2A, 3DEP LiDAR, and OSM — New York City</a>
+</h3>
+<div class="listing-categories">
+
+<div class="listing-category" onclick="window.quartoListingCategory('TGlEQVI='); return false;">LiDAR</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('R0VESQ=='); return false;">GEDI</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('M0RFUA=='); return false;">3DEP</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('VXJiYW4='); return false;">Urban</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('Q2Fub3B5JTIwSGVpZ2h0'); return false;">Canopy Height</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('Ug=='); return false;">R</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('VHV0b3JpYWw='); return false;">Tutorial</div>
+
+</div>
 <div class="delink listing-description"><a href="./posts/gedi-3dep-compare/index.html" class="no-external">
 Three independent data sources can measure urban heights in the Central Park–Manhattan corridor, each with different spatial coverage, resolution, accuracy, and access…
 </a></div>
@@ -589,11 +525,37 @@ Three independent data sources can measure urban heights in the Central Park–M
 <div class="listing-date">
 Jun 13, 2026
 </div>
+<div class="listing-author">
+Dingjin Chu
+</div>
 </a>
 </div>
 </div>
 <div class="quarto-post image-right" data-index="1" data-categories="TGlEQVIlMkNHRURJJTJDVXJiYW4lMkNDYW5vcHklMjBIZWlnaHQlMkNSJTJDVHV0b3JpYWw=" data-listing-date-sort="1778302800000" data-listing-file-modified-sort="1781368230946" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="16" data-listing-word-count-sort="3080">
+<div class="thumbnail"><a href="./posts/gedi-urban-nyc/index.html" class="no-external">
+
+<p class="card-img-top"><img src="posts\gedi-urban-nyc\fig_zone_spatial.png"  class="thumbnail-image card-img"/></p>
+
+</a></div>
 <div class="body">
+<h3 class="no-anchor listing-title">
+<a href="./posts/gedi-urban-nyc/index.html" class="no-external">Urban GEDI: Separating Vegetation from Buildings in New York City</a>
+</h3>
+<div class="listing-categories">
+
+<div class="listing-category" onclick="window.quartoListingCategory('TGlEQVI='); return false;">LiDAR</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('R0VESQ=='); return false;">GEDI</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('VXJiYW4='); return false;">Urban</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('Q2Fub3B5JTIwSGVpZ2h0'); return false;">Canopy Height</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('Ug=='); return false;">R</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('VHV0b3JpYWw='); return false;">Tutorial</div>
+
+</div>
 <div class="delink listing-description"><a href="./posts/gedi-urban-nyc/index.html" class="no-external">
 GEDI L2A measures the <strong>vertical distribution of returned laser energy</strong> — but in urban areas the sensor cannot distinguish a 20 m tree from a 20 m rooftop. Both produce similar…<strong></strong>
 </a></div>
@@ -603,11 +565,39 @@ GEDI L2A measures the <strong>vertical distribution of returned laser energy</st
 <div class="listing-date">
 May 9, 2026
 </div>
+<div class="listing-author">
+Dingjin Chu
+</div>
 </a>
 </div>
 </div>
 <div class="quarto-post image-right" data-index="2" data-categories="TGlEQVIlMkNHRURJJTJDTkVPTiUyQzNERVAlMkNCaW9tYXNzJTJDUiUyQ1R1dG9yaWFs" data-listing-date-sort="1776142800000" data-listing-file-modified-sort="1781368231710" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="13" data-listing-word-count-sort="2514">
+<div class="thumbnail"><a href="./posts/gedi-l4a/index.html" class="no-external">
+
+<p class="card-img-top"><img src="posts\gedi-l4a\fig_agbd_spatial.png"  class="thumbnail-image card-img"/></p>
+
+</a></div>
 <div class="body">
+<h3 class="no-anchor listing-title">
+<a href="./posts/gedi-l4a/index.html" class="no-external">GEDI L4A Above-Ground Biomass at NEON SCBI: Comparison with NEON AOP and 3DEP Allometric Estimates</a>
+</h3>
+<div class="listing-categories">
+
+<div class="listing-category" onclick="window.quartoListingCategory('TGlEQVI='); return false;">LiDAR</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('R0VESQ=='); return false;">GEDI</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('TkVPTg=='); return false;">NEON</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('M0RFUA=='); return false;">3DEP</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('QmlvbWFzcw=='); return false;">Biomass</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('Ug=='); return false;">R</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('VHV0b3JpYWw='); return false;">Tutorial</div>
+
+</div>
 <div class="delink listing-description"><a href="./posts/gedi-l4a/index.html" class="no-external">
 <strong>GEDI L4A</strong> converts full-waveform LiDAR returns into footprint-level <strong>above-ground biomass density (AGBD)</strong> estimates using allometric models trained on forest inventory data.…
 </a></div>
@@ -617,11 +607,39 @@ May 9, 2026
 <div class="listing-date">
 Apr 14, 2026
 </div>
+<div class="listing-author">
+Dingjin Chu
+</div>
 </a>
 </div>
 </div>
 <div class="quarto-post image-right" data-index="3" data-categories="TGlEQVIlMkNHRURJJTJDTkVPTiUyQzNERVAlMkNDYW5vcHklMjBIZWlnaHQlMkNSJTJDVHV0b3JpYWw=" data-listing-date-sort="1773810000000" data-listing-file-modified-sort="1781368232473" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="12" data-listing-word-count-sort="2295">
+<div class="thumbnail"><a href="./posts/gedi-l2a/index.html" class="no-external">
+
+<p class="card-img-top"><img src="posts\gedi-l2a\fig_spatial.png"  class="thumbnail-image card-img"/></p>
+
+</a></div>
 <div class="body">
+<h3 class="no-anchor listing-title">
+<a href="./posts/gedi-l2a/index.html" class="no-external">GEDI L2A Canopy Height at NEON SCBI: Comparison with NEON AOP and 3DEP LiDAR</a>
+</h3>
+<div class="listing-categories">
+
+<div class="listing-category" onclick="window.quartoListingCategory('TGlEQVI='); return false;">LiDAR</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('R0VESQ=='); return false;">GEDI</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('TkVPTg=='); return false;">NEON</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('M0RFUA=='); return false;">3DEP</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('Q2Fub3B5JTIwSGVpZ2h0'); return false;">Canopy Height</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('Ug=='); return false;">R</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('VHV0b3JpYWw='); return false;">Tutorial</div>
+
+</div>
 <div class="delink listing-description"><a href="./posts/gedi-l2a/index.html" class="no-external">
 <strong>GEDI L2A</strong> relative height (RH) metrics measure canopy vertical structure from the ISS. In forested landscapes, RH95 is the most widely used canopy height proxy. This post…<strong></strong>
 </a></div>
@@ -631,11 +649,41 @@ Apr 14, 2026
 <div class="listing-date">
 Mar 18, 2026
 </div>
+<div class="listing-author">
+Dingjin Chu
+</div>
 </a>
 </div>
 </div>
 <div class="quarto-post image-right" data-index="4" data-categories="TGlEQVIlMkMzREVQJTJDTWV0cmljcyUyQ0Nhbm9weSUyQ1VyYmFuJTJDUiUyQ1B5dGhvbiUyQ1R1dG9yaWFs" data-listing-date-sort="1773118800000" data-listing-file-modified-sort="1781396113821" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="45" data-listing-word-count-sort="8987">
+<div class="thumbnail"><a href="./posts/lidar-metrics/index.html" class="no-external">
+
+<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
+
+</a></div>
 <div class="body">
+<h3 class="no-anchor listing-title">
+<a href="./posts/lidar-metrics/index.html" class="no-external">LiDAR Metric Calculation: Canopy Structure, Complexity, and Urban Buildings</a>
+</h3>
+<div class="listing-categories">
+
+<div class="listing-category" onclick="window.quartoListingCategory('TGlEQVI='); return false;">LiDAR</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('M0RFUA=='); return false;">3DEP</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('TWV0cmljcw=='); return false;">Metrics</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('Q2Fub3B5'); return false;">Canopy</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('VXJiYW4='); return false;">Urban</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('Ug=='); return false;">R</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('UHl0aG9u'); return false;">Python</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('VHV0b3JpYWw='); return false;">Tutorial</div>
+
+</div>
 <div class="delink listing-description"><a href="./posts/lidar-metrics/index.html" class="no-external">
 <p>A comprehensive guide to computing LiDAR structural metrics in lidR, lasR, and Python — canopy height percentiles, complexity indices (Rumple, VCI, CRR), density profiles, and building-specific metrics for urban morphology analysis.</p>
 </a></div>
@@ -645,11 +693,37 @@ Mar 18, 2026
 <div class="listing-date">
 Mar 10, 2026
 </div>
+<div class="listing-author">
+Dingjin Chu
+</div>
 </a>
 </div>
 </div>
 <div class="quarto-post image-right" data-index="5" data-categories="TGlEQVIlMkMzREVQJTJDUHJlLXByb2Nlc3NpbmclMkNSJTJDUHl0aG9uJTJDVHV0b3JpYWw=" data-listing-date-sort="1771135200000" data-listing-file-modified-sort="1781398123902" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="24" data-listing-word-count-sort="4745">
+<div class="thumbnail"><a href="./posts/lidar-preprocessing/index.html" class="no-external">
+
+<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
+
+</a></div>
 <div class="body">
+<h3 class="no-anchor listing-title">
+<a href="./posts/lidar-preprocessing/index.html" class="no-external">Pre-Processing Airborne LiDAR Data: lidR vs lasR vs Python</a>
+</h3>
+<div class="listing-categories">
+
+<div class="listing-category" onclick="window.quartoListingCategory('TGlEQVI='); return false;">LiDAR</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('M0RFUA=='); return false;">3DEP</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('UHJlLXByb2Nlc3Npbmc='); return false;">Pre-processing</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('Ug=='); return false;">R</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('UHl0aG9u'); return false;">Python</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('VHV0b3JpYWw='); return false;">Tutorial</div>
+
+</div>
 <div class="delink listing-description"><a href="./posts/lidar-preprocessing/index.html" class="no-external">
 <p>A complete LiDAR pre-processing pipeline shown in parallel across lidR, lasR, and Python (PDAL / laspy+scipy) — with pros/cons for every stage and in-depth comparisons of decimation and noise-removal strategies.</p>
 </a></div>
@@ -659,11 +733,37 @@ Mar 10, 2026
 <div class="listing-date">
 Feb 15, 2026
 </div>
+<div class="listing-author">
+Dingjin Chu
+</div>
 </a>
 </div>
 </div>
 <div class="quarto-post image-right" data-index="6" data-categories="TGlEQVIlMkMzREVQJTJDUXVhbGl0eSUyMENvbnRyb2wlMkNSJTJDUHl0aG9uJTJDVHV0b3JpYWw=" data-listing-date-sort="1769925600000" data-listing-file-modified-sort="1781397837282" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="15" data-listing-word-count-sort="2907">
+<div class="thumbnail"><a href="./posts/lidar-qc/index.html" class="no-external">
+
+<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
+
+</a></div>
 <div class="body">
+<h3 class="no-anchor listing-title">
+<a href="./posts/lidar-qc/index.html" class="no-external">Pre-Flight Quality Check for Airborne LiDAR Data</a>
+</h3>
+<div class="listing-categories">
+
+<div class="listing-category" onclick="window.quartoListingCategory('TGlEQVI='); return false;">LiDAR</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('M0RFUA=='); return false;">3DEP</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('UXVhbGl0eSUyMENvbnRyb2w='); return false;">Quality Control</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('Ug=='); return false;">R</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('UHl0aG9u'); return false;">Python</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('VHV0b3JpYWw='); return false;">Tutorial</div>
+
+</div>
 <div class="delink listing-description"><a href="./posts/lidar-qc/index.html" class="no-external">
 <p>Before any processing, run these checks across lidR, lasR, and Python — CRS consistency, point density, Z-range sanity, return structure, and classification summary. Catches catalog-level problems in seconds from headers alone.</p>
 </a></div>
@@ -673,11 +773,27 @@ Feb 15, 2026
 <div class="listing-date">
 Feb 1, 2026
 </div>
+<div class="listing-author">
+Dingjin Chu
+</div>
 </a>
 </div>
 </div>
 <div class="quarto-post image-right" data-index="7" data-categories="Z2VuZXJhbA==" data-listing-date-sort="1768716000000" data-listing-file-modified-sort="1781368233228" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="47">
+<div class="thumbnail"><a href="./posts/welcome/index.html" class="no-external">
+
+<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
+
+</a></div>
 <div class="body">
+<h3 class="no-anchor listing-title">
+<a href="./posts/welcome/index.html" class="no-external">Welcome to My Blog</a>
+</h3>
+<div class="listing-categories">
+
+<div class="listing-category" onclick="window.quartoListingCategory('Z2VuZXJhbA=='); return false;">general</div>
+
+</div>
 <div class="delink listing-description"><a href="./posts/welcome/index.html" class="no-external">
 This is the first post on my blog. I will use this space to share thoughts on remote sensing, LiDAR analysis, forest ecology, and my research journey as a PhD student at…
 </a></div>
