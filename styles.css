@@ -160,31 +160,6 @@ a img {
   pointer-events: auto;
 }
 
-/* ── Blog Listing: description left, title right ─────────── */
-div.quarto-post .thumbnail {
-  display: none !important;
-}
-
-div.quarto-post {
-  grid-template-columns: 1fr !important;
-}
-
-div.quarto-post .body {
-  display: grid;
-  grid-template-columns: 1fr 42%;
-  align-items: start;
-  gap: 0 2rem;
-}
-
-/* Title link → right column */
-div.quarto-post .body > a.title-link {
-  grid-column: 2;
-  grid-row: 1;
-  text-align: right;
-}
-
-/* Description → left column */
-div.quarto-post .body > div.listing-description {
-  grid-column: 1;
-  grid-row: 1;
-}
+/* ── Blog Listing: hide title + thumbnail from cards ─────── */
+div.quarto-post h3.listing-title { display: none; }
+div.quarto-post .thumbnail { display: none; }
