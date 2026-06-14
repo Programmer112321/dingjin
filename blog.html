@@ -85,9 +85,9 @@ ul.task-list li input[type="checkbox"] {
     }
 
     const options = {
-      valueNames: ['listing-date','listing-title','listing-description',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-title-sort'] }],
+      valueNames: ['listing-image','listing-date','listing-title','listing-description',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
       
-      searchColumns: ["listing-date","listing-title","listing-author"],
+      searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description"],
     };
 
     window['quarto-listings'] = window['quarto-listings'] || {};
@@ -486,155 +486,185 @@ window.Quarto = {
 
 
 
-<div class="quarto-listing quarto-listing-container-table" id="listing-listing">
-<div class="listing-actions-group">
-   <div class="input-group input-group-sm quarto-listing-sort">
-    <span class="input-group-text"><i class="bi bi-sort-down"></i></span>
-    <select id="listing-listing-sort" class="form-select" aria-label="Order By" onchange="window['quarto-listings']['listing-listing'].sort(this.options[this.selectedIndex].value, { order: this.options[this.selectedIndex].getAttribute('data-direction')})">
-      <option value="" disabled="" selected="" hidden="">Order By</option>
-      <option value="index" data-direction="asc">Default</option>
-      <option value="listing-date-sort" data-direction="asc">
-        Date - Oldest
-      </option>
-      <option value="listing-date-sort" data-direction="desc">
-        Date - Newest
-      </option>
-      <option value="listing-title-sort" data-direction="asc">
-        Title
-      </option>
-    </select>
-  </div>
-    <div class="input-group input-group-sm quarto-listing-filter">
-      <span class="input-group-text"><i class="bi bi-search"></i></span>
-      <input type="text" class="search form-control" placeholder="Filter">
-    </div>
+<div class="quarto-listing quarto-listing-container-default" id="listing-listing">
+<div class="list quarto-listing-default">
+<div class="quarto-post image-right" data-index="0" data-categories="TGlEQVIlMkNHRURJJTJDM0RFUCUyQ1VyYmFuJTJDQ2Fub3B5JTIwSGVpZ2h0JTJDUiUyQ1R1dG9yaWFs" data-listing-date-sort="1781326800000" data-listing-file-modified-sort="1781367839141" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1947">
+<div class="thumbnail"><a href="./posts/gedi-3dep-compare/index.html" class="no-external">
+
+<p class="card-img-top"><img src="posts\gedi-3dep-compare\fig_3dep_chm.png"  class="thumbnail-image card-img"/></p>
+
+</a></div>
+<div class="body">
+<h3 class="no-anchor listing-title">
+<a href="./posts/gedi-3dep-compare/index.html" class="no-external">Multi-Source Urban Heights: GEDI L2A, 3DEP LiDAR, and OSM — New York City</a>
+</h3>
+<div class="delink listing-description"><a href="./posts/gedi-3dep-compare/index.html" class="no-external">
+Three independent data sources can measure urban heights in the Central Park–Manhattan corridor, each with different spatial coverage, resolution, accuracy, and access…
+</a></div>
 </div>
-<table class="quarto-listing-table table">
-<thead>
-<tr>
+<div class="metadata">
+<a href="./posts/gedi-3dep-compare/index.html" class="no-external">
+<div class="listing-date">
+Jun 13, 2026
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="1" data-categories="TGlEQVIlMkNHRURJJTJDVXJiYW4lMkNDYW5vcHklMjBIZWlnaHQlMkNSJTJDVHV0b3JpYWw=" data-listing-date-sort="1778302800000" data-listing-file-modified-sort="1781368230946" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="16" data-listing-word-count-sort="3080">
+<div class="thumbnail"><a href="./posts/gedi-urban-nyc/index.html" class="no-external">
 
-<th>
-<a class="sort" data-sort="listing-date-sort" onclick="if (this.classList.contains('sort-asc')) { this.classList.add('sort-desc'); this.classList.remove('sort-asc') } else { this.classList.add('sort-asc'); this.classList.remove('sort-desc')} return false;">Date</a>
-</th>
+<p class="card-img-top"><img src="posts\gedi-urban-nyc\fig_zone_spatial.png"  class="thumbnail-image card-img"/></p>
 
-<th>
-<a class="sort" data-sort="listing-title-sort" onclick="if (this.classList.contains('sort-asc')) { this.classList.add('sort-desc'); this.classList.remove('sort-asc') } else { this.classList.add('sort-asc'); this.classList.remove('sort-desc')} return false;">Title</a>
-</th>
+</a></div>
+<div class="body">
+<h3 class="no-anchor listing-title">
+<a href="./posts/gedi-urban-nyc/index.html" class="no-external">Urban GEDI: Separating Vegetation from Buildings in New York City</a>
+</h3>
+<div class="delink listing-description"><a href="./posts/gedi-urban-nyc/index.html" class="no-external">
+GEDI L2A measures the <strong>vertical distribution of returned laser energy</strong> — but in urban areas the sensor cannot distinguish a 20 m tree from a 20 m rooftop. Both produce similar…<strong></strong>
+</a></div>
+</div>
+<div class="metadata">
+<a href="./posts/gedi-urban-nyc/index.html" class="no-external">
+<div class="listing-date">
+May 9, 2026
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="2" data-categories="TGlEQVIlMkNHRURJJTJDTkVPTiUyQzNERVAlMkNCaW9tYXNzJTJDUiUyQ1R1dG9yaWFs" data-listing-date-sort="1776142800000" data-listing-file-modified-sort="1781368231710" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="13" data-listing-word-count-sort="2514">
+<div class="thumbnail"><a href="./posts/gedi-l4a/index.html" class="no-external">
 
-<th>
-Description
-</th>
+<p class="card-img-top"><img src="posts\gedi-l4a\fig_agbd_spatial.png"  class="thumbnail-image card-img"/></p>
 
-</tr>
-</thead>
-<tbody class="list">
+</a></div>
+<div class="body">
+<h3 class="no-anchor listing-title">
+<a href="./posts/gedi-l4a/index.html" class="no-external">GEDI L4A Above-Ground Biomass at NEON SCBI: Comparison with NEON AOP and 3DEP Allometric Estimates</a>
+</h3>
+<div class="delink listing-description"><a href="./posts/gedi-l4a/index.html" class="no-external">
+<strong>GEDI L4A</strong> converts full-waveform LiDAR returns into footprint-level <strong>above-ground biomass density (AGBD)</strong> estimates using allometric models trained on forest inventory data.…
+</a></div>
+</div>
+<div class="metadata">
+<a href="./posts/gedi-l4a/index.html" class="no-external">
+<div class="listing-date">
+Apr 14, 2026
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="3" data-categories="TGlEQVIlMkNHRURJJTJDTkVPTiUyQzNERVAlMkNDYW5vcHklMjBIZWlnaHQlMkNSJTJDVHV0b3JpYWw=" data-listing-date-sort="1773810000000" data-listing-file-modified-sort="1781368232473" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="12" data-listing-word-count-sort="2295">
+<div class="thumbnail"><a href="./posts/gedi-l2a/index.html" class="no-external">
 
-<tr data-index="0" data-categories="TGlEQVIlMkNHRURJJTJDM0RFUCUyQ1VyYmFuJTJDQ2Fub3B5JTIwSGVpZ2h0JTJDUiUyQ1R1dG9yaWFs" data-listing-date-sort="1781326800000" data-listing-file-modified-sort="1781367839141" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1947" data-listing-title-sort="Multi-Source Urban Heights: GEDI L2A, 3DEP LiDAR, and OSM — New York City" data-listing-filename-sort="index.qmd">
-<td>
-<span class="listing-date">Jun 13, 2026</span>
-</td>
-<td>
-<a href="./posts/gedi-3dep-compare/index.html" class="title listing-title">Multi-Source Urban Heights: GEDI L2A, 3DEP LiDAR, and OSM — New York City</a>
-</td>
-<td>
-<span class="listing-description">Three independent data sources can measure urban heights in the Central Park–Manhattan corridor, each with different spatial coverage, resolution, accuracy, and access…</span>
-</td>
+<p class="card-img-top"><img src="posts\gedi-l2a\fig_spatial.png"  class="thumbnail-image card-img"/></p>
 
-</tr>
+</a></div>
+<div class="body">
+<h3 class="no-anchor listing-title">
+<a href="./posts/gedi-l2a/index.html" class="no-external">GEDI L2A Canopy Height at NEON SCBI: Comparison with NEON AOP and 3DEP LiDAR</a>
+</h3>
+<div class="delink listing-description"><a href="./posts/gedi-l2a/index.html" class="no-external">
+<strong>GEDI L2A</strong> relative height (RH) metrics measure canopy vertical structure from the ISS. In forested landscapes, RH95 is the most widely used canopy height proxy. This post…<strong></strong>
+</a></div>
+</div>
+<div class="metadata">
+<a href="./posts/gedi-l2a/index.html" class="no-external">
+<div class="listing-date">
+Mar 18, 2026
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="4" data-categories="TGlEQVIlMkMzREVQJTJDTWV0cmljcyUyQ0Nhbm9weSUyQ1VyYmFuJTJDUiUyQ1B5dGhvbiUyQ1R1dG9yaWFs" data-listing-date-sort="1773118800000" data-listing-file-modified-sort="1781396113821" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="45" data-listing-word-count-sort="8987">
+<div class="thumbnail"><a href="./posts/lidar-metrics/index.html" class="no-external">
 
-<tr data-index="1" data-categories="TGlEQVIlMkNHRURJJTJDVXJiYW4lMkNDYW5vcHklMjBIZWlnaHQlMkNSJTJDVHV0b3JpYWw=" data-listing-date-sort="1778302800000" data-listing-file-modified-sort="1781368230946" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="16" data-listing-word-count-sort="3080" data-listing-title-sort="Urban GEDI: Separating Vegetation from Buildings in New York City" data-listing-filename-sort="index.qmd">
-<td>
-<span class="listing-date">May 9, 2026</span>
-</td>
-<td>
-<a href="./posts/gedi-urban-nyc/index.html" class="title listing-title">Urban GEDI: Separating Vegetation from Buildings in New York City</a>
-</td>
-<td>
-<span class="listing-description">GEDI L2A measures the <strong>vertical distribution of returned laser energy</strong> — but in urban areas the sensor cannot distinguish a 20 m tree from a 20 m rooftop. Both produce similar…<strong></strong></span>
-</td>
+<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
 
-</tr>
+</a></div>
+<div class="body">
+<h3 class="no-anchor listing-title">
+<a href="./posts/lidar-metrics/index.html" class="no-external">LiDAR Metric Calculation: Canopy Structure, Complexity, and Urban Buildings</a>
+</h3>
+<div class="delink listing-description"><a href="./posts/lidar-metrics/index.html" class="no-external">
+<p>A comprehensive guide to computing LiDAR structural metrics in lidR, lasR, and Python — canopy height percentiles, complexity indices (Rumple, VCI, CRR), density profiles, and building-specific metrics for urban morphology analysis.</p>
+</a></div>
+</div>
+<div class="metadata">
+<a href="./posts/lidar-metrics/index.html" class="no-external">
+<div class="listing-date">
+Mar 10, 2026
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="5" data-categories="TGlEQVIlMkMzREVQJTJDUHJlLXByb2Nlc3NpbmclMkNSJTJDUHl0aG9uJTJDVHV0b3JpYWw=" data-listing-date-sort="1771135200000" data-listing-file-modified-sort="1781398123902" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="24" data-listing-word-count-sort="4745">
+<div class="thumbnail"><a href="./posts/lidar-preprocessing/index.html" class="no-external">
 
-<tr data-index="2" data-categories="TGlEQVIlMkNHRURJJTJDTkVPTiUyQzNERVAlMkNCaW9tYXNzJTJDUiUyQ1R1dG9yaWFs" data-listing-date-sort="1776142800000" data-listing-file-modified-sort="1781368231710" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="13" data-listing-word-count-sort="2514" data-listing-title-sort="GEDI L4A Above-Ground Biomass at NEON SCBI: Comparison with NEON AOP and 3DEP Allometric Estimates" data-listing-filename-sort="index.qmd">
-<td>
-<span class="listing-date">Apr 14, 2026</span>
-</td>
-<td>
-<a href="./posts/gedi-l4a/index.html" class="title listing-title">GEDI L4A Above-Ground Biomass at NEON SCBI: Comparison with NEON AOP and 3DEP Allometric Estimates</a>
-</td>
-<td>
-<span class="listing-description"><strong>GEDI L4A</strong> converts full-waveform LiDAR returns into footprint-level <strong>above-ground biomass density (AGBD)</strong> estimates using allometric models trained on forest inventory data.…</span>
-</td>
+<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
 
-</tr>
+</a></div>
+<div class="body">
+<h3 class="no-anchor listing-title">
+<a href="./posts/lidar-preprocessing/index.html" class="no-external">Pre-Processing Airborne LiDAR Data: lidR vs lasR vs Python</a>
+</h3>
+<div class="delink listing-description"><a href="./posts/lidar-preprocessing/index.html" class="no-external">
+<p>A complete LiDAR pre-processing pipeline shown in parallel across lidR, lasR, and Python (PDAL / laspy+scipy) — with pros/cons for every stage and in-depth comparisons of decimation and noise-removal strategies.</p>
+</a></div>
+</div>
+<div class="metadata">
+<a href="./posts/lidar-preprocessing/index.html" class="no-external">
+<div class="listing-date">
+Feb 15, 2026
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="6" data-categories="TGlEQVIlMkMzREVQJTJDUXVhbGl0eSUyMENvbnRyb2wlMkNSJTJDUHl0aG9uJTJDVHV0b3JpYWw=" data-listing-date-sort="1769925600000" data-listing-file-modified-sort="1781397837282" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="15" data-listing-word-count-sort="2907">
+<div class="thumbnail"><a href="./posts/lidar-qc/index.html" class="no-external">
 
-<tr data-index="3" data-categories="TGlEQVIlMkNHRURJJTJDTkVPTiUyQzNERVAlMkNDYW5vcHklMjBIZWlnaHQlMkNSJTJDVHV0b3JpYWw=" data-listing-date-sort="1773810000000" data-listing-file-modified-sort="1781368232473" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="12" data-listing-word-count-sort="2295" data-listing-title-sort="GEDI L2A Canopy Height at NEON SCBI: Comparison with NEON AOP and 3DEP LiDAR" data-listing-filename-sort="index.qmd">
-<td>
-<span class="listing-date">Mar 18, 2026</span>
-</td>
-<td>
-<a href="./posts/gedi-l2a/index.html" class="title listing-title">GEDI L2A Canopy Height at NEON SCBI: Comparison with NEON AOP and 3DEP LiDAR</a>
-</td>
-<td>
-<span class="listing-description"><strong>GEDI L2A</strong> relative height (RH) metrics measure canopy vertical structure from the ISS. In forested landscapes, RH95 is the most widely used canopy height proxy. This post…<strong></strong></span>
-</td>
+<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
 
-</tr>
+</a></div>
+<div class="body">
+<h3 class="no-anchor listing-title">
+<a href="./posts/lidar-qc/index.html" class="no-external">Pre-Flight Quality Check for Airborne LiDAR Data</a>
+</h3>
+<div class="delink listing-description"><a href="./posts/lidar-qc/index.html" class="no-external">
+<p>Before any processing, run these checks across lidR, lasR, and Python — CRS consistency, point density, Z-range sanity, return structure, and classification summary. Catches catalog-level problems in seconds from headers alone.</p>
+</a></div>
+</div>
+<div class="metadata">
+<a href="./posts/lidar-qc/index.html" class="no-external">
+<div class="listing-date">
+Feb 1, 2026
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="7" data-categories="Z2VuZXJhbA==" data-listing-date-sort="1768716000000" data-listing-file-modified-sort="1781368233228" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="47">
+<div class="thumbnail"><a href="./posts/welcome/index.html" class="no-external">
 
-<tr data-index="4" data-categories="TGlEQVIlMkMzREVQJTJDTWV0cmljcyUyQ0Nhbm9weSUyQ1VyYmFuJTJDUiUyQ1B5dGhvbiUyQ1R1dG9yaWFs" data-listing-date-sort="1773118800000" data-listing-file-modified-sort="1781396113821" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="45" data-listing-word-count-sort="8987" data-listing-title-sort="LiDAR Metric Calculation: Canopy Structure, Complexity, and Urban Buildings" data-listing-filename-sort="index.qmd">
-<td>
-<span class="listing-date">Mar 10, 2026</span>
-</td>
-<td>
-<a href="./posts/lidar-metrics/index.html" class="title listing-title">LiDAR Metric Calculation: Canopy Structure, Complexity, and Urban Buildings</a>
-</td>
-<td>
-<span class="listing-description">A comprehensive guide to computing LiDAR structural metrics in lidR, lasR, and Python — canopy height percentiles, complexity indices (Rumple, VCI, CRR), density profiles, and building-specific metrics for urban morphology analysis.</span>
-</td>
+<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
 
-</tr>
-
-<tr data-index="5" data-categories="TGlEQVIlMkMzREVQJTJDUHJlLXByb2Nlc3NpbmclMkNSJTJDUHl0aG9uJTJDVHV0b3JpYWw=" data-listing-date-sort="1771135200000" data-listing-file-modified-sort="1781398123902" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="24" data-listing-word-count-sort="4745" data-listing-title-sort="Pre-Processing Airborne LiDAR Data: lidR vs lasR vs Python" data-listing-filename-sort="index.qmd">
-<td>
-<span class="listing-date">Feb 15, 2026</span>
-</td>
-<td>
-<a href="./posts/lidar-preprocessing/index.html" class="title listing-title">Pre-Processing Airborne LiDAR Data: lidR vs lasR vs Python</a>
-</td>
-<td>
-<span class="listing-description">A complete LiDAR pre-processing pipeline shown in parallel across lidR, lasR, and Python (PDAL / laspy+scipy) — with pros/cons for every stage and in-depth comparisons of decimation and noise-removal strategies.</span>
-</td>
-
-</tr>
-
-<tr data-index="6" data-categories="TGlEQVIlMkMzREVQJTJDUXVhbGl0eSUyMENvbnRyb2wlMkNSJTJDUHl0aG9uJTJDVHV0b3JpYWw=" data-listing-date-sort="1769925600000" data-listing-file-modified-sort="1781397837282" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="15" data-listing-word-count-sort="2907" data-listing-title-sort="Pre-Flight Quality Check for Airborne LiDAR Data" data-listing-filename-sort="index.qmd">
-<td>
-<span class="listing-date">Feb 1, 2026</span>
-</td>
-<td>
-<a href="./posts/lidar-qc/index.html" class="title listing-title">Pre-Flight Quality Check for Airborne LiDAR Data</a>
-</td>
-<td>
-<span class="listing-description">Before any processing, run these checks across lidR, lasR, and Python — CRS consistency, point density, Z-range sanity, return structure, and classification summary. Catches catalog-level problems in seconds from headers alone.</span>
-</td>
-
-</tr>
-
-<tr data-index="7" data-categories="Z2VuZXJhbA==" data-listing-date-sort="1768716000000" data-listing-file-modified-sort="1781368233228" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="47" data-listing-title-sort="Welcome to My Blog" data-listing-filename-sort="index.qmd">
-<td>
-<span class="listing-date">Jan 18, 2026</span>
-</td>
-<td>
-<a href="./posts/welcome/index.html" class="title listing-title">Welcome to My Blog</a>
-</td>
-<td>
-<span class="listing-description">This is the first post on my blog. I will use this space to share thoughts on remote sensing, LiDAR analysis, forest ecology, and my research journey as a PhD student at…</span>
-</td>
-
-</tr>
-
-</tbody>
-</table>
+</a></div>
+<div class="body">
+<h3 class="no-anchor listing-title">
+<a href="./posts/welcome/index.html" class="no-external">Welcome to My Blog</a>
+</h3>
+<div class="delink listing-description"><a href="./posts/welcome/index.html" class="no-external">
+This is the first post on my blog. I will use this space to share thoughts on remote sensing, LiDAR analysis, forest ecology, and my research journey as a PhD student at…
+</a></div>
+</div>
+<div class="metadata">
+<a href="./posts/welcome/index.html" class="no-external">
+<div class="listing-date">
+Jan 18, 2026
+</div>
+</a>
+</div>
+</div>
+</div>
 <div class="listing-no-matching d-none">No matching items</div>
 </div></main> <!-- /main -->
 <canvas id="bg-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none;"></canvas>
