@@ -459,6 +459,13 @@ window.Quarto = {
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Posts</h2>
+   
+  <ul class="collapse">
+  <li><a href="#posts" id="toc-posts" class="nav-link active" data-scroll-target="#posts">Posts</a></li>
+  </ul>
+</nav>
     <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(8)</span></div><div class="category" data-category="M0RFUA==">3DEP <span class="quarto-category-count">(6)</span></div><div class="category" data-category="QmlvbWFzcw==">Biomass <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Q2Fub3B5">Canopy <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Q2Fub3B5JTIwSGVpZ2h0">Canopy Height <span class="quarto-category-count">(3)</span></div><div class="category" data-category="R0VESQ==">GEDI <span class="quarto-category-count">(4)</span></div><div class="category" data-category="Z2VuZXJhbA==">general <span class="quarto-category-count">(1)</span></div><div class="category" data-category="TGlEQVI=">LiDAR <span class="quarto-category-count">(7)</span></div><div class="category" data-category="TWV0cmljcw==">Metrics <span class="quarto-category-count">(1)</span></div><div class="category" data-category="TkVPTg==">NEON <span class="quarto-category-count">(2)</span></div><div class="category" data-category="UHJlLXByb2Nlc3Npbmc=">Pre-processing <span class="quarto-category-count">(1)</span></div><div class="category" data-category="UHl0aG9u">Python <span class="quarto-category-count">(3)</span></div><div class="category" data-category="UXVhbGl0eSUyMENvbnRyb2w=">Quality Control <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Ug==">R <span class="quarto-category-count">(7)</span></div><div class="category" data-category="VHV0b3JpYWw=">Tutorial <span class="quarto-category-count">(7)</span></div><div class="category" data-category="VXJiYW4=">Urban <span class="quarto-category-count">(3)</span></div></div></div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -483,9 +490,33 @@ window.Quarto = {
 </header>
 
 
+<section id="posts" class="level2" style="display:none">
+<h2 style="display:none" class="anchored" data-anchor-id="posts">Posts</h2>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var items = [];
+  document.querySelectorAll('div.quarto-post').forEach(function (post) {
+    var h3   = post.querySelector('h3.listing-title');
+    var link = post.querySelector('a.title-link');
+    if (h3 && link) {
+      items.push({ title: h3.textContent.trim(), url: link.getAttribute('href') });
+    }
+  });
+  if (!items.length) return;
+
+  var tocUl = document.querySelector('#TOC ul');
+  if (!tocUl) return;
+  tocUl.innerHTML = items.map(function (p) {
+    return '<li class="nav-item toc-entry toc-h2">' +
+           '<a class="nav-link" href="' + p.url + '">' + p.title + '</a>' +
+           '</li>';
+  }).join('');
+});
+</script>
 
 
 
+</section>
 
 <div class="quarto-listing quarto-listing-container-default" id="listing-listing">
 <div class="list quarto-listing-default">

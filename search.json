@@ -665,13 +665,6 @@
     "text": "Where to Find Me\nAgricultural Hall, Oklahoma State University Stillwater, Oklahoma, USA\n\n\nView larger map"
   },
   {
-    "objectID": "blog.html",
-    "href": "blog.html",
-    "title": "Blog",
-    "section": "",
-    "text": "Multi-Source Urban Heights: GEDI L2A, 3DEP LiDAR, and OSM — New York City\n\n\n\nLiDAR\n\nGEDI\n\n3DEP\n\nUrban\n\nCanopy Height\n\nR\n\nTutorial\n\n\n\n\n\n\n\n\n\nJun 13, 2026\n\n\nDingjin Chu\n\n\n\n\n\n\n\n\n\n\n\n\nUrban GEDI: Separating Vegetation from Buildings in New York City\n\n\n\nLiDAR\n\nGEDI\n\nUrban\n\nCanopy Height\n\nR\n\nTutorial\n\n\n\n\n\n\n\n\n\nMay 9, 2026\n\n\nDingjin Chu\n\n\n\n\n\n\n\n\n\n\n\n\nGEDI L4A Above-Ground Biomass at NEON SCBI: Comparison with NEON AOP and 3DEP Allometric Estimates\n\n\n\nLiDAR\n\nGEDI\n\nNEON\n\n3DEP\n\nBiomass\n\nR\n\nTutorial\n\n\n\n\n\n\n\n\n\nApr 14, 2026\n\n\nDingjin Chu\n\n\n\n\n\n\n\n\n\n\n\n\nGEDI L2A Canopy Height at NEON SCBI: Comparison with NEON AOP and 3DEP LiDAR\n\n\n\nLiDAR\n\nGEDI\n\nNEON\n\n3DEP\n\nCanopy Height\n\nR\n\nTutorial\n\n\n\n\n\n\n\n\n\nMar 18, 2026\n\n\nDingjin Chu\n\n\n\n\n\n\n\n\n\n\n\n\nLiDAR Metric Calculation: Canopy Structure, Complexity, and Urban Buildings\n\n\n\nLiDAR\n\n3DEP\n\nMetrics\n\nCanopy\n\nUrban\n\nR\n\nPython\n\nTutorial\n\n\n\nA comprehensive guide to computing LiDAR structural metrics in lidR, lasR, and Python — canopy height percentiles, complexity indices (Rumple, VCI, CRR), density profiles, and building-specific metrics for urban morphology analysis.\n\n\n\n\n\nMar 10, 2026\n\n\nDingjin Chu\n\n\n\n\n\n\n\n\n\n\n\n\nPre-Processing Airborne LiDAR Data: lidR vs lasR vs Python\n\n\n\nLiDAR\n\n3DEP\n\nPre-processing\n\nR\n\nPython\n\nTutorial\n\n\n\nA complete LiDAR pre-processing pipeline shown in parallel across lidR, lasR, and Python (PDAL / laspy+scipy) — with pros/cons for every stage and in-depth comparisons of decimation and noise-removal strategies.\n\n\n\n\n\nFeb 15, 2026\n\n\nDingjin Chu\n\n\n\n\n\n\n\n\n\n\n\n\nPre-Flight Quality Check for Airborne LiDAR Data\n\n\n\nLiDAR\n\n3DEP\n\nQuality Control\n\nR\n\nPython\n\nTutorial\n\n\n\nBefore any processing, run these checks across lidR, lasR, and Python — CRS consistency, point density, Z-range sanity, return structure, and classification summary. Catches catalog-level problems in seconds from headers alone.\n\n\n\n\n\nFeb 1, 2026\n\n\nDingjin Chu\n\n\n\n\n\n\n\n\n\n\n\n\nWelcome to My Blog\n\n\n\ngeneral\n\n\n\n\n\n\n\n\n\nJan 18, 2026\n\n\n\n\n\nNo matching items"
-  },
-  {
     "objectID": "cv.html",
     "href": "cv.html",
     "title": "About Me",
