@@ -131,22 +131,6 @@ hr {
   color: #888;
 }
 
-/* ── Content Protection ──────────────────────────────────── */
-/* Disable text selection site-wide */
-body {
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}
-
-/* Re-enable selection inside form fields */
-input, textarea, select, [contenteditable] {
-  -webkit-user-select: text;
-  -moz-user-select: text;
-  user-select: text;
-}
-
 /* Prevent image drag-and-drop */
 img {
   -webkit-user-drag: none;

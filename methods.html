@@ -707,49 +707,8 @@ Note
     return false;
   });
 
-  /* ── Block copy-related keyboard shortcuts ───────────────── */
-  document.addEventListener("keydown", function (e) {
-    var ctrl = e.ctrlKey || e.metaKey; // Ctrl on Win/Linux, Cmd on Mac
-
-    if (ctrl) {
-      switch (e.key.toLowerCase()) {
-        case "c":  // Copy
-        case "a":  // Select All
-        case "x":  // Cut
-        case "u":  // View Source
-        case "s":  // Save Page
-        case "p":  // Print
-          e.preventDefault();
-          return false;
-      }
-      // Ctrl+Shift+I/J/C — DevTools
-      if (e.shiftKey && ["i", "j", "c"].includes(e.key.toLowerCase())) {
-        e.preventDefault();
-        return false;
-      }
-    }
-
-    // F12 — DevTools
-    if (e.key === "F12") {
-      e.preventDefault();
-      return false;
-    }
-  });
-
-  /* ── Block drag-and-drop of text / images ────────────────── */
+  /* ── Block drag-and-drop of images ──────────────────────── */
   document.addEventListener("dragstart", function (e) {
-    e.preventDefault();
-    return false;
-  });
-
-  /* ── Block copy event directly ───────────────────────────── */
-  document.addEventListener("copy", function (e) {
-    e.preventDefault();
-    return false;
-  });
-
-  /* ── Block cut event ─────────────────────────────────────── */
-  document.addEventListener("cut", function (e) {
     e.preventDefault();
     return false;
   });
