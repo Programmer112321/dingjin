@@ -395,16 +395,11 @@ Poster about the impacts of future climate extremes on the interannual variabili
 (function () {
   "use strict";
 
-  /* ── Block right-click context menu ──────────────────────── */
-  document.addEventListener("contextmenu", function (e) {
-    e.preventDefault();
-    return false;
-  });
-
   /* ── Block drag-and-drop of images ──────────────────────── */
   document.addEventListener("dragstart", function (e) {
-    e.preventDefault();
-    return false;
+    if (e.target.tagName === "IMG") {
+      e.preventDefault();
+    }
   });
 })();
 </script>
