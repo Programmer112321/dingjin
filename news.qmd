@@ -13,7 +13,7 @@ format:
 <p>Dingjin presented two studies at the 2026 Society of American Foresters (SAF) National Convention:</p>
 <ul>
   <li><strong>Talk (30 min):</strong> <em>Patterns and Drivers of Urban Forest Cooling Across U.S. Cities</em></li>
-  <li><strong>Poster:</strong> <em>Understanding the Drivers of Local-Scale Bias in Global Forest Aboveground Biomass Maps</em> — Poster Symposium.</li>
+  <li><strong>Poster:</strong> <em>Understanding the Drivers of Local-Scale Bias in Global Forest Aboveground Biomass Maps</em></li>
 </ul>
 <a href="https://safconvention2026.eventscribe.net/" class="btn btn-primary" target="_blank">Convention Program</a>
 
