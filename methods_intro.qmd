@@ -1,0 +1,34 @@
+---
+title: "Methods — Introduction"
+toc: true
+toc-title: "Contents"
+toc-depth: 2
+---
+
+This section outlines the methodological framework underlying my research. Four complementary approaches are combined to characterize ecosystem structure and function, quantify environmental drivers, and project future ecosystem dynamics under climate change. Each method has distinct mechanisms, strengths, and limitations; their integration provides analytical robustness that no single approach can achieve alone.
+
+---
+
+## Overview
+
+| Method | Core strength | Typical use |
+|---|---|---|
+| [**Statistical Modeling**](methods_statistical.qmd) | Interpretable inference and uncertainty quantification | Climate–ecosystem sensitivity, allometric relationships, time-series change detection |
+| [**Machine Learning**](methods_ml.qmd) | Flexible prediction from high-dimensional data | Biomass mapping, land cover classification, canopy height estimation |
+| [**Causal Inference**](methods_causal.qmd) | Attribution of effects beyond correlation | Isolating climate drivers, disturbance attribution, counterfactual scenarios |
+| [**Process-Based Models**](methods_process.qmd) | Mechanistic representation of ecosystem dynamics | NPP projection, forest succession, carbon cycle simulation |
+
+---
+
+## Integrative Framework
+
+No single method is sufficient for understanding ecosystem dynamics under climate change. My research combines these approaches in a layered framework:
+
+1. **Statistical modeling** establishes baseline empirical relationships and characterizes variability in observational records
+2. **Machine learning** scales those relationships spatially across large domains using multi-source remote sensing data
+3. **Causal inference** distinguishes genuine driver effects from spurious correlations in observational data
+4. **Process-based models** provide mechanistic constraints for extrapolation to future climate conditions beyond the observational record
+
+::: {.callout-note}
+Reproducible code implementing these methods is available in the [Blog/Notes](blog.qmd) section and linked from individual [Research](projects_intro.qmd) projects.
+:::

@@ -16,6 +16,7 @@ format:
   <li><strong>Poster:</strong> <em>Understanding the Drivers of Local-Scale Bias in Global Forest Aboveground Biomass Maps</em></li>
 </ul>
 <a href="https://safconvention2026.eventscribe.net/" class="btn btn-primary" target="_blank">Convention Program</a>
+<a href="projects_urban.qmd" class="btn btn-outline-primary">About this research</a>
 
 <div class="text-muted mt-4">14 May 2026</div>
 <h5><strong>New Paper Published in <em>Environmental Research Letters</em></strong></h5>
@@ -23,11 +24,16 @@ format:
 <p><small class="text-muted">Chu, D., Zhang, L., Wu, H., He, H., &amp; Ren, X. (2026). <em>Environmental Research Letters.</em> DOI: 10.1088/1748-9326/ae6dd4</small></p>
 <a href="https://doi.org/10.1088/1748-9326/ae6dd4" class="btn btn-primary" target="_blank">Read Paper</a>
 
+<div class="text-muted mt-4">Apr 2026</div>
+<h5><strong>Talk at the Natural Resource Conference, Oklahoma City, USA</strong></h5>
+<p>Dingjin gave a talk on <em>The factors influencing the accuracy of global forest biomass maps to estimate local carbon storage: a case study of Tribal Nations in the U.S.</em></p>
+<a href="projects_agb.qmd" class="btn btn-outline-primary">About this research</a>
+
 # 2025
 
 <div class="text-muted mt-4">15–19 Dec 2025</div>
 <h5><strong>AGU Fall Meeting, New Orleans, USA</strong></h5>
-<p>Dingjin presented recent research findings at the AGU Fall Meeting.</p>
+<p>Dingjin presented the poster <em>Understanding the Drivers of Local-Scale Bias in Global Forest Aboveground Biomass Maps</em> at the AGU Fall Meeting.</p>
 <img src="photo/AGU_poster.jpg" style="width:100%; border-radius:6px; margin: 0.75rem 0;" alt="AGU poster">
 <a href="https://www.agu.org" class="btn btn-primary" target="_blank">Visit AGU</a>
 

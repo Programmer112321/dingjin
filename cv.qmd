@@ -1,19 +1,35 @@
 ---
 title: "About Me"
+css: bg.css
 ---
 
-# Curriculum Vitae
+# Background
+
+I am a Ph.D. student in Quantitative Ecology in the Department of Natural Resource Ecology and Management at Oklahoma State University, advised by Dr. Lu Zhai. I study how forests store carbon, respond to climate extremes and cool cities, using airborne and spaceborne LiDAR, satellite imagery, forest inventory data and interpretable machine learning.
+
+Before coming to OSU, I was a research assistant at the Institute of Geographic Sciences and Natural Resources Research, Chinese Academy of Sciences (2023–2025), where I worked on global forest disturbance mapping, process-based ecosystem models, and the effects of climate extremes on vegetation productivity in drylands. My M.Sc. at Beijing Forestry University combined forest field surveys, tree rings and remote sensing to assess forest functions in the Qilian Mountains.
 
 [Download CV (PDF)](doc/DingjinChu_CV.pdf){.btn .btn-primary}
+[Publications & Presentations](publications.qmd){.btn .btn-outline-secondary}
 
----
+## Education
 
-# Open Science
+- **Ph.D., Quantitative Ecology** — Oklahoma State University, USA, 2025–present. Advisor: Dr. Lu Zhai
+- **M.Sc., Forest Ecology** — Beijing Forestry University, China, 2020–2023. Advisor: Prof. Kangning He
+- **B.Sc. (Agr.), Soil & Water Conservation and Desertification Combating** — Shenyang Agricultural University, China, 2016–2020
 
-I believe science advances faster when it is built collectively. In academic practice, I support open and reproducible research — sharing data, code, and workflows wherever possible so that others can build on, verify, and extend the work. Collaboration across labs and disciplines is how we make progress that actually lasts.
+## Highlights
 
-[<i class="bi bi-github"></i> GitHub](https://github.com/Programmer112321){.btn .btn-outline-secondary target="_blank"}
-[<i class="bi bi-archive"></i> Zenodo](https://zenodo.org/search?q=metadata.creators.person_or_org.name%3A%22Chu%2C%20Dingjin%22&l=list&p=1&s=10&sort=bestmatch){.btn .btn-outline-secondary target="_blank"}
+- 2026 — Afanasiev Distinguished Graduate Fellowship, Oklahoma State University
+- 2026 — Talk and poster at the Society of American Foresters (SAF) National Convention
+- 2025 — Poster at the AGU Fall Meeting
+- 2020–2022 — First-class scholarship, Beijing Forestry University (two years)
+
+## Service & Memberships
+
+- GSO Speaker Series Committee, Department of Natural Resource Ecology and Management, OSU (2025–2026)
+- Member, Society of American Foresters (SAF)
+- Member, American Geophysical Union (AGU)
 
 ---
 
@@ -32,3 +48,12 @@ Hiking, swimming, music, and movie.
 
 ![](photo/Personal/IMG_8628.jpg){style="border-radius: 6px; width: 100%;"}
 :::
+
+---
+
+# Open Science
+
+I believe science advances faster when it is built collectively. In academic practice, I support open and reproducible research — sharing data, code, and workflows wherever possible so that others can build on, verify, and extend the work. Collaboration across labs and disciplines is how we make progress that actually lasts.
+
+[<i class="bi bi-github"></i> GitHub](https://github.com/Programmer112321){.btn .btn-outline-secondary target="_blank"}
+[<i class="bi bi-archive"></i> Zenodo](https://zenodo.org/search?q=metadata.creators.person_or_org.name%3A%22Chu%2C%20Dingjin%22&l=list&p=1&s=10&sort=bestmatch){.btn .btn-outline-secondary target="_blank"}

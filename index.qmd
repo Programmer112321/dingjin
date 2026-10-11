@@ -1,5 +1,45 @@
 ---
-title: "Dingjin Chu"
+title: "Dingjin Chu 初鼎晋"
+description: "PhD Student in Land Surface Ecology & Geospatial Science at Oklahoma State University, researching forest AGB estimation, urban green space cooling, and ecosystem responses to disturbances."
+image: photo/personal_profile.JPG
+include-in-header:
+  - text: |
+      <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Dingjin Chu",
+        "alternateName": "初鼎晋",
+        "url": "https://programmer112321.github.io/dingjin/",
+        "image": "https://programmer112321.github.io/dingjin/photo/personal_profile.JPG",
+        "jobTitle": "PhD Student",
+        "description": "PhD Student in Land Surface Ecology and Geospatial Science, researching forest above-ground biomass estimation, urban green space cooling effects, and ecosystem responses to climate disturbances.",
+        "affiliation": {
+          "@type": "Organization",
+          "name": "Oklahoma State University",
+          "url": "https://go.okstate.edu/",
+          "department": "Department of Natural Resource Ecology and Management"
+        },
+        "email": "dingjinchu@gmail.com",
+        "sameAs": [
+          "https://github.com/Programmer112321",
+          "https://www.linkedin.com/in/dingjin-chu-892ba7352/",
+          "https://scholar.google.com/citations?user=XzIFKvMAAAAJ&hl=en",
+          "https://www.researchgate.net/profile/Dingjin-Chu/publications?sorting=recentlyAdded",
+          "https://zenodo.org/search?q=metadata.creators.person_or_org.name%3A%22Chu%2C%20Dingjin%22"
+        ],
+        "knowsAbout": [
+          "Forest Above-Ground Biomass Estimation",
+          "LiDAR Remote Sensing",
+          "Urban Green Space Cooling Effect",
+          "Ecosystem Response to Disturbances",
+          "Geospatial Science",
+          "Land Surface Ecology",
+          "GEDI",
+          "Airborne LiDAR"
+        ]
+      }
+      </script>
 about:
   template: jolla
   image: photo/personal_profile.JPG
@@ -12,7 +52,10 @@ about:
       href: https://www.linkedin.com/in/dingjin-chu-892ba7352/
     - icon: mortarboard-fill
       text: ResearchGate
-      href: https://www.researchgate.net/profile/YourResearchGate
+      href: https://www.researchgate.net/profile/Dingjin-Chu/publications?sorting=recentlyAdded
+    - icon: google
+      text: Scholar
+      href: https://scholar.google.com/citations?user=XzIFKvMAAAAJ&hl=en
     - icon: archive
       text: Zenodo
       href: "https://zenodo.org/search?q=metadata.creators.person_or_org.name%3A%22Chu%2C%20Dingjin%22&l=list&p=1&s=10&sort=bestmatch"
@@ -21,17 +64,48 @@ about:
       href: mailto:dingjinchu@gmail.com
 ---
 
-**PhD Student** · Forest Monitoring & Geospatial Analysis
+**PhD Student** · Land Surface Ecology & Geospatial Science
 
-[Department of Natural Resource Ecology& Management](https://go.okstate.edu/undergraduate-academics/majors/natural-resource-ecology-and-management) · [Oklahoma State University](https://go.okstate.edu/)
+[Department of Natural Resource Ecology & Management](https://go.okstate.edu/undergraduate-academics/majors/natural-resource-ecology-and-management) · [Oklahoma State University](https://go.okstate.edu/)
 
 ---
 
 ## 👋 Hello, this is Dingjin.
 
-I am a PhD student studying **Above ground biomass estimation, cooling effect of Urban green space, and forest disturbance** using remote sensing across different different platforms with filed investigation data. I work with satellite imagery, Airborne LiDAR data, and statistical modeling to understand how forests respond to climate variability and human disturbance.
+*Explore important [research](projects_intro.qmd) questions using robust [datasets](datasets_intro.qmd) and rigorous [methods](methods_intro.qmd) under well-defined [assumptions](methods_assumptions.qmd).*
 
-My research interests sit at the intersection of forest ecology, remote sensing, and environmental data science.
+---
+
+I study how forests store carbon, how they respond to climate extremes, and how much they cool our cities. My work asks questions such as: *Can a global biomass map be trusted to report the carbon in a local forest? Which forests hold their biomass through drought? Why do some urban forests cool their surroundings far more than others?* Read more in the [Research](projects_intro.qmd) section.
+
+To answer them, I combine field inventories (FIA, NEON) with airborne, spaceborne and terrestrial LiDAR and multi-decadal satellite records — see [Datasets](datasets_intro.qmd) — and analyze them with statistical models, interpretable machine learning and process-based models — see [Methods](methods_intro.qmd).
+
+**Latest:** I presented a talk on urban forest cooling and a poster on biomass-map bias at the [SAF National Convention](news.qmd) (Oct 2026), and my paper on climate extremes and productivity variability in Central Asia is out in [*Environmental Research Letters*](https://doi.org/10.1088/1748-9326/ae6dd4).
+
+---
+
+## Research Areas
+
+::: {.grid}
+::: {.g-col-12 .g-col-md-4}
+[![](photo/AGB_estimation.png){style="border-radius:8px; width:100%; aspect-ratio:4/3; object-fit:cover;"}](projects_agb.qmd)
+
+**[Forest Above-Ground Biomass](projects_agb.qmd)**<br>
+Multi-scale LiDAR and the local accuracy of biomass maps.
+:::
+::: {.g-col-12 .g-col-md-4}
+[![](photo/climate_extremes_merged_ecosystem.png){style="border-radius:8px; width:100%; aspect-ratio:4/3; object-fit:cover;"}](projects_disturbance.qmd)
+
+**[Response to Disturbances](projects_disturbance.qmd)**<br>
+Climate extremes, productivity variability and forest stability.
+:::
+::: {.g-col-12 .g-col-md-4}
+[![](photo/urban_green_space_cooling_effect.png){style="border-radius:8px; width:100%; aspect-ratio:4/3; object-fit:cover;"}](projects_urban.qmd)
+
+**[Urban Green Space Cooling](projects_urban.qmd)**<br>
+How canopy, climate and buildings shape urban cooling.
+:::
+:::
 
 ---
 

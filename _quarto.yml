@@ -3,20 +3,71 @@ project:
 
 website:
   title: "Dingjin Chu"
+  site-url: https://programmer112321.github.io/dingjin/
   favicon: "photo/favicon_satellite.svg"
+  description: "PhD Student in Land Surface Ecology & Geospatial Science at Oklahoma State University. Research on forest biomass estimation, urban green space cooling effects, and ecosystem responses to climate disturbances."
+  open-graph:
+    image: https://programmer112321.github.io/dingjin/photo/personal_profile.JPG
+    description: "PhD Student in Land Surface Ecology & Geospatial Science at Oklahoma State University. Research on forest biomass, urban green space, and ecosystem disturbances."
+  twitter-card:
+    image: https://programmer112321.github.io/dingjin/photo/personal_profile.JPG
+    card-style: summary_large_image
+    description: "PhD Student in Land Surface Ecology & Geospatial Science at Oklahoma State University."
   navbar:
     title: "<i class='bi bi-broadcast-pin'></i> Dingjin Chu"
     left:
       - text: Research
-        href: projects.qmd
+        menu:
+          - text: Introduction
+            href: projects_intro.qmd
+          - text: Forest Above-Ground Biomass Estimation
+            href: projects_agb.qmd
+          - text: Ecosystem Response to Disturbances
+            href: projects_disturbance.qmd
+          - text: Cooling Effect of Urban Green Space
+            href: projects_urban.qmd
+          - text: LiDAR Upscaling Review
+            href: research_lidar_upscaling.qmd
       - text: Datasets
-        href: datasets.qmd
+        menu:
+          - text: Introduction
+            href: datasets_intro.qmd
+          - text: LiDAR
+            href: datasets_lidar.qmd
+          - text: Optical Remote Sensing
+            href: datasets_optical.qmd
+          - text: Radar
+            href: datasets_radar.qmd
+          - text: Field Investigation
+            href: datasets_field.qmd
+          - text: Derived Products
+            href: datasets_derived.qmd
+      - text: Methods
+        menu:
+          - text: Introduction
+            href: methods_intro.qmd
+          - text: Statistical Modeling
+            href: methods_statistical.qmd
+          - text: Machine Learning
+            href: methods_ml.qmd
+          - text: Causal Inference
+            href: methods_causal.qmd
+          - text: Process-Based Models
+            href: methods_process.qmd
+          - text: Key Assumptions
+            href: methods_assumptions.qmd
+          - text: Evaluation Metrics
+            href: methods_metrics.qmd
       - text: About Me
         href: cv.qmd
+      - text: Publications
+        href: publications.qmd
       - text: News
         href: news.qmd
+      - text: Blog/Notes
+        href: blog.qmd
       - text: Contact Me
-        href: contact.qmd
+        href: index.html#contact-me
     right:
       - icon: github
         href: https://github.com/Programmer112321
@@ -24,9 +75,12 @@ website:
       - icon: linkedin
         href: https://www.linkedin.com/in/dingjin-chu-892ba7352/
         aria-label: LinkedIn
-      - icon: twitter
-        href: https://twitter.com/YourTwitter
-        aria-label: Twitter
+      - text: "<img src='photo/scholar_logo.svg' alt='Google Scholar' style='height:20px; vertical-align:middle; margin-top:-2px;'>"
+        href: https://scholar.google.com/citations?user=XzIFKvMAAAAJ&hl=en
+        aria-label: Google Scholar
+      - text: "<img src='photo/zenodo_logo.svg' alt='Zenodo' style='height:20px; vertical-align:middle; margin-top:-2px;'>"
+        href: "https://zenodo.org/search?q=metadata.creators.person_or_org.name%3A%22Chu%2C%20Dingjin%22&l=list&p=1&s=10&sort=bestmatch"
+        aria-label: Zenodo
   page-footer:
     center: "© 2026 Dingjin Chu"
 
@@ -37,3 +91,6 @@ format:
       dark: darkly
     css: styles.css
     toc: false
+    include-after-body:
+      - _bg_animated.html
+      - _protect.html
