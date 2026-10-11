@@ -1,0 +1,197 @@
+---
+title: "Radar Datasets"
+toc: true
+toc-title: "Contents"
+toc-depth: 2
+---
+
+Microwave radar remote sensing datasets for soil moisture, vegetation structure, and surface deformation monitoring.
+
+::: {style="display:flex; flex-wrap:wrap; gap:0.5rem; margin:1rem 0 1.5rem 0; padding:0.85rem 1rem; background:rgba(0,0,0,0.03); border-radius:8px;"}
+[Sentinel-1](#sentinel1){.btn .btn-outline-secondary .btn-sm}
+[SMAP](#smap){.btn .btn-outline-secondary .btn-sm}
+[ALOS-2 PALSAR-2](#alos2){.btn .btn-outline-secondary .btn-sm}
+[TanDEM-X](#tandemx){.btn .btn-outline-secondary .btn-sm}
+[NISAR](#nisar){.btn .btn-outline-secondary .btn-sm}
+[BIOMASS](#biomass){.btn .btn-outline-secondary .btn-sm}
+[CYGNSS](#cygnss){.btn .btn-outline-secondary .btn-sm}
+[GRACE-FO](#gracefo){.btn .btn-outline-secondary .btn-sm}
+[Sentinel-6](#sentinel6){.btn .btn-outline-secondary .btn-sm}
+:::
+
+---
+
+## Sentinel-1 — ESA Copernicus {#sentinel1}
+
+**Sentinel-1** provides C-band Synthetic Aperture Radar (SAR) imagery, enabling cloud-penetrating, day-and-night observations of land and ocean surfaces.
+
+**Agency:** European Space Agency (ESA) — Copernicus Programme
+**Sensor:** C-band SAR (5.405 GHz · 5.55 cm wavelength)
+**Spatial resolution:** ~5 × 20 m single-look resolution (~10 m processed GRD products)
+**Temporal resolution:** 6–12 days depending on satellite availability and latitude
+**Common polarizations:** VV+VH (most land observations) or HH+HV depending on acquisition mode and region
+**Key applications:** Forest above-ground biomass, flood mapping, soil moisture, ice monitoring, subsidence detection
+
+::: {.callout-note}
+Sentinel-1 data are freely available through the [Copernicus Data Space](https://dataspace.copernicus.eu) and [Google Earth Engine](https://earthengine.google.com).
+:::
+
+---
+
+## SMAP — Soil Moisture Active Passive (NASA) {#smap}
+
+**SMAP** is a NASA satellite mission designed to measure the moisture content of Earth's soil surface globally and repeatedly. Its L-band radiometer provides one of the most widely validated global soil moisture products available from space, and is widely used in hydrology, agriculture, climate modeling, and ecosystem studies.
+
+**Agency:** NASA Jet Propulsion Laboratory (JPL)
+**Sensor:** L-band passive radiometer (1.41 GHz · 21.3 cm wavelength); active radar ceased operation in July 2015
+**Spatial resolution:** ~36 km (radiometer) · 9 km (enhanced product)
+**Temporal resolution:** 2–3 day global revisit
+**Launch:** January 2015
+**Key products:**
+- **SPL3SMP** — Daily global soil moisture (36 km)
+- **SPL3SMP_E** — Enhanced daily soil moisture (9 km)
+- **SPL4SMGP** — Surface and root-zone soil moisture (9 km, model-assimilated)
+**Key applications:** Drought monitoring, flood forecasting, agricultural water use, carbon flux modeling, forest moisture stress
+
+::: {.callout-note}
+SMAP data are freely available through [NASA EarthData](https://earthdata.nasa.gov) and [Google Earth Engine](https://earthengine.google.com).
+:::
+
+---
+
+## ALOS-2 PALSAR-2 — JAXA {#alos2}
+
+**ALOS-2 PALSAR-2** is a Japanese L-band SAR satellite operated by JAXA. L-band radar penetrates forest canopy more effectively than C-band, making it particularly valuable for above-ground biomass estimation and forest structure retrieval.
+
+**Agency:** Japan Aerospace Exploration Agency (JAXA)
+**Sensor:** L-band SAR (1.2575 GHz · 23.8 cm wavelength)
+**Spatial resolution:** 3 m (Spotlight) · 6–10 m (Stripmap) · 60–100 m (ScanSAR), mode dependent
+**Temporal resolution:** 14-day repeat cycle
+**Polarizations:** Single-, dual-, and quad-polarization modes (HH, HV, VV, VH depending on acquisition mode)
+**Key applications:** Forest biomass estimation, forest/non-forest mapping, disaster monitoring, wetland mapping
+
+::: {.callout-note}
+ALOS-2 PALSAR-2 global mosaic data are freely available through [JAXA EORC](https://www.eorc.jaxa.jp/ALOS/en/dataset/fnf_e.htm).
+:::
+
+---
+
+## TanDEM-X — DLR {#tandemx}
+
+**TanDEM-X** is a German radar mission that produced a highly accurate global Digital Elevation Model (DEM) using X-band bistatic InSAR, flying in close formation with TerraSAR-X. The global DEM is widely used in canopy height estimation workflows and as a terrain correction layer.
+
+**Agency:** German Aerospace Center (DLR)
+**Sensor:** X-band SAR (9.65 GHz · 3.1 cm wavelength), bistatic InSAR
+**Spatial resolution:** 12 m (global DEM posting)
+**Vertical accuracy:** Relative accuracy ~2 m (flat open terrain); absolute accuracy typically <10 m globally
+**Key applications:** Global DEM generation, canopy height estimation workflows, glacier monitoring, terrain analysis
+
+::: {.callout-note}
+TanDEM-X global DEM data are available through [DLR](https://www.dlr.de/de/eoc/competences/remote-sensing-technology-institute/sar-signal-processing/tandem-x-science-service-system).
+:::
+
+---
+
+## NISAR — NASA / ISRO *(Initial operations 2025)* {#nisar}
+
+**NISAR** (NASA-ISRO Synthetic Aperture Radar) is a joint Earth observation mission between NASA and the Indian Space Research Organisation (ISRO). It is the first spaceborne SAR mission combining fully operational L-band and S-band imaging radars, designed to measure ecosystem disturbances, ice-sheet dynamics, natural hazards, and sea-level change. For forest research, NISAR's L-band radar is expected to provide global above-ground biomass and forest disturbance data at high spatial resolution and frequent revisit.
+
+**Agency:** NASA (Jet Propulsion Laboratory) + ISRO
+**Launch:** March 2025; initial science operations beginning 2025
+**Sensors:** L-band SAR (1.25 GHz · 24.0 cm wavelength, NASA) + S-band SAR (3.2 GHz · 9.4 cm wavelength, ISRO)
+**Spatial resolution:** 3–10 m depending on observation mode
+**Temporal resolution:** 12-day repeat cycle
+**Swath width:** 240 km
+**Key applications:** Forest above-ground biomass, deforestation and disturbance mapping, wetland dynamics, earthquake and landslide monitoring, glacier flow, sea-level change
+
+::: {.callout-note}
+NISAR data will be freely available through [NASA EarthData](https://earthdata.nasa.gov) and [ISRO's NRSC portal](https://www.nrsc.gov.in).
+:::
+
+---
+
+## BIOMASS — ESA *(Launched April 2025)* {#biomass}
+
+**BIOMASS** is ESA's first P-band SAR satellite, specifically designed to produce the first global maps of forest above-ground biomass. P-band radar (~69 cm wavelength) penetrates deep into forest canopy and is sensitive to the woody structure of trunks and large branches — the components that store most carbon in forests. BIOMASS is a state-of-the-art mission for global carbon cycle science and is expected to directly support international carbon accounting and climate policy.
+
+**Agency:** European Space Agency (ESA) — Earth Explorer Mission
+**Launch:** April 2025
+**Sensor:** P-band SAR (435 MHz · 69 cm wavelength), fully polarimetric
+**Spatial resolution:** ~50–200 m (standard biomass products); finer native SAR image resolution available
+**Temporal resolution:** ~25-day repeat cycle; multiple observation passes used for tomographic forest structure retrieval
+**Mission phases:**
+- **Tomographic phase** (Years 1–3): 3D forest structure mapping using SAR tomography
+- **Interferometric phase** (Years 4–5): Change detection and biomass updating
+**Key products:** Global forest above-ground biomass density, forest height, forest disturbance
+**Key applications:** Forest carbon stock estimation, deforestation monitoring, carbon flux modeling, climate change assessment
+
+::: {.callout-note}
+BIOMASS data will be freely available through [ESA's Earth Online portal](https://earth.esa.int/eogateway/missions/biomass).
+:::
+
+---
+
+## CYGNSS — Cyclone Global Navigation Satellite System (NASA) {#cygnss}
+
+**CYGNSS** is a constellation of eight microsatellites that use GPS signals reflected off Earth's surface (GNSS-R) to measure wind speed over the ocean and soil moisture over land. Unlike traditional active radar satellites, CYGNSS is a passive bistatic radar system that exploits signals of opportunity from GPS — enabling rapid, global coverage at low cost.
+
+**Agency:** NASA Goddard Space Flight Center
+**Launched:** December 2016
+**Technique:** GNSS-Reflectometry (GNSS-R) — passive bistatic radar using reflected GPS L1 (1.575 GHz · 19.0 cm wavelength) signals
+**Spatial resolution:** ~25 km (nominal ocean wind product) · varies for land soil moisture retrievals
+**Temporal resolution:** Median revisit ~7 hours globally; ~2-day revisit at mid-latitudes
+**Coverage:** ±35° latitude (tropical belt)
+**Key products:**
+- **CYGNSS L2** — Ocean surface wind speed
+- **CYGNSS L3** — Gridded wind speed and soil moisture (25 km)
+**Key applications:** Tropical cyclone intensity monitoring, soil moisture in densely vegetated tropical forests (regions where L-band retrievals are attenuated), inland flood inundation, wetland dynamics
+
+::: {.callout-note}
+CYGNSS data are freely available through [NASA EarthData](https://earthdata.nasa.gov) (Physical Oceanography DAAC, PO.DAAC) and [Google Earth Engine](https://earthengine.google.com).
+:::
+
+---
+
+## GRACE-FO — Gravity Recovery and Climate Experiment Follow-On (NASA / GFZ) {#gracefo}
+
+**GRACE-FO** (and its predecessor GRACE, 2002–2017) measures subtle changes in Earth's gravity field caused by large-scale mass redistribution — primarily changes in water storage. By tracking how the gravity field changes month to month, GRACE-FO provides unique observations of groundwater depletion, ice sheet mass loss, ocean mass change, and total water storage anomalies that are impossible to obtain from any other remote sensing approach.
+
+**Agency:** NASA Jet Propulsion Laboratory (JPL) / GFZ German Research Centre for Geosciences
+**Launched:** May 2018 (GRACE-FO); predecessor GRACE operated 2002–2017
+**Technique:** Dual-satellite microwave ranging (K/Ka-band, ~26 GHz) combined with GPS and accelerometers; not an imaging radar — gravity field inversion
+**Spatial resolution:** ~300 km (spherical harmonic truncation at degree/order 60–96)
+**Temporal resolution:** Monthly global gravity field solutions; some mascon products provide 10-day updates
+**Key products:**
+- **GRACE-FO RL06** — Monthly gravity field coefficients (CSR, JPL, GFZ)
+- **JPL Mascon** — Terrestrial Water Storage (TWS) anomalies on equal-area mascons
+- **GSFC Mascon** — High-resolution TWS solution
+**Key applications:** Groundwater depletion (aquifer monitoring), ice sheet and glacier mass balance, drought quantification, seasonal water cycle, sea level rise attribution, post-glacial rebound
+
+::: {.callout-tip}
+GRACE/GRACE-FO is the only spaceborne tool capable of directly detecting groundwater changes at continental scale, making it uniquely valuable for drought early warning and water resource management in data-sparse regions.
+:::
+
+::: {.callout-note}
+GRACE-FO data are freely available through [NASA EarthData](https://earthdata.nasa.gov) (PODAAC), [JPL GRACE Tellus](https://grace.jpl.nasa.gov), and [Google Earth Engine](https://earthengine.google.com) (`NASA/GRACE/MASS_GRIDS`).
+:::
+
+---
+
+## Sentinel-6 — Copernicus (ESA / EUMETSAT / NASA) {#sentinel6}
+
+**Sentinel-6 Michael Freilich** is a radar altimetry mission dedicated to measuring global sea surface height with millimeter-level precision. While primarily an oceanographic mission, its altimetric data also support inland water body monitoring (lake levels, river stages) and ice sheet surface elevation change.
+
+**Agency:** ESA / EUMETSAT / European Commission Copernicus Programme; in partnership with NASA and NOAA
+**Launched:** November 2020
+**Sensor:** Poseidon-4 dual-frequency radar altimeter (Ku-band: 13.575 GHz · 2.2 cm; C-band: 5.41 GHz · 5.5 cm)
+**Orbital altitude:** 1336 km, 10-day exact repeat cycle
+**Spatial coverage:** ±66° latitude
+**Measurement accuracy:** ~2–3 cm sea surface height precision
+**Key products:**
+- **L2 Ocean Products** — Significant wave height, wind speed, sea surface height anomaly
+- **L2 Inland Water** — Lake and reservoir water levels
+**Key applications:** Global sea level rise monitoring, ocean circulation, El Niño/La Niña dynamics, lake and reservoir water level changes, ice sheet surface height trends
+
+::: {.callout-note}
+Sentinel-6 data are freely available through the [Copernicus Data Space](https://dataspace.copernicus.eu) and [EUMETSAT Data Store](https://data.eumetsat.int).
+:::

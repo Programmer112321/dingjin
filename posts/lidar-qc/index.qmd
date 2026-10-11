@@ -1,0 +1,546 @@
+---
+title: "Pre-Flight Quality Check for Airborne LiDAR Data"
+author: "Dingjin Chu"
+date: "2026-02-01"
+categories: [LiDAR Preprocess]
+description: "Before any processing, run these checks across lidR, lasR, and Python — CRS consistency, point density, Z-range sanity, return structure, and classification summary. Catches catalog-level problems in seconds from headers alone."
+---
+
+Airborne LiDAR tiles from 3DEP, NEON AOP, or proprietary vendors are rarely uniformly clean across a catalog. Before committing to any processing pipeline, a quick pre-flight check catches CRS mismatches, density gaps, bogus Z values, missing ground classification, and all-single-return anomalies — all from file headers alone, without loading a single point.
+
+This post is the QC step that precedes the [pre-processing pipeline](../lidar-preprocessing/index.qmd).
+
+---
+
+### 0.1 CRS Validation
+
+::: {.panel-tabset}
+
+## lidR
+
+```r
+library(lidR)
+library(sf)
+
+ctg <- readLAScatalog("path/to/las_folder/")
+
+# Extract CRS from every tile header (fast — reads only the header, not points)
+crs_list <- lapply(ctg@data$filename, function(f) st_crs(readLASheader(f))$wkt)
+n_unique  <- length(unique(crs_list))
+
+if (n_unique > 1) {
+  warning(sprintf("CRS MISMATCH: %d different CRS found across %d tiles!",
+                  n_unique, length(crs_list)))
+} else {
+  message("CRS OK — all tiles: ", st_crs(ctg)$input)
+}
+```
+
+## lasR
+
+```r
+# lasR has no header-scan stage; CRS inspection is done via lidR
+# readLASheader() before building the pipeline.
+library(lidR)
+library(lasR)
+library(sf)
+
+headers   <- lapply(list.files("path/to/las_folder/", pattern="\\.la[sz]$",
+                               full.names=TRUE), readLASheader)
+crs_wkts  <- sapply(headers, function(h) st_crs(h)$wkt)
+n_unique  <- length(unique(crs_wkts))
+
+if (n_unique > 1) warning("CRS MISMATCH: ", n_unique, " different projections found.")
+else message("CRS OK: ", st_crs(headers[[1]])$input)
+```
+
+## Python
+
+```python
+import laspy, glob
+from pyproj import CRS
+
+files = sorted(glob.glob("path/to/las_folder/*.laz"))
+
+def get_crs(filepath):
+    with laspy.open(filepath) as f:
+        try:
+            return f.header.parse_crs().to_wkt()
+        except Exception:
+            return "unknown"
+
+crs_list = [get_crs(f) for f in files]
+unique_crs = set(crs_list)
+
+if len(unique_crs) > 1:
+    print(f"CRS MISMATCH: {len(unique_crs)} different projections across {len(files)} tiles!")
+    for f, c in zip(files, crs_list):
+        name = CRS.from_wkt(c).name if c != "unknown" else "unknown"
+        print(f"  {f}: {name}")
+else:
+    crs = CRS.from_wkt(crs_list[0]) if crs_list[0] != "unknown" else None
+    print(f"CRS OK — all tiles: {crs.name if crs else 'unknown'}")
+```
+
+:::
+
+---
+
+### 0.2 Point Density
+
+::: {.panel-tabset}
+
+## lidR
+
+```r
+# LAScatalog stores per-tile header stats (no points loaded)
+dens_tbl <- ctg@data
+dens_tbl$area    <- (dens_tbl$Max.X - dens_tbl$Min.X) *
+                    (dens_tbl$Max.Y - dens_tbl$Min.Y)
+dens_tbl$density <- dens_tbl$Number.of.point.records / dens_tbl$area
+
+cat(sprintf(
+  "Density summary (pts/m²):\n  min=%.1f  median=%.1f  max=%.1f\n",
+  min(dens_tbl$density), median(dens_tbl$density), max(dens_tbl$density)
+))
+
+# Flag tiles below a minimum acceptable density
+low_dens <- dens_tbl[dens_tbl$density < 2, c("filename", "density")]
+if (nrow(low_dens) > 0) {
+  warning(nrow(low_dens), " tile(s) below 2 pts/m²:")
+  print(low_dens)
+}
+
+# Visualise density map
+plot(ctg, attribute = "density")
+```
+
+## lasR
+
+```r
+# Header-based density (same as lidR approach — no pipeline needed)
+library(lidR)
+
+headers <- lapply(list.files("path/to/las_folder/", pattern="\\.la[sz]$",
+                             full.names=TRUE), readLASheader)
+
+dens <- sapply(headers, function(h) {
+  pts  <- h@PHB[["Number of point records"]]
+  area <- (h@PHB[["Max X"]] - h@PHB[["Min X"]]) *
+          (h@PHB[["Max Y"]] - h@PHB[["Min Y"]])
+  pts / area
+})
+
+cat(sprintf("Density: min=%.1f  median=%.1f  max=%.1f pts/m²\n",
+            min(dens), median(dens), max(dens)))
+
+# lasR alternative: stream a point-count raster at 10 m resolution
+library(lasR)
+pipeline <- reader_las() +
+            rasterize(10, ~list(n = length(Z)), ofile = "density_10m.tif")
+exec(pipeline, on = "path/to/las_folder/", ncores = 4L)
+```
+
+## Python
+
+```python
+import numpy as np
+from pathlib import Path
+
+def tile_density(filepath):
+    with laspy.open(filepath) as f:
+        hdr = f.header
+        pts = hdr.point_count
+        dx  = hdr.x_max - hdr.x_min
+        dy  = hdr.y_max - hdr.y_min
+        area = dx * dy
+    return {"file": Path(filepath).name,
+            "n_pts": pts,
+            "density": pts / area if area > 0 else 0,
+            "area_m2": area}
+
+records   = [tile_density(f) for f in files]
+densities = np.array([r["density"] for r in records])
+
+print(f"Density (pts/m²): min={densities.min():.1f}  "
+      f"median={np.median(densities):.1f}  max={densities.max():.1f}")
+
+low = [r for r in records if r["density"] < 2]
+if low:
+    print(f"\n{len(low)} tile(s) below 2 pts/m²:")
+    for r in low:
+        print(f"  {r['file']}: {r['density']:.2f} pts/m²")
+```
+
+:::
+
+---
+
+### 0.3 Z-Range / Elevation Sanity
+
+::: {.panel-tabset}
+
+## lidR
+
+```r
+z_range_tbl <- ctg@data[, c("filename", "Min.Z", "Max.Z")]
+z_range_tbl$span <- z_range_tbl$Max.Z - z_range_tbl$Min.Z
+
+bad_z <- z_range_tbl[
+  z_range_tbl$Min.Z < -100 |
+  z_range_tbl$Max.Z > 5000 |
+  z_range_tbl$span  < 0.5,
+]
+if (nrow(bad_z) > 0) {
+  warning(nrow(bad_z), " tile(s) with suspicious Z range:")
+  print(bad_z)
+}
+
+cat(sprintf("Z range across catalog: %.1f m — %.1f m\n",
+            min(ctg@data$Min.Z), max(ctg@data$Max.Z)))
+```
+
+## lasR
+
+```r
+z_mins <- sapply(headers, function(h) h@PHB[["Min Z"]])
+z_maxs <- sapply(headers, function(h) h@PHB[["Max Z"]])
+
+cat(sprintf("Z range: %.1f m — %.1f m\n", min(z_mins), max(z_maxs)))
+
+bad <- which(z_mins < -100 | z_maxs > 5000 | (z_maxs - z_mins) < 0.5)
+if (length(bad) > 0) {
+  warning(length(bad), " tile(s) with suspicious Z range")
+  for (i in bad)
+    cat(sprintf("  %s: Z [%.1f, %.1f]\n",
+                basename(files[i]), z_mins[i], z_maxs[i]))
+}
+```
+
+## Python
+
+```python
+def tile_z_range(filepath):
+    with laspy.open(filepath) as f:
+        hdr = f.header
+    return {"file":   Path(filepath).name,
+            "z_min":  hdr.z_min,
+            "z_max":  hdr.z_max,
+            "z_span": hdr.z_max - hdr.z_min}
+
+z_records = [tile_z_range(f) for f in files]
+
+print(f"Z range across catalog: "
+      f"{min(r['z_min'] for r in z_records):.1f} m — "
+      f"{max(r['z_max'] for r in z_records):.1f} m")
+
+bad_z = [r for r in z_records
+         if r["z_min"] < -100 or r["z_max"] > 5000 or r["z_span"] < 0.5]
+if bad_z:
+    print(f"\n{len(bad_z)} tile(s) with suspicious Z range:")
+    for r in bad_z:
+        print(f"  {r['file']}: [{r['z_min']:.1f}, {r['z_max']:.1f}] m "
+              f"span={r['z_span']:.1f} m")
+```
+
+:::
+
+| Flag | Threshold | Meaning |
+|------|-----------|---------|
+| Min.Z too low | < −100 m | Likely corrupt or wrong vertical datum |
+| Max.Z too high | > 5000 m | Sensor artifact or wrong scale factor |
+| Z span too small | < 0.5 m | Flat file — all ground, rasterized, or empty |
+
+---
+
+### 0.4 Return Structure
+
+::: {.panel-tabset}
+
+## lidR
+
+```r
+return_qc <- function(las) {
+  rn   <- las$ReturnNumber
+  nr   <- las$NumberOfReturns
+  list(
+    n_total        = length(rn),
+    pct_single     = mean(nr == 1) * 100,
+    pct_first      = mean(rn == 1) * 100,
+    pct_last       = mean(rn == nr) * 100,
+    max_return_num = max(rn),
+    has_multi      = any(nr > 1)
+  )
+}
+
+las_s <- readLAS(ctg@data$filename[1])
+rq    <- return_qc(las_s)
+print(rq)
+
+if (!rq$has_multi)
+  warning("No multi-return pulses — data may be from a rasterised (gridded) source.")
+```
+
+## lasR
+
+```r
+pipeline <-
+  reader_las() +
+  rasterize(
+    res     = 500,
+    metrics = ~list(
+      pct_single = mean(NumberOfReturns == 1) * 100,
+      max_rn     = max(ReturnNumber),
+      has_multi  = as.integer(any(NumberOfReturns > 1))
+    ),
+    ofile = "return_qc.tif"
+  )
+exec(pipeline, on = "path/to/las_folder/", ncores = 4L)
+```
+
+## Python
+
+```python
+def return_qc(filepath):
+    las = laspy.read(filepath)
+    rn  = np.array(las.return_number)
+    nr  = np.array(las.number_of_returns)
+    return {
+        "file":           Path(filepath).name,
+        "n_points":       len(rn),
+        "pct_single":     np.mean(nr == 1) * 100,
+        "pct_first":      np.mean(rn == 1) * 100,
+        "max_return_num": int(rn.max()),
+        "has_multi":      bool(np.any(nr > 1))
+    }
+
+for f in files[:5]:
+    rq   = return_qc(f)
+    flag = " ⚠ ALL-SINGLE-RETURN" if not rq["has_multi"] else ""
+    print(f"{rq['file']}: {rq['pct_single']:.1f}% single-return, "
+          f"max RN={rq['max_return_num']}{flag}")
+```
+
+:::
+
+::: {.callout-warning}
+All-single-return datasets are not suitable for canopy penetration metrics, gap fraction, or multi-return structural indices. Verify with the data provider before proceeding.
+:::
+
+---
+
+### 0.5 Classification Summary
+
+::: {.panel-tabset}
+
+## lidR
+
+```r
+class_qc <- function(las) {
+  cls  <- las$Classification
+  tbl  <- table(cls)
+  prop <- round(prop.table(tbl) * 100, 1)
+  data.frame(
+    class = as.integer(names(tbl)),
+    label = LASCLASSIFICATION[as.integer(names(tbl)) + 1],
+    n_pts = as.integer(tbl),
+    pct   = as.numeric(prop)
+  )
+}
+
+las_s   <- readLAS(ctg@data$filename[1])
+cls_tbl <- class_qc(las_s)
+print(cls_tbl)
+
+has_ground <- any(las_s$Classification == LASGROUND)
+has_noise  <- any(las_s$Classification %in% c(7L, 18L))
+cat("Ground classified:", has_ground, "\nNoise flagged:", has_noise, "\n")
+```
+
+## lasR
+
+```r
+pipeline <-
+  reader_las() +
+  rasterize(
+    res     = 500,
+    metrics = ~list(
+      pct_ground   = mean(Classification == 2L)         * 100,
+      pct_veg      = mean(Classification %in% c(3L,4L,5L)) * 100,
+      pct_building = mean(Classification == 6L)         * 100,
+      pct_noise    = mean(Classification %in% c(7L,18L)) * 100,
+      pct_unclass  = mean(Classification == 1L)         * 100,
+      has_ground   = as.integer(any(Classification == 2L))
+    ),
+    ofile = "classification_qc.tif"
+  )
+exec(pipeline, on = "path/to/las_folder/", ncores = 4L)
+```
+
+## Python
+
+```python
+CLASS_LABELS = {
+    0: "Never classified", 1: "Unclassified",     2: "Ground",
+    3: "Low vegetation",   4: "Medium vegetation", 5: "High vegetation",
+    6: "Building",         7: "Low point (noise)", 9: "Water",
+    17: "Bridge deck",     18: "High noise"
+}
+
+def class_qc(filepath):
+    las = laspy.read(filepath)
+    cls = np.array(las.classification)
+    unique, counts = np.unique(cls, return_counts=True)
+    total = len(cls)
+    return [
+        {"class": int(c),
+         "label": CLASS_LABELS.get(int(c), f"Class {c}"),
+         "n_pts": int(n),
+         "pct":   round(n / total * 100, 1)}
+        for c, n in zip(unique, counts)
+    ]
+
+for row in class_qc(files[0]):
+    print(f"  Class {row['class']:2d} ({row['label']:20s}): "
+          f"{row['n_pts']:>8,d}  ({row['pct']:5.1f}%)")
+```
+
+:::
+
+| Class | Label | Pre-processing implication |
+|-------|-------|---------------------------|
+| 1 | Unclassified | Ground classification needed (Stage 2) |
+| 2 | Ground | Already present — CSF can be skipped |
+| 6 | Building | Urban dataset — building metrics available |
+| 7 / 18 | Noise (low / high) | Remove before normalization |
+| 9 | Water | Exclude from height normalization (flat surface) |
+
+---
+
+### 0.6 Complete QC Report
+
+::: {.panel-tabset}
+
+## lidR
+
+```r
+qc_catalog <- function(ctg) {
+  d        <- ctg@data
+  d$area   <- (d$Max.X - d$Min.X) * (d$Max.Y - d$Min.Y)
+  d$density <- d$Number.of.point.records / d$area
+  d$z_span  <- d$Max.Z - d$Min.Z
+
+  flags <- data.frame(
+    file           = basename(d$filename),
+    density        = round(d$density, 1),
+    z_min          = round(d$Min.Z, 1),
+    z_max          = round(d$Max.Z, 1),
+    z_span         = round(d$z_span, 1),
+    flag_low_dens  = d$density < 2,
+    flag_bad_z     = d$Min.Z < -100 | d$Max.Z > 5000 | d$z_span < 0.5
+  )
+
+  n_bad <- sum(flags$flag_low_dens | flags$flag_bad_z)
+  cat(sprintf(
+    "QC summary: %d tiles | density %.1f–%.1f pts/m² | Z %.1f–%.1f m | %d flag(s)\n",
+    nrow(d), min(d$density), max(d$density),
+    min(d$Min.Z), max(d$Max.Z), n_bad
+  ))
+  if (n_bad > 0) print(flags[flags$flag_low_dens | flags$flag_bad_z, ])
+  invisible(flags)
+}
+
+flags <- qc_catalog(ctg)
+```
+
+## lasR
+
+```r
+library(lidR); library(lasR)
+
+files   <- list.files("path/to/las_folder/", pattern="\\.la[sz]$", full.names=TRUE)
+headers <- lapply(files, readLASheader)
+
+qc_hdr <- do.call(rbind, lapply(seq_along(headers), function(i) {
+  h    <- headers[[i]]
+  pts  <- h@PHB[["Number of point records"]]
+  dx   <- h@PHB[["Max X"]] - h@PHB[["Min X"]]
+  dy   <- h@PHB[["Max Y"]] - h@PHB[["Min Y"]]
+  data.frame(
+    file     = basename(files[i]),
+    density  = pts / (dx * dy),
+    z_min    = h@PHB[["Min Z"]],
+    z_max    = h@PHB[["Max Z"]],
+    z_span   = h@PHB[["Max Z"]] - h@PHB[["Min Z"]]
+  )
+}))
+print(summary(qc_hdr[, -1]))
+
+# Stream a 10 m density raster for visual inspection
+pipeline <- reader_las() +
+            rasterize(10, ~list(n = length(Z)), ofile = "density_check_10m.tif")
+exec(pipeline, on = "path/to/las_folder/", ncores = 4L)
+```
+
+## Python
+
+```python
+import pandas as pd
+
+def full_qc(files, density_threshold=2.0, z_min_ok=-100, z_max_ok=5000):
+    records = []
+    for f in files:
+        with laspy.open(f) as lf:
+            hdr = lf.header
+            pts = hdr.point_count
+            dx  = hdr.x_max - hdr.x_min
+            dy  = hdr.y_max - hdr.y_min
+        area    = dx * dy
+        density = pts / area if area > 0 else 0
+        records.append({
+            "file":          Path(f).name,
+            "n_pts":         pts,
+            "density":       round(density, 2),
+            "z_min":         round(hdr.z_min, 1),
+            "z_max":         round(hdr.z_max, 1),
+            "z_span":        round(hdr.z_max - hdr.z_min, 1),
+            "flag_low_dens": density < density_threshold,
+            "flag_bad_z":    (hdr.z_min < z_min_ok or hdr.z_max > z_max_ok
+                              or (hdr.z_max - hdr.z_min) < 0.5)
+        })
+
+    df      = pd.DataFrame(records)
+    flagged = df[df["flag_low_dens"] | df["flag_bad_z"]]
+
+    print(f"QC summary: {len(df)} tiles | "
+          f"density {df['density'].min():.1f}–{df['density'].max():.1f} pts/m² | "
+          f"Z {df['z_min'].min():.1f}–{df['z_max'].max():.1f} m | "
+          f"{len(flagged)} flag(s)")
+    if len(flagged) > 0:
+        print("\nFlagged tiles:")
+        print(flagged.to_string(index=False))
+    return df
+
+qc_df = full_qc(files)
+```
+
+:::
+
+---
+
+::: {.callout-tip}
+**Recommended QC checklist before processing:**
+
+- [ ] All tiles share one projected CRS (UTM or state plane — not geographic WGS84)
+- [ ] Point density ≥ 2 pts/m² (prefer ≥ 5 for canopy metrics)
+- [ ] Z range is plausible for the landscape (no −9999 nodata placeholders)
+- [ ] Multi-return pulses present (at least some NumberOfReturns > 1)
+- [ ] Class 2 (ground) present **or** ground classification planned
+- [ ] Noise proportion (Classes 7/18) < ~1% of total returns
+:::
+
+---
+
+::: {.callout-note}
+Once the catalog passes QC, proceed to the [pre-processing pipeline](../lidar-preprocessing/index.qmd) for ground classification, height normalization, noise removal, and decimation.
+:::

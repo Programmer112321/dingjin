@@ -1,0 +1,9 @@
+# Raw data for this post lives on ws2 (NREM-1TJZ2Q3): D:\cdj\blog_data$p\data
+# Moved off OneDrive on 2026-10-10; copy verified by sha256 on both sides.
+# Restore: scp -O -r ws2:D:/cdj/blog_data/gedi-urban-nyc/data .
+# sha256  path
+486ecce314cd60acf089b606afab97244873b6cdfb2dafcfca45b690b9236675  gedi-urban-nyc/data/gedi_l2a/GEDI02_A_2019118151337_O02124_03_T04166_02_003_01_V002.h5
+6e9d95ff82700a701ac4b6c0403bdd2b9f311e06a47532e971fe5c43e7197338  gedi-urban-nyc/data/gedi_l2a/GEDI02_A_2020056151028_O06825_03_T01473_02_003_01_V002.h5
+e557d92d7927366b44ac0649debf081559ddc8e586794d080e1d6ca89e73fafc  gedi-urban-nyc/data/gedi_l2a/GEDI02_A_2021067100808_O12666_03_T08435_02_003_02_V002.h5
+5da056682003738ef5ecdafef45711f5500382dede82af2371a930d3aa1d48ec  gedi-urban-nyc/data/gedi_l2a/GEDI02_A_2023013004828_O23141_02_T10252_02_003_02_V002.h5
+5cb8d6b6fa0e665001b493215137a324f3b5110697a9617090c6c767dc609c77  gedi-urban-nyc/data/gedi_l2a/GEDI02_A_2025135223914_O36385_02_T10405_02_004_02_V002.h5

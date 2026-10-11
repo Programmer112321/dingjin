@@ -1,0 +1,1549 @@
+---
+title: "LiDAR Metric Calculation: Canopy Structure, Complexity, and Urban Buildings"
+author: "Dingjin Chu"
+date: "2026-03-10"
+categories: [LiDAR Metric Calculation]
+description: "A comprehensive guide to computing LiDAR structural metrics in lidR, lasR, and Python — canopy height percentiles, complexity indices (Rumple, VCI, CRR), density profiles, and building-specific metrics for urban morphology analysis."
+---
+
+Following the [pre-processing pipeline](../lidar-preprocessing/index.qmd), this post covers extraction of structural metrics from the cleaned, height-normalised point cloud — shown in parallel across **lidR**, **lasR**, and **Python** (laspy + numpy / scipy / shapely).
+
+### Setup
+
+::: {.panel-tabset}
+
+## lidR
+
+```r
+library(lidR)
+library(sf)
+library(terra)
+library(moments)   # skewness / kurtosis
+
+las <- readLAS("clean_normalized.laz", select = "xyzrncH")
+# x, y, z (raw), r (ReturnNumber), n (NumberOfReturns),
+# c (Classification), H (Height above ground)
+```
+
+## lasR
+
+```r
+library(lasR)
+
+# lasR does not load tiles into memory.
+# Pass the folder path to exec(); metrics are computed inside
+# rasterize() stages within the pipeline.
+
+# Helper functions referenced inside rasterize() must be defined
+# in R before building the pipeline:
+source("metric_functions.R")   # height_metrics(), vci_metric(), etc.
+```
+
+## Python
+
+```python
+import laspy
+import numpy as np
+from scipy import stats
+from scipy.spatial import ConvexHull, Delaunay
+from shapely.geometry import MultiPoint
+import rasterio
+from rasterio.transform import from_bounds
+
+las = laspy.read("clean_normalized.laz")
+
+# Convenience arrays — used throughout all sections
+x   = np.array(las.x)
+y   = np.array(las.y)
+z   = np.array(las.z)             # raw elevation
+H   = np.array(las.Height)        # height above ground (extra dim from pre-processing)
+ret = np.array(las.return_number)
+cls = np.array(las.classification)
+```
+
+:::
+
+---
+
+## Part 1 — Canopy Height Metrics {#height}
+
+Height percentiles characterise the vertical distribution of the canopy and are the backbone of LiDAR-based AGB and canopy height modelling.
+
+### 1.1 Height Percentiles and Basic Statistics
+
+::: {.panel-tabset}
+
+## lidR
+
+```r
+height_metrics <- function(z) {
+  p  <- c(10, 25, 50, 75, 90, 95, 99)
+  hp <- as.list(quantile(z, p / 100))
+  names(hp) <- paste0("H", p)
+  c(
+    hp,
+    Hmean = mean(z),
+    Hmax  = max(z),
+    Hsd   = sd(z),
+    Hcv   = sd(z) / mean(z),
+    Hskew = moments::skewness(z),
+    Hkurt = moments::kurtosis(z),
+    Hqm   = sqrt(mean(z^2))
+  )
+}
+
+# Rasterised at 20 × 20 m grid (exclude returns ≤ 2 m)
+metrics_grid <- pixel_metrics(las, ~height_metrics(Height[Height > 2]), res = 20)
+
+# Point-cloud level (single plot or tile)
+metrics_plot <- cloud_metrics(las, ~height_metrics(Height[Height > 2]))
+```
+
+## lasR
+
+```r
+# height_metrics() is defined identically to the lidR version above.
+# Pass it inside rasterize() — lasR streams the tile and evaluates
+# the formula per grid cell without loading the full tile.
+
+pipeline <-
+  reader_las() +
+  rasterize(
+    res     = 20,
+    metrics = ~height_metrics(Height[Height > 2]),
+    ofile   = "height_metrics_20m.tif"
+  )
+
+exec(pipeline, on = "path/to/folder/", ncores = 4L, chunk = 500, buffer = 10)
+```
+
+## Python
+
+```python
+def height_metrics(h):
+    """Height above ground array → dict of metrics. h should be pre-filtered (h > 2)."""
+    if len(h) < 5:
+        return None
+    percs = np.percentile(h, [10, 25, 50, 75, 90, 95, 99])
+    return {
+        "H10":   percs[0], "H25": percs[1], "H50": percs[2],
+        "H75":   percs[3], "H90": percs[4], "H95": percs[5], "H99": percs[6],
+        "Hmean": h.mean(),
+        "Hmax":  h.max(),
+        "Hsd":   h.std(),
+        "Hcv":   h.std() / h.mean() if h.mean() > 0 else np.nan,
+        "Hskew": stats.skew(h),
+        "Hkurt": stats.kurtosis(h),
+        "Hqm":   np.sqrt(np.mean(h**2))
+    }
+
+# ── Pixel-level (20 m grid) ────────────────────────────────────────
+def pixel_metrics(x, y, H, func, res=20):
+    """Apply func over a regular res × res grid; returns dict of 2D arrays."""
+    h_filt = H > 2
+    xmin, xmax = x.min(), x.max()
+    ymin, ymax = y.min(), y.max()
+    cols = max(1, int(np.ceil((xmax - xmin) / res)))
+    rows = max(1, int(np.ceil((ymax - ymin) / res)))
+    ci = np.clip(((x - xmin) / res).astype(int), 0, cols - 1)
+    ri = np.clip(((ymax - y) / res).astype(int), 0, rows - 1)
+    out = {}
+    for r in range(rows):
+        for c in range(cols):
+            mask = (ri == r) & (ci == c) & h_filt
+            if mask.sum() < 5:
+                continue
+            m = func(H[mask])
+            if m is None:
+                continue
+            for k, v in m.items():
+                if k not in out:
+                    out[k] = np.full((rows, cols), np.nan)
+                out[k][r, c] = v
+    return out
+
+grid = pixel_metrics(x, y, H, height_metrics, res=20)
+```
+
+:::
+
+| Metric | Formula | Ecological meaning |
+|--------|---------|-------------------|
+| H50 | 50th percentile | Median canopy height — robust central tendency |
+| H95 / H99 | 95th / 99th percentile | Dominant / emergent height; proxy for top-of-canopy |
+| Hmean | $\bar{H}$ | Mean canopy height — strongly correlated with AGB |
+| Hsd | $\sigma_H$ | Vertical spread — indicator of structural heterogeneity |
+| Hcv | $\sigma_H / \bar{H}$ | Scale-free variability — useful across biomes |
+| Hskew | $\mu_3 / \sigma^3$ | Positive skew = bottom-heavy profile (young/regrowth) |
+| Hqm | $\sqrt{\bar{H^2}}$ | Quadratic mean — more sensitive to tall trees than Hmean |
+
+::: {.callout-tip}
+**H99 vs Hmax:** `Hmax` is the single tallest point and is highly susceptible to surviving noise. `H99` is far more robust and is what most published AGB models use.
+:::
+
+---
+
+### 1.2 Canopy Cover and Gap Fraction
+
+::: {.panel-tabset}
+
+## lidR
+
+```r
+cover_metrics <- function(z, rn, threshold = 2) {
+  list(
+    CC       = mean(z >= threshold),
+    GF       = mean(z < threshold),
+    CC_first = mean(z[rn == 1] >= threshold)
+  )
+}
+
+cover_grid <- pixel_metrics(
+  las,
+  ~cover_metrics(Height, ReturnNumber, threshold = 2),
+  res = 20
+)
+```
+
+## lasR
+
+```r
+pipeline <-
+  reader_las() +
+  rasterize(
+    res     = 20,
+    metrics = ~list(
+      CC       = mean(Height >= 2),
+      GF       = mean(Height <  2),
+      CC_first = mean(Height[ReturnNumber == 1] >= 2)
+    ),
+    ofile   = "cover_20m.tif"
+  )
+
+exec(pipeline, on = "path/to/folder/", ncores = 4L, chunk = 500, buffer = 10)
+```
+
+## Python
+
+```python
+def cover_metrics(h, ret, threshold=2.0):
+    n_total  = len(h)
+    n_above  = np.sum(h >= threshold)
+    first    = ret == 1
+    return {
+        "CC":       n_above / n_total if n_total > 0 else np.nan,
+        "GF":       1 - n_above / n_total if n_total > 0 else np.nan,
+        "CC_first": np.mean(h[first] >= threshold) if first.sum() > 0 else np.nan
+    }
+
+# Grid version — uses the same pixel_metrics() helper from above
+def cover_func(h):
+    return cover_metrics(h, ret[H > -999], threshold=2.0)
+```
+
+:::
+
+Canopy cover (CC) from LiDAR:
+
+$$CC = \frac{n_{\text{returns} \geq h_t}}{n_{\text{total returns}}} \times 100\%$$
+
+Gap fraction (GF = 1 − CC) as a proxy for LAI via Beer-Lambert:
+
+$$\text{LAI} \approx -\frac{\ln(\text{GF})}{k}, \quad k \approx 0.5$$
+
+---
+
+## Part 2 — Vertical Density and Profile Metrics {#density}
+
+### 2.1 Density by Height Stratum
+
+::: {.panel-tabset}
+
+## lidR
+
+```r
+density_profile <- function(z) {
+  breaks <- c(0, 0.5, 2, 5, 10, 20, 30, Inf)
+  labels <- c("G", "S0.5", "S2", "S5", "S10", "S20", "S30")
+  strata <- cut(z[z >= 0], breaks = breaks, labels = labels, right = FALSE)
+  tab    <- table(strata)
+  prop   <- as.list(prop.table(tab))
+  names(prop) <- paste0("D_", names(prop))
+  prop
+}
+
+density_grid <- pixel_metrics(las, ~density_profile(Height), res = 20)
+```
+
+## lasR
+
+```r
+# density_profile() defined as above; referenced inside rasterize()
+pipeline <-
+  reader_las() +
+  rasterize(
+    res     = 20,
+    metrics = ~density_profile(Height),
+    ofile   = "density_profile_20m.tif"
+  )
+
+exec(pipeline, on = "path/to/folder/", ncores = 4L, chunk = 500, buffer = 10)
+```
+
+## Python
+
+```python
+def density_profile(h):
+    h   = h[h >= 0]
+    if len(h) == 0:
+        return None
+    breaks = [0, 0.5, 2, 5, 10, 20, 30, np.inf]
+    labels = ["G", "S0.5", "S2", "S5", "S10", "S20", "S30"]
+    counts = np.histogram(h, bins=breaks)[0]
+    total  = counts.sum()
+    return {f"D_{lbl}": c / total for lbl, c in zip(labels, counts)}
+```
+
+:::
+
+| Ratio | Meaning |
+|-------|---------|
+| D_S10 + D_S20 + D_S30 | Upper canopy dominance |
+| D_G + D_S0.5 | Ground / near-ground proportion (bare soil indicator) |
+| D_S2 / D_S10 | Understory-to-upper-canopy ratio |
+
+### 2.2 Canopy Layer Separation
+
+::: {.panel-tabset}
+
+## lidR
+
+```r
+layer_metrics <- function(z) {
+  list(
+    P_above2  = mean(z >= 2),
+    P_above10 = mean(z >= 10),
+    P_above20 = mean(z >= 20),
+    ratio_sub = mean(z >= 2 & z < 10) / max(mean(z >= 10), 1e-6)
+  )
+}
+
+layer_grid <- pixel_metrics(las, ~layer_metrics(Height), res = 20)
+```
+
+## lasR
+
+```r
+pipeline <-
+  reader_las() +
+  rasterize(
+    res     = 20,
+    metrics = ~list(
+      P_above2  = mean(Height >= 2),
+      P_above10 = mean(Height >= 10),
+      P_above20 = mean(Height >= 20),
+      ratio_sub = mean(Height >= 2 & Height < 10) /
+                  max(mean(Height >= 10), 1e-6)
+    ),
+    ofile = "layers_20m.tif"
+  )
+
+exec(pipeline, on = "path/to/folder/", ncores = 4L, chunk = 500, buffer = 10)
+```
+
+## Python
+
+```python
+def layer_metrics(h):
+    if len(h) == 0:
+        return None
+    p2  = np.mean(h >= 2)
+    p10 = np.mean(h >= 10)
+    return {
+        "P_above2":  p2,
+        "P_above10": p10,
+        "P_above20": np.mean(h >= 20),
+        "ratio_sub": np.mean((h >= 2) & (h < 10)) / max(p10, 1e-6)
+    }
+```
+
+:::
+
+`ratio_sub` distinguishes single-layer even-aged stands (low) from multi-layered old-growth (high).
+
+---
+
+## Part 3 — Structural Complexity Metrics {#complexity}
+
+### 3.1 Rumple Index (RI)
+
+$$RI = \frac{A_{3D}}{A_{2D}}$$
+
+$A_{3D}$ — triangulated canopy surface area (TIN from first returns); $A_{2D}$ — projected footprint. A flat uniform canopy has $RI \approx 1$; a complex multi-layered canopy has $RI \gg 1$.
+
+::: {.panel-tabset}
+
+## lidR
+
+```r
+# lidR computes RI from a Canopy Height Model raster
+chm <- rasterize_canopy(las, res = 1, algorithm = p2r(subcircle = 0.2))
+ri  <- rumple_index(chm)
+
+# Grid version: compute RI per pixel block
+ri_grid <- pixel_metrics(
+  las,
+  ~list(RI = rumple_index(
+    rasterize_canopy(las, res = 1, algorithm = p2r()))),
+  res = 50
+)
+```
+
+## lasR
+
+```r
+# lasR has a dedicated chm() stage; RI is computed on the output raster
+# using lidR::rumple_index() after exec() (not inside the pipeline).
+
+pipeline <-
+  reader_las() +
+  chm(res = 1, ofile = "chm_1m.tif")
+
+exec(pipeline, on = "path/to/folder/", ncores = 4L, chunk = 500, buffer = 10)
+
+# Post-process: load the CHM raster and compute RI per block
+chm_r <- terra::rast("chm_1m.tif")
+ri    <- lidR::rumple_index(chm_r)
+```
+
+## Python
+
+```python
+def rumple_index_py(x, y, z, res=1.0):
+    """Compute RI via Delaunay triangulation of first-return canopy surface."""
+    # Keep only first returns (or highest-z per cell as a proxy)
+    xi  = np.floor(x / res).astype(int)
+    yi  = np.floor(y / res).astype(int)
+    key = xi * 1_000_000_007 + yi
+    _, top = np.unique(key, return_index=True)   # one pt per cell = highest
+    px, py, pz = x[top], y[top], z[top]
+
+    if len(px) < 4:
+        return np.nan
+
+    pts2d = np.column_stack([px, py])
+    tri   = Delaunay(pts2d)
+
+    # 3D surface area via cross product for each triangle
+    verts = np.column_stack([px, py, pz])
+    a3d   = 0.0
+    for s in tri.simplices:
+        v  = verts[s]
+        ab = v[1] - v[0]
+        ac = v[2] - v[0]
+        a3d += np.linalg.norm(np.cross(ab, ac)) / 2
+
+    a2d = (px.max() - px.min()) * (py.max() - py.min())
+    return a3d / a2d if a2d > 0 else np.nan
+
+ri = rumple_index_py(x, y, H, res=1.0)
+```
+
+:::
+
+| RI value | Canopy type |
+|----------|-------------|
+| 1.0–1.1 | Flat agricultural / grassland |
+| 1.1–1.3 | Young even-aged plantation |
+| 1.3–1.6 | Mature mixed forest |
+| > 1.6 | Old-growth, multi-layered, high structural complexity |
+
+::: {.callout-important}
+RI is **resolution-sensitive**: a 0.25 m CHM captures branch-level rugosity; a 5 m CHM smooths it. Always report CHM resolution alongside RI.
+:::
+
+---
+
+### 3.2 Canopy Relief Ratio (CRR)
+
+$$CRR = \frac{\bar{H} - H_{\min}}{H_{\max} - H_{\min}}$$
+
+::: {.panel-tabset}
+
+## lidR
+
+```r
+crr_metric <- function(z) {
+  z <- z[z >= 0]
+  list(CRR = (mean(z) - min(z)) / (max(z) - min(z) + 1e-6))
+}
+pixel_metrics(las, ~crr_metric(Height[Height >= 0]), res = 20)
+```
+
+## lasR
+
+```r
+pipeline <-
+  reader_las() +
+  rasterize(
+    res     = 20,
+    metrics = ~{
+      z <- Height[Height >= 0]
+      list(CRR = (mean(z) - min(z)) / (max(z) - min(z) + 1e-6))
+    },
+    ofile   = "crr_20m.tif"
+  )
+exec(pipeline, on = "path/to/folder/", ncores = 4L)
+```
+
+## Python
+
+```python
+def crr_metric(h):
+    h = h[h >= 0]
+    if len(h) < 3:
+        return {"CRR": np.nan}
+    return {"CRR": (h.mean() - h.min()) / (h.max() - h.min() + 1e-6)}
+```
+
+:::
+
+Low CRR (< 0.4) → bottom-heavy (open/low-stature); high CRR (> 0.6) → top-heavy (dense tall closed canopy).
+
+---
+
+### 3.3 Vertical Complexity Index (VCI) — Shannon Entropy
+
+$$VCI = -\sum_{i=1}^{n} p_i \ln(p_i)$$
+
+Normalised VCI = VCI / ln(n) ranges 0–1 (0 = single layer; 1 = uniform vertical distribution).
+
+::: {.panel-tabset}
+
+## lidR
+
+```r
+vci_metric <- function(z, n_strata = 10) {
+  z     <- z[z >= 0 & z < 80]
+  strat <- cut(z, breaks = seq(0, 80, length.out = n_strata + 1),
+               include.lowest = TRUE)
+  p     <- prop.table(table(strat))
+  p     <- p[p > 0]
+  vci   <- -sum(p * log(p))
+  list(VCI = vci, VCI_norm = vci / log(n_strata))
+}
+pixel_metrics(las, ~vci_metric(Height), res = 20)
+```
+
+## lasR
+
+```r
+pipeline <-
+  reader_las() +
+  rasterize(
+    res     = 20,
+    metrics = ~vci_metric(Height, n_strata = 10),
+    ofile   = "vci_20m.tif"
+  )
+exec(pipeline, on = "path/to/folder/", ncores = 4L)
+```
+
+## Python
+
+```python
+def vci_metric(h, n_strata=10):
+    h = h[(h >= 0) & (h < 80)]
+    if len(h) < 5:
+        return {"VCI": np.nan, "VCI_norm": np.nan}
+    edges  = np.linspace(0, 80, n_strata + 1)
+    counts = np.histogram(h, bins=edges)[0]
+    p      = counts / counts.sum()
+    p      = p[p > 0]
+    vci    = -np.sum(p * np.log(p))
+    return {"VCI": vci, "VCI_norm": vci / np.log(n_strata)}
+```
+
+:::
+
+---
+
+### 3.4 Height Distribution Shape Metrics
+
+::: {.panel-tabset}
+
+## lidR
+
+```r
+bimodality_coefficient <- function(x) {
+  n <- length(x)
+  (moments::skewness(x)^2 + 1) /
+  (moments::kurtosis(x) + 3 * (n - 1)^2 / ((n - 2) * (n - 3)))
+}
+
+shape_metrics <- function(z) {
+  z <- z[z >= 0]
+  list(
+    Hskew  = moments::skewness(z),
+    Hkurt  = moments::kurtosis(z),
+    Hbimod = bimodality_coefficient(z),
+    Hrange = diff(range(z))
+  )
+}
+pixel_metrics(las, ~shape_metrics(Height), res = 20)
+```
+
+## lasR
+
+```r
+# Same helper functions sourced before building the pipeline
+pipeline <-
+  reader_las() +
+  rasterize(
+    res     = 20,
+    metrics = ~shape_metrics(Height),
+    ofile   = "shape_20m.tif"
+  )
+exec(pipeline, on = "path/to/folder/", ncores = 4L)
+```
+
+## Python
+
+```python
+def bimodality_coefficient(h):
+    n = len(h)
+    if n < 4:
+        return np.nan
+    sk = stats.skew(h)
+    ku = stats.kurtosis(h)   # Fisher (excess) kurtosis
+    return (sk**2 + 1) / (ku + 3 * (n - 1)**2 / max((n - 2) * (n - 3), 1))
+
+def shape_metrics(h):
+    h = h[h >= 0]
+    if len(h) < 4:
+        return None
+    return {
+        "Hskew":  stats.skew(h),
+        "Hkurt":  stats.kurtosis(h),
+        "Hbimod": bimodality_coefficient(h),
+        "Hrange": h.max() - h.min()
+    }
+```
+
+:::
+
+---
+
+### 3.5 All Complexity Metrics — Combined
+
+::: {.panel-tabset}
+
+## lidR
+
+```r
+complexity_metrics <- function(z) {
+  z <- z[z >= 0]
+  c(
+    crr_metric(z),
+    vci_metric(z),
+    shape_metrics(z)
+  )
+}
+
+# RI requires the CHM raster, so compute it separately:
+chm     <- rasterize_canopy(las, res = 1, algorithm = p2r(subcircle = 0.2))
+ri      <- rumple_index(chm)
+cplx    <- cloud_metrics(las, ~complexity_metrics(Height))
+cplx$RI <- ri
+```
+
+## lasR
+
+```r
+# Inline complexity (all except RI, which needs the CHM raster)
+pipeline <-
+  reader_las() +
+  chm(res = 1, ofile = "chm_1m.tif") +
+  rasterize(
+    res     = 20,
+    metrics = ~complexity_metrics(Height),
+    ofile   = "complexity_20m.tif"
+  )
+exec(pipeline, on = "path/to/folder/", ncores = 4L, chunk = 500, buffer = 10)
+
+# Post-process RI from the CHM output
+chm_r  <- terra::rast("chm_1m.tif")
+ri_val <- lidR::rumple_index(chm_r)
+```
+
+## Python
+
+```python
+def all_complexity_metrics(x, y, h, res_chm=1.0):
+    h0 = h[h >= 0]
+    return {
+        "RI":       rumple_index_py(x, y, h, res=res_chm),
+        **crr_metric(h0),
+        **vci_metric(h0),
+        **shape_metrics(h0)
+    }
+
+cplx = all_complexity_metrics(x, y, H, res_chm=1.0)
+```
+
+:::
+
+| Metric | Range | What it captures |
+|--------|-------|-----------------|
+| Rumple Index | ≥ 1 | 3D canopy surface rugosity |
+| CRR | 0–1 | Vertical centre of mass |
+| VCI (normalised) | 0–1 | Shannon diversity of height strata |
+| Hskew | −∞ to +∞ | Asymmetry of height distribution |
+| Hkurt | > 0 | Peakedness (concentration) of distribution |
+| Bimodality coefficient | 0–1 | Two-layer canopy (> 0.555) |
+
+---
+
+### 3.6 Advanced Complexity: Adaptive KDE Entropy (Liu et al. 2022) {#entropy}
+
+Simple height-bin VCI is sensitive to point density gradients that often exist across a tile due to scan-angle variation. The Liu et al. (2022) approach removes this bias before computing entropy:
+
+1. **`avg_point_dist`** — compute mean nearest-neighbour distance per 1 m height layer to quantify the vertical density gradient.
+2. **`adaptative_resample`** — iteratively coarsen voxel size until a Mann-Kendall trend test finds no significant vertical density trend (p > α), then return the resampled cloud.
+3. **`canopy_entropy`** — project the resampled cloud onto three orthogonal planes (XY, XZ, YZ), fit a KDE on each, compute Shannon entropy $H = -\sum p \ln(p) \cdot dA$, and return $H_{XYZ} = \sqrt{H_{XY}^2 + H_{XZ}^2 + H_{YZ}^2}$.
+
+::: {.panel-tabset}
+
+## lidR
+
+```r
+library(lidR)
+library(data.table)
+library(nabor)      # fast kNN
+library(TreeLS)     # las2xyz helper
+library(ks)         # kernel density estimation
+library(trend)      # Mann-Kendall test
+
+# ── 1. Average nearest-neighbour distance per vertical layer ───────
+avg_point_dist <- function(las, thickness = 1) {
+  n_pts <- nrow(las@data)
+  if (n_pts < 2) {
+    return(data.table(layer = 0L, dist = NA_real_))
+  }
+  las@data$MinDist <- nabor::knn(TreeLS:::las2xyz(las), k = 2)$nn.dist[, 2]
+  z_pts            <- las$Z - min(las$Z)
+  las@data$layer   <- as.integer(z_pts / thickness)
+  las@data[order(layer), .(dist = mean(MinDist, na.rm = TRUE)), by = layer]
+}
+
+# ── 2. Adaptive voxel resampling ───────────────────────────────────
+adaptative_resample <- function(las, thickness = 1, alpha = 0.05, step = 0.1) {
+  avg_dst <- avg_point_dist(las, thickness)
+
+  noise_tol <- mean(avg_dst$dist, na.rm = TRUE) + 2 * sd(avg_dst$dist, na.rm = TRUE)
+  avg_dst   <- avg_dst[!is.na(dist) & dist < noise_tol]
+  if (nrow(avg_dst) < 3) return(NULL)
+
+  max_dst <- max(avg_dst$dist)
+
+  vlas <- las
+  mkt  <- NULL
+
+  for (ratio in seq(2, 5, step)) {
+    vox     <- ratio * max_dst
+    vlas    <- TreeLS::tlsSample(las, smp.voxelize(vox))
+    avg_dst <- avg_point_dist(vlas, thickness)
+    avg_dst <- avg_dst[!is.na(dist)]
+    if (nrow(avg_dst) < 3) break
+    mkt <- trend::mk.test(avg_dst$dist)
+    if (mkt$p.value > alpha) break
+  }
+
+  if (is.null(mkt)) return(NULL)
+  list(las = vlas, ratio = ratio, vox = vox, dist = avg_dst, mk.test = mkt)
+}
+
+# ── 3. KDE Shannon entropy in XY, XZ, YZ planes ───────────────────
+canopy_entropy <- function(las, bw = 0.2, grid_size = 0.1) {
+  bounds <- apply(las@data[, .(X, Y, Z)], 2, range)
+  ce     <- numeric(3L)
+  names(ce) <- c("XY", "XZ", "YZ")
+
+  for (ij in list(c("X", "Y"), c("X", "Z"), c("Y", "Z"))) {
+    i <- ij[1]; j <- ij[2]
+    key   <- paste(ij, collapse = "")
+    plane <- las@data[, ..ij]
+    ni   <- 2L + as.integer((diff(bounds[, i]) + 8 * bw) %/% grid_size)
+    nj   <- 2L + as.integer((diff(bounds[, j]) + 8 * bw) %/% grid_size)
+    lims <- c(bounds[, ij]) + (bw * 4 + grid_size / 2) * c(-1, 1, -1, 1)
+    den  <- ks::kde(plane, h = bw,
+                    gridsize = c(ni, nj),
+                    xmin     = lims[c(1, 3)],
+                    xmax     = lims[c(2, 4)])$estimate
+    den        <- den[den > 0]
+    ce[key]    <- -sum(den * log(den) * grid_size^2)
+  }
+
+  ce["XYZ"] <- sqrt(sum(ce^2))
+  as.data.frame(t(ce))
+}
+
+# ── 4. Entropy wrapper with adaptive resampling ────────────────────
+get_entropy <- function(las, thickness = 1) {
+  las@data$Z <- las@data$Height   # use HAG geometry (Liu et al. 2022)
+  res <- adaptative_resample(las, thickness)
+  if (is.null(res)) return(NULL)
+  ent       <- canopy_entropy(res$las)
+  ent$p     <- res$mk.test$p.value
+  ent$vox   <- res$vox
+  ent
+}
+
+# ── 5. Pixel-level complexity — called inside pixel_metrics() ──────
+pix_complexity <- function(x, y, z, h) {
+  keep <- h >= 1
+  if (sum(keep) < 10L) return(NULL)
+  las <- suppressMessages(
+    LAS(data.table(X = x[keep], Y = y[keep],
+                   Z = z[keep], Height = h[keep]),
+        check = FALSE)
+  )
+  if (is.empty(las)) return(NULL)
+  ce <- tryCatch(get_entropy(las),
+                 error = function(e) {
+                   warning("get_entropy failed: ", conditionMessage(e))
+                   NULL
+                 })
+  if (!is.null(ce)) as.list(ce) else NULL
+}
+
+# Run at 20 m pixel level
+entropy_grid <- pixel_metrics(
+  las,
+  ~pix_complexity(X, Y, Z, Height),
+  res = 20
+)
+```
+
+## lasR
+
+```r
+# All five helper functions (avg_point_dist, adaptative_resample,
+# canopy_entropy, get_entropy, pix_complexity) are pure R and can be
+# evaluated inside lasR's rasterize() stage per cell.
+#
+# Required packages: nabor, TreeLS, ks, trend, data.table
+# These must be installed separately — lasR does not install them.
+source("entropy_helpers.R")   # load the five functions above
+
+pipeline <-
+  reader_las() +
+  rasterize(
+    res     = 20,
+    metrics = ~pix_complexity(X, Y, Z, Height),
+    ofile   = "entropy_complexity_20m.tif"
+  )
+
+exec(pipeline,
+     on     = "path/to/folder/",
+     ncores = 4L,
+     chunk  = 500,
+     buffer = 10)
+```
+
+::: {.callout-warning}
+**lasR caveat:** `TreeLS:::las2xyz` is an internal (triple-colon) function. If TreeLS is not fully loaded in each worker thread, the call may fail. Test on a single tile first with `ncores = 1L`. If it fails, switch to the lidR `pixel_metrics()` route for this metric.
+:::
+
+## Python
+
+```python
+# pip install pymannkendall
+# scipy, numpy required
+import numpy as np
+from scipy import stats
+from scipy.spatial import cKDTree
+from scipy.stats import gaussian_kde
+import pymannkendall as mk   # pip install pymannkendall
+
+# ── 1. Average nearest-neighbour distance per vertical layer ───────
+def avg_point_dist(x, y, z, thickness=1.0):
+    """Mean NN-distance (k=2) per height layer of `thickness` m."""
+    pts  = np.column_stack([x, y, z])
+    tree = cKDTree(pts)
+    d, _ = tree.query(pts, k=2)
+    nn   = d[:, 1]              # distance to nearest neighbour (exclude self)
+
+    z0     = z - z.min()
+    layers = (z0 / thickness).astype(int)
+    result = {}
+    for lyr in np.unique(layers):
+        m = layers == lyr
+        result[lyr] = nn[m].mean()
+    return result   # {layer_id: mean_dist}
+
+# ── 2. Adaptive voxel resampling ───────────────────────────────────
+def adaptative_resample(x, y, z, thickness=1.0, alpha=0.05, step=0.1):
+    """Coarsen voxel size until Mann-Kendall finds no vertical density trend."""
+    ld = avg_point_dist(x, y, z, thickness)
+    if len(ld) < 3:
+        return None
+
+    d_arr = np.array(list(ld.values()))
+    tol   = d_arr.mean() + 2 * d_arr.std()
+    d_arr = d_arr[d_arr < tol]
+    if len(d_arr) < 3:
+        return None
+
+    max_dst = d_arr.max()
+    rx, ry, rz = x.copy(), y.copy(), z.copy()
+    mkt_p = None
+    final_vox = None
+
+    for ratio in np.arange(2.0, 5.0 + step, step):
+        vox = ratio * max_dst
+        # Voxel decimation: keep one point per vox×vox×vox cell
+        key = (np.floor(x / vox).astype(np.int64) * 1_000_000_007 +
+               np.floor(y / vox).astype(np.int64) * 7001 +
+               np.floor(z / vox).astype(np.int64))
+        _, idx = np.unique(key, return_index=True)
+        rx, ry, rz = x[idx], y[idx], z[idx]
+
+        ld2 = avg_point_dist(rx, ry, rz, thickness)
+        if len(ld2) < 3:
+            break
+        d2 = np.array(list(ld2.values()))
+        d2 = d2[~np.isnan(d2)]
+        if len(d2) < 3:
+            break
+
+        # Mann-Kendall trend test (scipy kendalltau ≈ mk.test)
+        # Use pymannkendall for a closer match to R's trend::mk.test
+        res_mk = mk.original_test(d2)
+        mkt_p  = res_mk.p
+        final_vox = vox
+        if mkt_p > alpha:
+            break
+
+    if mkt_p is None:
+        return None
+    return {"x": rx, "y": ry, "z": rz, "vox": final_vox, "p": mkt_p}
+
+# ── 3. KDE Shannon entropy in XY, XZ, YZ planes ───────────────────
+def canopy_entropy(x, y, z, bw=0.2, grid_size=0.1):
+    """
+    KDE Shannon entropy in three orthogonal planes (Liu et al. 2022).
+    Note: scipy gaussian_kde uses a bandwidth *factor* of data std;
+    to approximate the absolute bw=0.2 m used by ks::kde in R, we
+    scale by the per-plane std. Results are numerically close but not
+    identical to the R implementation.
+    """
+    planes = {"XY": (x, y), "XZ": (x, z), "YZ": (y, z)}
+    ce = {}
+    for name, (a, b) in planes.items():
+        # Approximate absolute bandwidth: bw_factor = bw / data_std
+        std_a = a.std() or 1.0
+        std_b = b.std() or 1.0
+        bw_f  = bw / ((std_a + std_b) / 2)
+        kde   = gaussian_kde(np.vstack([a, b]), bw_method=bw_f)
+
+        g_a = np.arange(a.min() - 4*bw, a.max() + 4*bw, grid_size)
+        g_b = np.arange(b.min() - 4*bw, b.max() + 4*bw, grid_size)
+        ga, gb = np.meshgrid(g_a, g_b)
+        density = kde(np.vstack([ga.ravel(), gb.ravel()]))
+        density = density[density > 0]
+        ce[name] = -np.sum(density * np.log(density) * grid_size**2)
+
+    ce["XYZ"] = np.sqrt(ce["XY"]**2 + ce["XZ"]**2 + ce["YZ"]**2)
+    return ce
+
+# ── 4. Entropy wrapper with adaptive resampling ────────────────────
+def get_entropy(x, y, h, thickness=1.0):
+    """Use height above ground (h) for all geometry (Liu et al. 2022)."""
+    res = adaptative_resample(x, y, h, thickness)
+    if res is None:
+        return None
+    ent = canopy_entropy(res["x"], res["y"], res["z"])
+    ent["p"]   = res["p"]
+    ent["vox"] = res["vox"]
+    return ent
+
+# ── 5. Pixel-level complexity ──────────────────────────────────────
+def pix_complexity(x_cell, y_cell, z_cell, h_cell):
+    """Pixel-level wrapper — mirrors lidR pix_complexity."""
+    keep = h_cell >= 1.0
+    if keep.sum() < 10:
+        return None
+    try:
+        return get_entropy(x_cell[keep], y_cell[keep], h_cell[keep])
+    except Exception as e:
+        print(f"get_entropy failed: {e}")
+        return None
+
+# Apply over 20 m grid using the pixel_metrics() helper from Section 1.1
+def pixel_entropy(x, y, H, res=20):
+    xmin, xmax = x.min(), x.max()
+    ymin, ymax = y.min(), y.max()
+    cols = max(1, int(np.ceil((xmax - xmin) / res)))
+    rows = max(1, int(np.ceil((ymax - ymin) / res)))
+    ci = np.clip(((x - xmin) / res).astype(int), 0, cols - 1)
+    ri = np.clip(((ymax - y) / res).astype(int), 0, rows - 1)
+    out = {}
+    for r in range(rows):
+        for c in range(cols):
+            mask = (ri == r) & (ci == c)
+            if mask.sum() < 10:
+                continue
+            m = pix_complexity(x[mask], y[mask], z[mask], H[mask])
+            if m is None:
+                continue
+            for k, v in m.items():
+                if k not in out:
+                    out[k] = np.full((rows, cols), np.nan)
+                out[k][r, c] = v
+    return out
+
+entropy_grid = pixel_entropy(x, y, H, res=20)
+```
+
+:::
+
+::: {.callout-note collapse="true"}
+## Key differences — Adaptive KDE Entropy
+
+| | lidR | lasR | Python |
+|-|------|------|--------|
+| **kNN** | `nabor::knn` (C++ FLANN) | Same (called inside rasterize) | `scipy.cKDTree` (C++) — equally fast |
+| **Voxel resampling** | `TreeLS::tlsSample(smp.voxelize())` | Same | numpy voxel grid (manual) |
+| **Mann-Kendall test** | `trend::mk.test` (exact S statistic) | Same | `pymannkendall.original_test` (direct port) or `scipy.stats.kendalltau` (approx.) |
+| **KDE** | `ks::kde` (bandwidth matrix, exact grid) | Same | `scipy.stats.gaussian_kde` — bandwidth is a factor of data std; requires scaling to match R's absolute bw |
+| **Pixel dispatch** | `pixel_metrics(~pix_complexity(...))` | `rasterize(~pix_complexity(...))` | Manual grid loop |
+| **Runtime** | Slowest (R kNN + R KDE per pixel) | Faster (multi-threaded C++ tile loop; R functions still called per cell) | Comparable to lidR for small tiles; numpy voxel is faster than TreeLS for large tiles |
+:::
+
+---
+
+## Part 4 — Building-Specific Metrics {#buildings}
+
+After semantic segmentation (Class 6 = building, Class 5 = high vegetation), building-specific metrics are extracted from the non-ground, non-vegetation returns.
+
+### 4.1 Building Height Metrics
+
+::: {.panel-tabset}
+
+## lidR
+
+```r
+las_bld <- filter_poi(las, Classification == LASBUILDING)   # Class 6
+
+building_height_metrics <- function(z) {
+  list(
+    Bh_p95   = quantile(z, 0.95),
+    Bh_p99   = quantile(z, 0.99),
+    Bh_range = diff(range(z)),
+    Bh_floor = quantile(z, 0.95) / 3
+  )
+}
+
+cloud_metrics(las_bld, ~building_height_metrics(Height))
+```
+
+## lasR
+
+```r
+pipeline <-
+  reader_las(filter = "-keep_class 6") +
+  rasterize(
+    res     = 20,
+    metrics = ~list(
+      Bh_p95   = quantile(Height, 0.95),
+      Bh_p99   = quantile(Height, 0.99),
+      Bh_range = diff(range(Height)),
+      Bh_floor = quantile(Height, 0.95) / 3
+    ),
+    ofile   = "building_height_20m.tif"
+  )
+exec(pipeline, on = "path/to/folder/", ncores = 4L)
+```
+
+## Python
+
+```python
+bld_mask = cls == 6   # ASPRS Class 6 = building
+H_bld    = H[bld_mask]
+
+def building_height_metrics(h):
+    if len(h) < 5:
+        return None
+    p95 = np.percentile(h, 95)
+    return {
+        "Bh_p95":   p95,
+        "Bh_p99":   np.percentile(h, 99),
+        "Bh_range": h.max() - h.min(),
+        "Bh_floor": p95 / 3.0
+    }
+
+bld_hm = building_height_metrics(H_bld)
+```
+
+:::
+
+| Metric | Interpretation |
+|--------|---------------|
+| H95 (building) | Eave or parapet height — most common published building height |
+| H99 (building) | Chimney, rooftop equipment, or top of gable |
+| Height range | Multi-storey span |
+| Floor count | $\approx H_{95} / 3$ — rough estimate, varies by construction era |
+
+---
+
+### 4.2 Roof Geometry and Complexity
+
+::: {.panel-tabset}
+
+## lidR
+
+```r
+roof_metrics <- function(x, y, z) {
+  pts      <- cbind(x, y, z)
+  eig      <- eigen(cov(pts))
+  normal   <- eig$vectors[, 3]
+  slope    <- acos(abs(normal[3])) * 180 / pi
+  list(
+    roof_slope_mean = slope,
+    roof_roughness  = sd(z - mean(z))
+  )
+}
+
+cloud_metrics(las_bld, ~roof_metrics(X, Y, Height))
+```
+
+## lasR
+
+```r
+# PCA-based roof slope requires per-building point sets.
+# lasR does not support per-object metric computation natively;
+# use segment_shape() or post-process individual building
+# footprints extracted from a vector layer.
+
+pipeline <-
+  reader_las(filter = "-keep_class 6") +
+  rasterize(
+    res     = 5,   # fine grid for roof detail
+    metrics = ~list(
+      roof_roughness = sd(Height - mean(Height)),
+      roof_range     = diff(range(Height))
+    ),
+    ofile   = "roof_roughness_5m.tif"
+  )
+exec(pipeline, on = "path/to/folder/", ncores = 4L)
+```
+
+## Python
+
+```python
+def roof_metrics(x, y, h):
+    if len(h) < 6:
+        return None
+    pts    = np.column_stack([x, y, h])
+    # PCA: eigenvector of smallest eigenvalue = surface normal
+    _, evecs = np.linalg.eigh(np.cov(pts.T))
+    normal   = evecs[:, 0]
+    slope    = np.degrees(np.arccos(np.abs(normal[2])))
+    return {
+        "roof_slope_mean": slope,
+        "roof_roughness":  np.std(h - h.mean())
+    }
+
+rm = roof_metrics(x[bld_mask], y[bld_mask], H[bld_mask])
+```
+
+:::
+
+| Metric | Low value | High value |
+|--------|-----------|------------|
+| `roof_slope_mean` | Flat roof (commercial) | Steep gable/hip (residential) |
+| `roof_roughness` | Smooth surface | Rough / cluttered roof |
+
+---
+
+### 4.3 Building Footprint and Volume
+
+::: {.panel-tabset}
+
+## lidR
+
+```r
+building_footprint_metrics <- function(x, y, z) {
+  pts2d          <- st_sfc(st_multipoint(cbind(x, y)))
+  hull           <- st_convex_hull(pts2d)
+  footprint_area <- as.numeric(st_area(hull))
+  perimeter      <- as.numeric(
+    st_length(st_cast(hull, "MULTILINESTRING")))
+  height_p95     <- quantile(z, 0.95)
+  volume         <- footprint_area * height_p95
+  compactness    <- 4 * pi * footprint_area / perimeter^2
+  list(
+    footprint_m2 = footprint_area,
+    perimeter_m  = perimeter,
+    compactness  = compactness,
+    volume_m3    = volume,
+    FAR          = volume / footprint_area
+  )
+}
+
+cloud_metrics(las_bld, ~building_footprint_metrics(X, Y, Height))
+```
+
+## lasR
+
+```r
+# Footprint / volume require 2D convex hull per building — not
+# directly supported inside rasterize(). Typical workflow:
+#   1) Run exec() to get the CHM and a classified raster.
+#   2) Vectorise building blobs with terra::patches() or sf operations.
+#   3) For each polygon, extract building points and compute metrics in R.
+
+bld_raster  <- terra::rast("building_height_20m.tif")
+bld_polys   <- terra::as.polygons(bld_raster > 0)   # rough footprint mask
+```
+
+## Python
+
+```python
+def building_footprint_metrics(x, y, h):
+    if len(h) < 4:
+        return None
+    pts2d = np.column_stack([x, y])
+    try:
+        hull = ConvexHull(pts2d)
+    except Exception:
+        return None
+    # In scipy 2D ConvexHull: hull.volume = area, hull.area = perimeter
+    footprint_area = hull.volume
+    perimeter      = hull.area
+    h_p95          = np.percentile(h, 95)
+    volume         = footprint_area * h_p95
+    compactness    = 4 * np.pi * footprint_area / perimeter**2
+    return {
+        "footprint_m2": footprint_area,
+        "perimeter_m":  perimeter,
+        "compactness":  compactness,
+        "volume_m3":    volume,
+        "FAR":          volume / footprint_area
+    }
+
+fm = building_footprint_metrics(x[bld_mask], y[bld_mask], H[bld_mask])
+```
+
+:::
+
+---
+
+### 4.4 Sky View Factor (SVF) and Urban Canyon Geometry
+
+$$SVF = 1 - \frac{1}{2\pi} \int_0^{2\pi} \sin^2\!\left(\theta(\phi)\right) d\phi$$
+
+::: {.panel-tabset}
+
+## lidR
+
+```r
+dsm  <- rasterize_canopy(las, res = 1, algorithm = p2r())
+dtm  <- rasterize_terrain(las, res = 1, algorithm = knnidw())
+ndsm <- dsm - dtm
+
+# SVF via external package or SAGA GIS
+# library(svf)
+# svf_raster <- svf(ndsm, radius = 50, directions = 36)
+```
+
+## lasR
+
+```r
+pipeline <-
+  reader_las() +
+  chm(res = 1, ofile = "dsm_1m.tif") +
+  dtm(res = 1, algorithm = knnidw(), ofile = "dtm_1m.tif")
+
+exec(pipeline, on = "path/to/folder/", ncores = 4L)
+
+# Compute nDSM and SVF post-pipeline
+dsm_r  <- terra::rast("dsm_1m.tif")
+dtm_r  <- terra::rast("dtm_1m.tif")
+ndsm_r <- dsm_r - dtm_r
+```
+
+## Python
+
+```python
+import rasterio
+import numpy as np
+
+# Load previously computed DSM and DTM
+with rasterio.open("dsm_1m.tif") as src:
+    dsm_arr = src.read(1).astype(float)
+    profile = src.profile
+with rasterio.open("dtm_1m.tif") as src:
+    dtm_arr = src.read(1).astype(float)
+
+ndsm_arr = dsm_arr - dtm_arr   # height above ground surface
+
+# Approximate SVF via horizon scanning (simplified)
+def svf_approx(ndsm, radius_px=50, n_dirs=36):
+    rows, cols = ndsm.shape
+    svf_out    = np.full_like(ndsm, np.nan, dtype=float)
+    angles     = np.linspace(0, 2 * np.pi, n_dirs, endpoint=False)
+    r_range    = np.arange(1, radius_px + 1)
+    for i in range(rows):
+        for j in range(cols):
+            max_sin2 = 0.0
+            for a in angles:
+                ri = (i + r_range * np.sin(a)).astype(int)
+                ci = (j + r_range * np.cos(a)).astype(int)
+                valid = (ri >= 0) & (ri < rows) & (ci >= 0) & (ci < cols)
+                if valid.any():
+                    elev = ndsm[ri[valid], ci[valid]] / r_range[valid]
+                    max_sin2 += np.sin(np.arctan(elev.max()))**2
+            svf_out[i, j] = 1 - max_sin2 / n_dirs
+    return svf_out
+```
+
+:::
+
+**H/W Ratio:**
+
+| H/W | Urban canyon type | Thermal effect |
+|-----|------------------|----------------|
+| < 0.5 | Open street | Low trapping; better sky access |
+| 0.5–2.0 | Moderate canyon | Intermediate |
+| > 2.0 | Deep canyon | High heat trapping; reduced SVF |
+
+---
+
+### 4.5 Full Urban Metrics Pipeline
+
+::: {.panel-tabset}
+
+## lidR
+
+```r
+urban_metrics <- function(las_tile) {
+  las_veg <- filter_poi(las_tile, Classification %in%
+                          c(LASVEGETATION, LASHIGHVEGETATION))
+  las_bld <- filter_poi(las_tile, Classification == LASBUILDING)
+
+  veg_m <- cloud_metrics(las_veg, ~{
+    z <- Height[Height >= 0]
+    list(H95 = quantile(z,.95), Hmean = mean(z), Hsd = sd(z),
+         CC  = mean(z >= 2),
+         VCI = vci_metric(z)$VCI_norm,
+         CRR = crr_metric(z)$CRR)
+  })
+  bld_m <- cloud_metrics(las_bld, ~{
+    list(
+      Bh_p95      = quantile(Height,.95),
+      Bh_floor    = quantile(Height,.95) / 3,
+      roof_slope  = roof_metrics(X, Y, Height)$roof_slope_mean,
+      roof_rough  = roof_metrics(X, Y, Height)$roof_roughness,
+      footprint   = building_footprint_metrics(X, Y, Height)$footprint_m2,
+      volume      = building_footprint_metrics(X, Y, Height)$volume_m3,
+      compactness = building_footprint_metrics(X, Y, Height)$compactness
+    )
+  })
+  list(vegetation = veg_m, buildings = bld_m)
+}
+
+opt_output_files(ctg) <- "output/{*}_metrics.rds"
+catalog_apply(ctg, urban_metrics)
+```
+
+## lasR
+
+```r
+pipeline <-
+  reader_las() +
+  # Vegetation metrics (Classes 4 & 5)
+  rasterize(
+    res     = 20,
+    metrics = ~{
+      veg <- Classification %in% c(4L, 5L)
+      z   <- Height[veg & Height >= 0]
+      list(H95  = quantile(z,.95), Hmean = mean(z), Hsd = sd(z),
+           CC   = mean(z >= 2),
+           VCI  = vci_metric(z)$VCI_norm,
+           CRR  = crr_metric(z)$CRR)
+    },
+    ofile = "veg_metrics_20m.tif"
+  ) +
+  # Building height metrics (Class 6)
+  rasterize(
+    res     = 20,
+    metrics = ~{
+      bld <- Classification == 6L
+      h   <- Height[bld]
+      list(Bh_p95      = quantile(h,.95),
+           Bh_floor    = quantile(h,.95) / 3,
+           roof_rough  = sd(h - mean(h)))
+    },
+    ofile = "bld_metrics_20m.tif"
+  ) +
+  chm(res = 1, ofile = "chm_1m.tif") +
+  dtm(res = 1, ofile = "dtm_1m.tif")
+
+exec(pipeline, on = "path/to/folder/", ncores = 4L, chunk = 500, buffer = 10)
+```
+
+## Python
+
+```python
+def compute_urban_metrics(las):
+    x   = np.array(las.x)
+    y   = np.array(las.y)
+    H   = np.array(las.Height)
+    cls = np.array(las.classification)
+
+    veg_mask = np.isin(cls, [4, 5])
+    bld_mask = cls == 6
+
+    H_veg = H[veg_mask & (H >= 0)]
+    H_bld = H[bld_mask]
+
+    veg_m = {
+        "H95":   np.percentile(H_veg, 95) if len(H_veg) > 0 else np.nan,
+        "Hmean": H_veg.mean() if len(H_veg) > 0 else np.nan,
+        "CC":    np.mean(H_veg >= 2) if len(H_veg) > 0 else np.nan,
+        **vci_metric(H_veg),
+        **crr_metric(H_veg)
+    }
+    bld_m = {
+        **(building_height_metrics(H_bld) or {}),
+        **(roof_metrics(x[bld_mask], y[bld_mask], H_bld) or {}),
+        **(building_footprint_metrics(x[bld_mask], y[bld_mask], H_bld) or {})
+    }
+    return {"vegetation": veg_m, "buildings": bld_m}
+
+for laz_file in laz_files:
+    tile = laspy.read(laz_file)
+    result = compute_urban_metrics(tile)
+```
+
+:::
+
+---
+
+### 4.6 Building vs. Vegetation Metrics — Comparison
+
+| Metric | Vegetation | Buildings | Key difference |
+|--------|-----------|-----------|----------------|
+| H95 | Top-of-canopy height | Eave/parapet height | Same formula; different semantic meaning |
+| Rumple Index | Canopy rugosity | Roof complexity | RI > 1.5 = complex canopy or multi-facet roof |
+| VCI | Foliage layering | Floor distribution | VCI useful for multi-storey detection |
+| Cover fraction | Canopy cover | Building coverage ratio | BCR = building footprint / plot area |
+| Volume | Crown + stem volume | Gross building volume | Building volume used for FAR estimation |
+
+::: {.callout-important}
+A key challenge is **co-classification error**: tall trees adjacent to buildings share similar height and density statistics. Always segment by classification (Class 5 = vegetation, Class 6 = building) before computing class-specific metrics.
+:::
+
+---
+
+## Part 5 — Tool Comparison Summary {#summary}
+
+### 5.1 Data Model and API
+
+| | lidR | lasR | Python |
+|-|------|------|--------|
+| **Point cloud object** | `LAS` (S4, data.table internally) | No R object — streaming C++ | `laspy.LasData` or numpy arrays |
+| **Tile/catalog** | `LAScatalog` with `opt_*` settings | Folder path → `exec()` | Manual `glob` + loop or PDAL batch |
+| **Metric function** | Passed as formula to `pixel_metrics()` or `cloud_metrics()` | Passed as formula to `rasterize()` | Python function applied per cell in a loop, or PDAL `filters.stats` |
+| **Column access** | `Height`, `Z`, `ReturnNumber` (direct column names in formula) | Same column names | `las.Height`, `las.z` (attribute access on LasData) or numpy arrays |
+| **Output** | `SpatRaster` (terra) or `data.frame` | GeoTIFF written by `ofile=` | numpy arrays written via `rasterio` |
+
+### 5.2 Performance
+
+| | lidR | lasR | Python (laspy + numpy) |
+|-|------|------|------------------------|
+| **Tile loading** | One chunk in R memory | Streaming — never in memory | Full tile loaded via `laspy.read()` |
+| **Parallelism** | `catalog_apply` multi-core via `future` | `exec(ncores=N)` — C++ thread pool | `multiprocessing.Pool` or `concurrent.futures` |
+| **kNN speed** | `nabor` (C++ FLANN) | Same | `scipy.cKDTree` (C++, Cython) — comparable |
+| **KDE speed** | `ks::kde` (C++ back-end) | Same | `scipy.gaussian_kde` (C++) — comparable |
+| **Voxel resampling** | `TreeLS::tlsSample` (C++) | Same | numpy `np.unique` — fast for moderate sizes |
+| **Overall for large catalogs** | Moderate | Fastest | Moderate; can match lasR with PDAL pipeline |
+
+### 5.3 Complex Operations
+
+| Operation | lidR | lasR | Python |
+|-----------|------|------|--------|
+| Height percentiles | `quantile(Height, p)` | Same in `rasterize()` | `np.percentile(H, p)` |
+| Rumple Index | `rumple_index(chm)` — one line | CHM via `chm()`, then `lidR::rumple_index()` post-exec | scipy `Delaunay` triangulation — manual 3D area |
+| Canopy cover | `mean(H >= threshold)` | Same | `np.mean(H >= threshold)` |
+| VCI / Shannon entropy | `cut()` + `prop.table()` + entropy sum | Same in `rasterize()` | `np.histogram()` + numpy entropy sum |
+| KDE entropy (Liu 2022) | `ks::kde` + `trend::mk.test` — full pipeline in R | Same functions inside `rasterize()` | `scipy.gaussian_kde` + `pymannkendall` — minor bw difference |
+| Building footprint | `sf::st_convex_hull()` + `st_area()` | Post-process with `terra::patches()` + sf | `scipy.ConvexHull` — 2D: `.volume` = area, `.area` = perimeter |
+| SVF | External package (`svf`) on nDSM raster | Same post-exec | Rasterio + numpy horizon scan (custom) |
+| Per-building roof PCA | `eigen(cov(pts))` inside `cloud_metrics()` | Not natively per-object; needs vector pre-segmentation | `np.linalg.eigh(np.cov(pts.T))` |
+
+### 5.4 Decision Guide
+
+| Situation | Recommended tool |
+|-----------|-----------------|
+| Exploring a new dataset, tuning parameters interactively | **lidR** — `cloud_metrics()` on a single tile, `plot()`, inspect any intermediate variable |
+| Production run over large catalog (> 50 GB) | **lasR** — streaming C++, multi-threaded, constant memory |
+| Metrics feed into ML models (sklearn, PyTorch, XGBoost) | **Python** — keep everything in numpy; no format conversion |
+| KDE entropy (Liu et al. 2022) | **lidR** or **lasR** (same R helpers); Python approximation of bw is close but not identical |
+| Building footprint / volume per polygon | **lidR** (sf integration) or **Python** (scipy + shapely); lasR needs post-processing step |
+| Cross-platform team without R | **Python** — PDAL + laspy + scipy covers most operations |
+| GPU-accelerated kNN / entropy (very large tiles) | **Python** — cuML (RAPIDS) replaces scipy; not available in R |
+
+### 5.5 Package Dependencies
+
+::: {.panel-tabset}
+
+## lidR
+
+```r
+install.packages(c(
+  "lidR",      # core
+  "terra",     # raster output
+  "sf",        # building footprints
+  "moments",   # skewness / kurtosis
+  "data.table",# fast tables in entropy functions
+  "nabor",     # C++ kNN (for KDE entropy)
+  "ks",        # KDE (for KDE entropy)
+  "trend"      # Mann-Kendall test
+))
+# TreeLS from GitHub: remotes::install_github("tiagodc/TreeLS")
+```
+
+## lasR
+
+```r
+install.packages(c(
+  "lasR",       # core pipeline
+  "terra",      # post-process rasters
+  "sf",         # building polygons post-exec
+  "data.table", "nabor", "ks", "trend"  # for KDE entropy helpers
+))
+# TreeLS from GitHub: remotes::install_github("tiagodc/TreeLS")
+```
+
+## Python
+
+```bash
+pip install laspy[lazrs]      # LAS/LAZ I/O
+pip install numpy scipy       # arrays, kNN, stats, KDE, ConvexHull
+pip install shapely           # building polygon ops
+pip install rasterio          # write GeoTIFF output
+pip install pymannkendall     # Mann-Kendall test (Liu 2022 entropy)
+pip install pdal              # optional: pipeline-based processing
+pip install open3d            # optional: 3D visualisation
+pip install scikit-learn      # optional: Isolation Forest
+```
+
+:::
+
+---
+
+::: {.callout-note}
+The previous post covers the [pre-processing pipeline](../lidar-preprocessing/index.qmd). The next post applies these metrics to real GEDI L2A and 3DEP data over NEON SCBI.
+:::

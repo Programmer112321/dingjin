@@ -1,0 +1,882 @@
+---
+title: "Pre-Processing Airborne LiDAR Data: lidR vs lasR vs Python"
+author: "Dingjin Chu"
+date: "2026-02-15"
+categories: [LiDAR Preprocess]
+description: "A complete LiDAR pre-processing pipeline shown in parallel across lidR, lasR, and Python (PDAL / laspy+scipy) — with pros/cons for every stage and in-depth comparisons of decimation and noise-removal strategies."
+---
+
+Airborne LiDAR point clouds are rarely analysis-ready out of the box. Raw tiles from 3DEP, NEON AOP, or proprietary acquisitions often carry noise, inconsistent densities across acquisition campaigns, and missing height normalization. This post documents a reproducible pipeline covering every stage from raw LAS/LAZ ingestion to a clean, normalized, decimated cloud — shown side by side in **lidR**, **lasR**, and **Python**.
+
+## Package Overview
+
+| | lidR | lasR | Python |
+|--|------|------|--------|
+| Processing model | Loads tiles as R `LAS` objects | Streaming C++ pipeline; tiles never enter R memory | **PDAL**: JSON streaming pipeline; **laspy + scipy**: loads tile as numpy arrays |
+| API style | Function calls on `LAS` / `LAScatalog` | Stage composition with `+`, run via `exec()` | PDAL: JSON config dict; laspy: OOP + numpy |
+| Speed | Moderate (R loop + C++ algorithms) | Fastest (fully multi-threaded C++) | PDAL ≈ lasR; laspy + scipy moderate |
+| Memory footprint | One chunk in RAM | Constant (streaming) | PDAL streaming; laspy loads full tile |
+| Interactivity | Best — easy mid-pipeline inspection | Poor — batch only | Good in Jupyter; harder to inspect PDAL mid-pipeline |
+| Ecosystem | R tidyverse, terra, sf | R only | NumPy, scikit-learn, Open3D, PyTorch, GDAL |
+| Best for | Exploration, small–medium datasets | Production, HPC, large catalogs | ML integration, custom algorithms, cross-platform |
+
+Python note: **PDAL** (`pip install pdal`) is the pipeline-based option — analogous to lasR. **laspy** (`pip install laspy[lazrs]`) + scipy is the object-based option — analogous to lidR. The examples below show whichever fits each stage best, with PDAL preferred for the full pipeline.
+
+::: {.callout-note}
+**Before processing:** run the [Pre-Flight Quality Check](../lidar-qc/index.qmd) to validate CRS consistency, point density, Z-range sanity, return structure, and classification state across the full catalog.
+:::
+
+---
+
+## Part 1: Pre-Processing Pipeline — Stage by Stage
+
+### Stage 1 — Input & Setup
+
+::: {.panel-tabset}
+
+## lidR
+
+```r
+library(lidR)
+
+ctg <- readLAScatalog("path/to/las_folder/")
+
+opt_filter(ctg)       <- "-drop_class 7 18"   # drop noise classes on read
+opt_chunk_buffer(ctg) <- 10                    # 10 m buffer for SOR edge safety
+opt_chunk_size(ctg)   <- 500                   # 500 × 500 m chunks
+
+plot(ctg, mapview = TRUE)   # visual tile overview
+summary(ctg)                # density, CRS, point count per tile
+```
+
+## lasR
+
+```r
+library(lasR)
+
+# No catalog object in lasR.
+# The folder path goes directly to exec().
+# Filter, buffer, and chunk size are exec() arguments.
+
+read_stage <- reader_las(filter = "-drop_class 7 18")
+```
+
+## Python
+
+```python
+import laspy
+import numpy as np
+from pathlib import Path
+import glob, json
+import pdal
+
+# ── laspy approach: list tiles manually ────────────────────────────
+laz_files = sorted(glob.glob("path/to/las_folder/*.laz"))
+
+# Quick density check on first tile
+with laspy.open(laz_files[0]) as f:
+    las   = f.read()
+    area  = (las.x.max() - las.x.min()) * (las.y.max() - las.y.min())
+    dens  = len(las.x) / area
+    print(f"Tile density: {dens:.1f} pts/m²")
+
+# ── PDAL approach: process folder via exec loop ────────────────────
+# (PDAL has no catalog object; tiles are iterated in Python)
+```
+
+:::
+
+::: {.callout-note collapse="true"}
+## Stage 1 — Pros & Cons
+
+| | lidR | lasR | Python |
+|-|------|------|--------|
+| **Pros** | `LAScatalog` gives per-tile density map and CRS check; `plot()` reveals coverage gaps instantly | No catalog boilerplate; folder path to `exec()` is all that is needed | Pure Python — no R dependency; `laspy` is lightweight; integrates with pathlib/glob for custom filtering |
+| **Cons** | Catalog scan reads all file headers — slow for thousands of tiles; buffer must be explicitly remembered | No visual tile overview; hard to spot corrupt or outlier-density tiles before the run | No built-in catalog with visual tile map; tile iteration and buffering must be coded manually; `laspy` loads the entire tile into memory |
+:::
+
+---
+
+### Stage 2 — Ground Classification (if missing)
+
+::: {.panel-tabset}
+
+## lidR
+
+```r
+has_ground <- function(las) any(las@data$Classification == LASGROUND)
+
+classify_ground_csf <- function(las) {
+  if (!has_ground(las))
+    las <- classify_ground(las, csf(sloop_smooth     = TRUE,
+                                    class_threshold  = 0.5,
+                                    cloth_resolution = 0.5,
+                                    time_step        = 0.65))
+  return(las)
+}
+
+opt_output_files(ctg) <- paste0(tempdir(), "/{*}_ground")
+ctg_ground <- catalog_apply(ctg, classify_ground_csf)
+```
+
+## lasR
+
+```r
+# lasR has no per-tile conditional — CSF runs on all tiles unconditionally.
+# Safe for 3DEP (re-classifying pre-labelled ground is harmless).
+
+ground_stage <- classify_ground(
+  csf(sloop_smooth     = TRUE,
+      class_threshold  = 0.5,
+      cloth_resolution = 0.5,
+      time_step        = 0.65)
+)
+```
+
+## Python
+
+```python
+# ── Option A: CSF Python package ──────────────────────────────────
+# pip install cloth-simulation-filter
+import CSF
+
+def classify_ground_csf(las):
+    """Return a boolean mask of ground points using CSF."""
+    pts = np.column_stack([las.x, las.y, las.z])
+
+    c = CSF.CSF()
+    c.params.bSloopSmooth    = True
+    c.params.cloth_resolution = 0.5
+    c.params.class_threshold  = 0.5
+    c.params.time_step        = 0.65
+
+    c.setPointCloud(pts.tolist())
+    ground_idx     = CSF.VecInt()
+    non_ground_idx = CSF.VecInt()
+    c.do_filtering(ground_idx, non_ground_idx)
+
+    mask = np.zeros(len(las.x), dtype=bool)
+    mask[list(ground_idx)] = True
+    return mask   # True = ground
+
+# Apply only if no Class 2 exists
+if not np.any(las.classification == 2):
+    ground_mask = classify_ground_csf(las)
+    las.classification[ground_mask] = 2
+
+# ── Option B: PDAL filters.csf (used in full pipeline below) ──────
+csf_stage = {
+    "type":       "filters.csf",
+    "smooth":     True,
+    "resolution": 0.5,
+    "threshold":  0.5
+}
+```
+
+:::
+
+::: {.callout-note collapse="true"}
+## Stage 2 — Pros & Cons
+
+| | lidR | lasR | Python |
+|-|------|------|--------|
+| **Pros** | Conditional `has_ground` skips CSF on pre-classified 3DEP tiles — saves time; can visualize ground on one tile interactively before batch-running | C++ CSF is the fastest of the three; seamlessly chained into the pipeline | `CSF` Python package mirrors the original C++ algorithm exactly; PDAL's `filters.csf` is equally fast; both integrate naturally into numpy workflows |
+| **Cons** | `catalog_apply()` with a custom function is verbose; R-level loop overhead | No conditional — CSF always runs even on pre-classified tiles | `CSF` package requires `tolist()` conversion (Python list, not numpy array); less maintained than lidR/lasR CSF implementations; PDAL JSON config is verbose |
+:::
+
+---
+
+### Stage 3 — Height Normalization
+
+::: {.panel-tabset}
+
+## lidR
+
+```r
+normalize_and_save <- function(las) {
+  dtm <- rasterize_terrain(las, res = 1, algorithm = knnidw(k = 10, p = 2))
+  las <- normalize_height(las, dtm)
+
+  # Save height as named extra-bytes attribute BEFORE restoring raw Z
+  las <- add_lasattribute(las, las@data$Z, "Height", "Height above ground (m)")
+  las <- unnormalize_height(las)   # Z → raw elevation; Height persists
+
+  las <- filter_poi(las, Height > -0.5 & Height < 80)
+  return(las)
+}
+
+opt_output_files(ctg) <- paste0(tempdir(), "/{*}_norm")
+ctg_norm <- catalog_apply(ctg_ground, normalize_and_save)
+```
+
+## lasR
+
+```r
+# normalize() builds DTM and subtracts it in one streaming pass.
+# Z is overwritten (normalized in place).
+
+norm_stage <- normalize(knnidw(k = 10, p = 2))
+
+# Height filter on the now-normalized Z
+filt_stage <- filter_poi(keep_z_above(-0.5) & keep_z_below(80))
+
+# To preserve raw Z alongside Height: run a first-pass stage to copy Z
+# into an extra-bytes attribute before normalization, then normalize.
+save_raw_z <- add_extrabytes("float", "RawZ", "Raw elevation (m a.s.l.)")
+```
+
+## Python
+
+```python
+from scipy.spatial import cKDTree
+
+def normalize_height(las, k=10, p=2):
+    """Build kNN-IDW DTM from ground points and compute height above ground."""
+    gnd = las.classification == 2
+    gx, gy, gz = las.x[gnd], las.y[gnd], las.z[gnd]
+
+    # k-NN inverse-distance weighted interpolation
+    tree   = cKDTree(np.column_stack([gx, gy]))
+    dists, idx = tree.query(np.column_stack([las.x, las.y]), k=k)
+    dists  = np.where(dists == 0, 1e-10, dists)   # avoid division by zero
+    w      = dists ** (-p)
+    ground_elev = (w * gz[idx]).sum(axis=1) / w.sum(axis=1)
+
+    height = las.z - ground_elev
+
+    # Save as extra-bytes attribute (preserves raw Z unchanged)
+    las.add_extra_dim(laspy.ExtraBytesParams(
+        name="Height", type=np.float32,
+        description="Height above ground (m)"))
+    las.Height = height.astype(np.float32)
+
+    # Filter artifacts
+    keep = (las.Height > -0.5) & (las.Height < 80)
+    return las[keep]
+
+# ── PDAL equivalent (used in full pipeline) ───────────────────────
+hag_stage = {
+    "type":  "filters.hag_nn",   # Height Above Ground via nearest neighbours
+    "count": 10
+}
+# PDAL stores result in HeightAboveGround dimension; raw Z is preserved.
+filt_stage_pdal = {
+    "type":   "filters.range",
+    "limits": "HeightAboveGround[-0.5:80]"
+}
+```
+
+:::
+
+::: {.callout-note collapse="true"}
+## Stage 3 — Pros & Cons
+
+| | lidR | lasR | Python |
+|-|------|------|--------|
+| **Pros** | `add_lasattribute()` + `unnormalize_height()` keeps both raw Z and Height in one pass — no second run needed; DTM inspectable as a raster | One-pass streaming — DTM is never materialised in full memory; fastest of the three | PDAL's `filters.hag_nn` is simple and preserves raw Z automatically; laspy + scipy gives full control over interpolation method and edge handling |
+| **Cons** | Full DTM raster materialised in R memory before normalization; slow for large dense tiles | Z is overwritten — recovering raw elevation needs a pre-pass to copy Z into extra bytes | scipy kNN IDW is ~3× slower than lidR's C++ implementation for dense tiles; tile-edge artefacts require manual buffering in the laspy approach |
+:::
+
+---
+
+### Stage 4 — Statistical Outlier Removal (SOR)
+
+::: {.panel-tabset}
+
+## lidR
+
+```r
+remove_noise_sor <- function(las) {
+  las <- classify_noise(las, sor(k = 15, m = 3))    # labels, does not remove
+  las <- filter_poi(las, Classification != LASNOISE) # then remove
+  return(las)
+}
+
+# Buffer already set on ctg (opt_chunk_buffer = 10)
+opt_output_files(ctg) <- paste0(tempdir(), "/{*}_clean")
+ctg_clean <- catalog_apply(ctg_norm, remove_noise_sor)
+```
+
+## lasR
+
+```r
+sor_stage <- classify_noise(sor(k = 15, m = 3))
+# buffer = 10 is passed to exec() — applies automatically to this stage
+```
+
+## Python
+
+```python
+def sor_filter(las, k=15, m=3, use_height=True):
+    """Statistical Outlier Removal on 3D point coordinates."""
+    z_col = las.Height if (use_height and hasattr(las, "Height")) else las.z
+    pts   = np.column_stack([las.x, las.y, z_col])
+
+    tree  = cKDTree(pts)
+    # Query k+1 (first result is the point itself, dist=0)
+    dists, _ = tree.query(pts, k=k + 1)
+    mean_dists = dists[:, 1:].mean(axis=1)   # exclude self
+
+    mu, sigma = mean_dists.mean(), mean_dists.std()
+    keep = mean_dists <= mu + m * sigma
+    return las[keep]
+
+las = sor_filter(las, k=15, m=3)
+
+# ── PDAL equivalent ────────────────────────────────────────────────
+sor_stage_pdal = {
+    "type":       "filters.outlier",
+    "method":     "statistical",
+    "mean_k":     15,
+    "multiplier": 3.0
+}
+```
+
+:::
+
+::: {.callout-note collapse="true"}
+## Stage 4 — Pros & Cons
+
+| | lidR | lasR | Python |
+|-|------|------|--------|
+| **Pros** | Two-step classify-then-remove: inspect flagged points before deletion; easy interactive parameter tuning on one tile | C++ kNN with multi-threading — 4–8× faster; buffer handled automatically in `exec()` | scipy `cKDTree` is compiled C++ — fast; easy to expose and inspect `mean_dists` array; integrates with custom filtering logic; PDAL stage is one-liner |
+| **Cons** | Pure R kNN is slow on dense tiles (> 50 pts/m²); tile-edge buffer must be set separately on the catalog | Cannot inspect flagged points mid-pipeline without a debug run | Manual tile-edge buffering required for laspy approach; PDAL black-boxes the flagged distances; laspy's kNN query loads full tile into RAM |
+
+$$\bar{d}_i = \frac{1}{k}\sum_{j \in \mathcal{N}_k(i)} \|p_i - p_j\| \quad \Rightarrow \text{flag if } \bar{d}_i > \mu + m\sigma$$
+
+| `k` | `m` | Setting |
+|-----|-----|---------|
+| 15 | 4–5 | Sparse terrain / open canopy |
+| 15 | 3 | Standard forest |
+| 8 | 2 | Dense urban / noisy sensor |
+:::
+
+---
+
+### Stage 5 — Voxel Decimation
+
+::: {.panel-tabset}
+
+## lidR
+
+```r
+decimate_catalog <- function(las, min_dens = 5) {
+  voxel_res <- min(1 / sqrt(min_dens), 1 / sqrt(5))
+  las <- decimate_points(las, voxel(voxel_res))
+  return(las)
+}
+
+opt_output_files(ctg) <- paste0(tempdir(), "/{*}_decim")
+ctg_final <- catalog_apply(ctg_clean, decimate_catalog)
+```
+
+## lasR
+
+```r
+voxel_res   <- 1 / sqrt(5)         # 0.447 m for 5 pts/m² floor
+decim_stage <- sampling_voxel(voxel_res)
+```
+
+## Python
+
+```python
+# ── Option A: numpy manual voxel grid (no extra dependency) ────────
+def voxel_decimate(las, res=0.447):
+    """Keep one random point per voxel cell."""
+    coords   = np.column_stack([las.x, las.y, las.z])
+    vox_idx  = np.floor(coords / res).astype(np.int64)
+
+    # Encode 3D index as a single integer key
+    key = (vox_idx[:, 0] * 1_000_000_007 +
+           vox_idx[:, 1] * 7_001 +
+           vox_idx[:, 2])
+    _, first = np.unique(key, return_index=True)
+    return las[np.sort(first)]
+
+las = voxel_decimate(las, res=1 / np.sqrt(5))
+
+# ── Option B: Open3D (preserves colours if present) ────────────────
+# pip install open3d
+import open3d as o3d
+
+pcd   = o3d.geometry.PointCloud()
+pcd.points = o3d.utility.Vector3dVector(
+    np.column_stack([las.x, las.y, las.z]))
+pcd_d = pcd.voxel_down_sample(voxel_size=1 / np.sqrt(5))
+# Note: attributes (Intensity, Height, etc.) are NOT carried over by Open3D
+
+# ── Option C: PDAL filters.voxelgrid ──────────────────────────────
+vox_res = 1 / np.sqrt(5)
+decim_stage_pdal = {
+    "type":   "filters.voxelgrid",
+    "leaf_x": vox_res,
+    "leaf_y": vox_res,
+    "leaf_z": vox_res
+}
+```
+
+:::
+
+::: {.callout-note collapse="true"}
+## Stage 5 — Pros & Cons
+
+| | lidR | lasR | Python |
+|-|------|------|--------|
+| **Pros** | Four decimation algorithms (voxel, random, homogenize, highest/lowest) easy to compare; result immediately accessible | `sampling_voxel()` in C++ — fastest; cleanly chained in the pipeline | Three options: numpy (no dependency), Open3D (fast, GPU-capable), PDAL (pipeline-integrated); numpy approach carries all attributes transparently |
+| **Cons** | R-level catalog_apply loop overhead; no GPU acceleration | Fewer algorithm options than lidR; no highest/lowest equivalent | Open3D **drops all non-XYZ attributes** (Intensity, Height, etc.) — not suitable when extra dimensions must be preserved; numpy approach may be slow for tiles > 100 M points |
+:::
+
+---
+
+## Complete Pipeline Summary
+
+::: {.panel-tabset}
+
+## lidR (full)
+
+```r
+library(lidR)
+
+ctg <- readLAScatalog("path/to/las_folder/")
+opt_filter(ctg)       <- "-drop_class 7 18"
+opt_chunk_buffer(ctg) <- 10
+opt_chunk_size(ctg)   <- 500
+opt_output_files(ctg) <- "output/{*}_clean.laz"
+
+full_pipeline <- function(las) {
+  # Stage 2: ground (if absent)
+  if (!any(las@data$Classification == LASGROUND))
+    las <- classify_ground(las, csf(sloop_smooth=TRUE, class_threshold=0.5,
+                                    cloth_resolution=0.5))
+  # Stage 3: normalize + preserve both Z and Height
+  dtm <- rasterize_terrain(las, res=1, algorithm=knnidw(k=10, p=2))
+  las <- normalize_height(las, dtm)
+  las <- add_lasattribute(las, las@data$Z, "Height", "Height above ground (m)")
+  las <- unnormalize_height(las)
+  las <- filter_poi(las, Height > -0.5 & Height < 80)
+  # Stage 4: SOR
+  las <- classify_noise(las, sor(k=15, m=3))
+  las <- filter_poi(las, Classification != LASNOISE)
+  # Stage 5: voxel decimation
+  las <- decimate_points(las, voxel(1/sqrt(5)))
+  return(las)
+}
+
+catalog_apply(ctg, full_pipeline)
+```
+
+## lasR (full)
+
+```r
+library(lasR)
+
+pipeline <-
+  reader_las(filter = "-drop_class 7 18")             +  # Stage 1
+  classify_ground(csf(sloop_smooth     = TRUE,            # Stage 2
+                      class_threshold  = 0.5,
+                      cloth_resolution = 0.5))        +
+  normalize(knnidw(k = 10, p = 2))                   +  # Stage 3
+  filter_poi(keep_z_above(-0.5) & keep_z_below(80))  +  # Stage 3 filter
+  classify_noise(sor(k = 15, m = 3))                 +  # Stage 4
+  sampling_voxel(1 / sqrt(5))                        +  # Stage 5
+  write_las(ofile = "output/*.laz")
+
+exec(pipeline,
+     on     = "path/to/las_folder/",
+     ncores = 4L,
+     chunk  = 500,
+     buffer = 10)
+```
+
+## Python / PDAL (full)
+
+```python
+import pdal, json, glob
+
+VEG_CLASSES = "Classification![7:7],Classification![18:18]"
+vox_res = 1 / (5 ** 0.5)   # 0.447 m ≈ 5 pts/m²
+
+def make_pipeline(infile, outfile):
+    return {
+        "pipeline": [
+            # Stage 1: read + class filter
+            {"type": "readers.las",
+             "filename": infile},
+            {"type": "filters.range",
+             "limits": VEG_CLASSES},
+
+            # Stage 2: ground classification (CSF)
+            {"type":       "filters.csf",
+             "smooth":     True,
+             "resolution": 0.5,
+             "threshold":  0.5},
+
+            # Stage 3: height normalization + height filter
+            {"type":  "filters.hag_nn",
+             "count": 10},
+            {"type":   "filters.range",
+             "limits": "HeightAboveGround[-0.5:80]"},
+
+            # Stage 4: SOR noise removal
+            {"type":       "filters.outlier",
+             "method":     "statistical",
+             "mean_k":     15,
+             "multiplier": 3.0},
+            {"type":   "filters.range",
+             "limits": "Classification![7:7]"},
+
+            # Stage 5: voxel decimation
+            {"type":   "filters.voxelgrid",
+             "leaf_x": vox_res,
+             "leaf_y": vox_res,
+             "leaf_z": vox_res},
+
+            # Write output
+            {"type":       "writers.las",
+             "filename":   outfile,
+             "extra_dims": "HeightAboveGround=float32"}
+        ]
+    }
+
+# Batch process all tiles
+for infile in sorted(glob.glob("path/to/las_folder/*.laz")):
+    outfile = infile.replace("las_folder", "output")
+    p = pdal.Pipeline(json.dumps(make_pipeline(infile, outfile)))
+    p.execute()
+    print(f"Processed {infile}: {p.metadata}")
+```
+
+:::
+
+::: {.callout-important}
+**When to choose which:**
+
+- **lidR** — exploring a new dataset, tuning parameters on one tile, needing `add_lasattribute()` to co-preserve raw Z and normalised Height in the same file.
+- **lasR** — production runs over large catalogs (> 50 GB), HPC environments, time-critical workflows. Expect 5–10× speedup over lidR.
+- **Python / PDAL** — workflows that feed into ML pipelines (scikit-learn, PyTorch), cross-platform environments without R, or when combining LiDAR with other Python geospatial tools (GDAL, Shapely, GeoPandas).
+:::
+
+---
+
+## Section 1 — Decimation Methods in Depth {#decimation}
+
+### 1.1 Random Thinning
+
+::: {.panel-tabset}
+
+## lidR
+```r
+las <- decimate_points(las, random(density = 10))
+```
+## lasR
+```r
+decim <- sampling_random(density = 10)
+```
+## Python
+```python
+# PDAL
+{"type": "filters.sample", "radius": 0.316}   # approx. 10 pts/m²
+
+# laspy + numpy (Bernoulli sampling)
+target_dens = 10
+current_dens = len(las.x) / ((las.x.max()-las.x.min())*(las.y.max()-las.y.min()))
+p = min(target_dens / current_dens, 1.0)
+keep = np.random.rand(len(las.x)) < p
+las  = las[keep]
+```
+:::
+
+Each point is independently retained with probability $p = d_{\text{target}}/d_{\text{local}}$. Spatially blind — dense clusters stay dense.
+
+**Strengths:** fastest; no discretisation artifacts; preserves attribute distributions.
+**Weaknesses:** no spatial uniformity; density gradients persist; result depends on random seed.
+
+---
+
+### 1.2 Voxel Thinning
+
+::: {.panel-tabset}
+
+## lidR
+```r
+las <- decimate_points(las, voxel(res = 0.45))
+```
+## lasR
+```r
+decim <- sampling_voxel(res = 0.45)
+```
+## Python
+```python
+# PDAL
+{"type": "filters.voxelgrid", "leaf_x": 0.45, "leaf_y": 0.45, "leaf_z": 0.45}
+
+# numpy (keeps all LAS attributes)
+def voxel_decimate(las, res=0.45):
+    key = (np.floor(las.x/res).astype(np.int64) * 1_000_000_007 +
+           np.floor(las.y/res).astype(np.int64) * 7_001 +
+           np.floor(las.z/res).astype(np.int64))
+    _, idx = np.unique(key, return_index=True)
+    return las[np.sort(idx)]
+```
+:::
+
+Divides 3D space into cubic voxels; retains one random point per occupied voxel.
+
+**Strengths:** 3D spatial uniformity; removes density gradients from scan-angle overlap; best for mixed 3DEP campaigns.
+**Weaknesses:** fine-scale vertical structure within a voxel may be lost; no direct pts/m² targeting.
+
+---
+
+### 1.3 Homogenize Thinning
+
+::: {.panel-tabset}
+
+## lidR
+```r
+las <- decimate_points(las, homogenize(density = 10, res = 5))
+```
+## lasR
+```r
+decim <- sampling_homogenize(density = 10, res = 5)
+```
+## Python
+```python
+# No direct PDAL equivalent — implement with numpy 2D grid
+def homogenize_decimate(las, target_density=10, cell_res=5):
+    xi = np.floor(las.x / cell_res).astype(int)
+    yi = np.floor(las.y / cell_res).astype(int)
+    keep = np.zeros(len(las.x), dtype=bool)
+    cell_area = cell_res ** 2
+    max_pts   = int(target_density * cell_area)
+    for (cx, cy), idx in _group_by(xi, yi):
+        chosen = np.random.choice(idx, min(len(idx), max_pts), replace=False)
+        keep[chosen] = True
+    return las[keep]
+
+def _group_by(xi, yi):
+    from itertools import groupby
+    pairs = sorted(zip(zip(xi, yi), np.arange(len(xi))), key=lambda x: x[0])
+    for key, group in groupby(pairs, key=lambda x: x[0]):
+        yield key, [g[1] for g in group]
+```
+:::
+
+2D cells randomly thinned to `density` pts/m²; cells below target are left untouched.
+
+**Strengths:** explicit pts/m² target; removes horizontal density gradients; preserves full vertical structure.
+**Weaknesses:** 3D vertical clustering can persist; Python implementation requires more code.
+
+---
+
+### 1.4 Highest / Lowest per Cell
+
+::: {.panel-tabset}
+
+## lidR
+```r
+las_high <- decimate_points(las, highest(res = 1))
+las_low  <- decimate_points(las, lowest(res = 1))
+```
+## lasR
+```r
+# No native equivalent in lasR at present.
+```
+## Python
+```python
+# numpy approach — preserves all LAS attributes
+def highest_point(las, res=1.0):
+    xi  = np.floor(las.x / res).astype(int)
+    yi  = np.floor(las.y / res).astype(int)
+    key = xi * 1_000_000_007 + yi
+    order = np.lexsort((las.z, key))
+    _, last_in_group = np.unique(key[order], return_index=True)
+    return las[order[last_in_group]]
+
+def lowest_point(las, res=1.0):
+    xi  = np.floor(las.x / res).astype(int)
+    yi  = np.floor(las.y / res).astype(int)
+    key = xi * 1_000_000_007 + yi
+    order = np.lexsort((-las.z, key))
+    _, first_in_group = np.unique(key[order], return_index=True)
+    return las[order[first_in_group]]
+```
+:::
+
+| Method | Retains | Application |
+|--------|---------|-------------|
+| `highest` | Top-of-canopy point per cell | Approximate CHM |
+| `lowest` | Near-ground point per cell | Bare-earth approximation |
+
+---
+
+### 1.5 Comparison Summary
+
+| Method | Uniform | Vertical | Density target | Speed | lidR | lasR | Python |
+|--------|---------|---------|---------------|-------|------|------|--------|
+| Random | None | Preserved | Approx. | ★★★★★ | ✓ | ✓ | ✓ |
+| Voxel | 3D | Partial | No | ★★★★☆ | ✓ | ✓ | ✓ |
+| Homogenize | 2D | Preserved | Yes | ★★★☆☆ | ✓ | ✓ | Manual |
+| Highest/Lowest | 2D | No | No | ★★★★☆ | ✓ | — | ✓ |
+
+---
+
+## Section 2 — Noise and Outlier Removal Methods {#removal}
+
+### 2.1 Class-Based Filtering
+
+::: {.panel-tabset}
+
+## lidR
+```r
+opt_filter(ctg) <- "-drop_class 7 18"
+```
+## lasR
+```r
+read_stage <- reader_las(filter = "-drop_class 7 18")
+```
+## Python
+```python
+# PDAL
+{"type": "filters.range", "limits": "Classification![7:7],Classification![18:18]"}
+
+# laspy + numpy
+keep = ~np.isin(las.classification, [7, 18])
+las  = las[keep]
+```
+:::
+
+| | lidR | lasR | Python |
+|-|------|------|--------|
+| **Pros** | Applied at catalog level — no per-tile code | Integrated into reader | laspy: one-line numpy boolean mask; PDAL: inline in pipeline |
+| **Cons** | Easy to forget to set before running | — | laspy requires file to be in memory first |
+
+---
+
+### 2.2 Height-Based Thresholding
+
+::: {.panel-tabset}
+
+## lidR
+```r
+las <- filter_poi(las, Height > -0.5 & Height < 80)
+```
+## lasR
+```r
+filter_poi(keep_z_above(-0.5) & keep_z_below(80))
+```
+## Python
+```python
+# PDAL (operates on HeightAboveGround dimension from filters.hag_nn)
+{"type": "filters.range", "limits": "HeightAboveGround[-0.5:80]"}
+
+# laspy + numpy
+keep = (las.Height > -0.5) & (las.Height < 80)
+las  = las[keep]
+```
+:::
+
+Fast, tunable, always complementary. Cannot detect isolated noise within the valid height range.
+
+---
+
+### 2.3 Statistical Outlier Removal (SOR)
+
+::: {.panel-tabset}
+
+## lidR
+```r
+las <- classify_noise(las, sor(k=15, m=3))
+las <- filter_poi(las, Classification != LASNOISE)
+```
+## lasR
+```r
+classify_noise(sor(k=15, m=3))   # buffer set in exec()
+```
+## Python
+```python
+# PDAL
+{"type": "filters.outlier", "method": "statistical", "mean_k": 15, "multiplier": 3.0}
+
+# laspy + scipy (full control, inspectable intermediate arrays)
+from scipy.spatial import cKDTree
+pts  = np.column_stack([las.x, las.y, las.z])
+tree = cKDTree(pts)
+d, _ = tree.query(pts, k=16)        # k+1 (includes self)
+md   = d[:, 1:].mean(axis=1)        # mean distance to 15 neighbours
+keep = md <= md.mean() + 3 * md.std()
+las  = las[keep]
+```
+:::
+
+| | lidR | lasR | Python |
+|-|------|------|--------|
+| **Pros** | Inspect flagged points before removal | C++ multi-threaded, 4–8× faster | laspy: `md` array fully inspectable; PDAL: one-line stage |
+| **Cons** | Slow R kNN; buffer must be set manually | Cannot inspect flagged points | laspy: full tile in memory; PDAL: buffer handled only if pipeline is aware of tile overlaps |
+
+---
+
+### 2.4 Isolation Forest (ML-Based)
+
+::: {.panel-tabset}
+
+## lidR
+```r
+# Via reticulate only
+library(reticulate)
+sklearn <- import("sklearn.ensemble")
+```
+## lasR
+```r
+# Not available in lasR
+```
+## Python
+```python
+# Native Python — no R bridge needed
+from sklearn.ensemble import IsolationForest
+import numpy as np
+
+features = np.column_stack([
+    las.x, las.y, las.z,
+    las.intensity,
+    las.return_number,
+    las.number_of_returns
+])
+
+iforest = IsolationForest(contamination=0.01, n_estimators=100, random_state=42)
+labels  = iforest.fit_predict(features)   # 1 = inlier, -1 = outlier
+las     = las[labels == 1]
+```
+:::
+
+Multi-attribute (intensity + return structure) — catches noise invisible to geometry-only SOR. Python is the natural home for this algorithm; lidR requires a Python bridge and lasR does not support it.
+
+| | lidR | lasR | Python |
+|-|------|------|--------|
+| **Pros** | Can call via `reticulate` | — | Native; integrates with sklearn pipeline; GPU-capable via `cuml` |
+| **Cons** | Requires R + Python bridge; complex setup | Not available | 100× slower than SOR; sensitive to feature scaling |
+
+---
+
+### 2.5 Removal Method Summary
+
+| Method | lidR | lasR | Python | Geometric | Attr-aware | Speed | Edge-safe |
+|--------|------|------|--------|-----------|-----------|-------|-----------|
+| Class filter | ✓ | ✓ | ✓ | — | — | ★★★★★ | ✓ |
+| Height threshold | ✓ | ✓ | ✓ | ✓ | — | ★★★★★ | ✓ |
+| SOR | ✓ | ✓ | ✓ | ✓ | — | ★★★☆☆ | Buffer |
+| Voxel IVR | Partial | — | Manual | ✓ | — | ★★★★☆ | ✓ |
+| Isolation Forest | Via Python | — | ✓ | ✓ | ✓ | ★☆☆☆☆ | Manual |
+
+::: {.callout-important}
+**Recommended stack for 3DEP data:**
+
+1. Class filter — always first (all three packages)
+2. Height threshold `(-0.5, 80 m)` — after normalization
+3. SOR `k=15, m=3`, buffer 10 m — after normalization, before decimation
+:::
+
+---
+
+::: {.callout-note}
+The next post applies these cleaned point clouds to extract canopy and building metrics: [LiDAR Metric Calculation](../lidar-metrics/index.qmd).
+:::

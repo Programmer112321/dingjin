@@ -1,0 +1,52 @@
+---
+title: "Causal Inference"
+toc: true
+toc-title: "Contents"
+toc-depth: 2
+---
+
+Causal inference provides a rigorous framework for identifying the *independent causal effect* of one variable on another — going beyond the correlational relationships that regression and machine learning describe. The foundational distinction is between association (*X* and *Y* covary) and causation (*X* produces *Y* when manipulated), formalized through two complementary traditions: the **potential outcomes framework** (Rubin, Neyman) and **structural causal models** (Pearl).
+
+---
+
+## Basic Mechanisms
+
+**Directed Acyclic Graphs (DAGs)** represent causal structures as graphs where nodes are variables and directed edges encode assumed causal directions. DAGs identify which variables must be conditioned on (confounders) or must *not* be conditioned on (mediators, colliders) to estimate an unconfounded causal effect — a process called **backdoor adjustment**. **Pearl's do-calculus** formalizes interventional distributions P(Y | do(X)), distinguishing observational conditioning from hypothetical manipulation.
+
+**Instrumental Variables (IV)** identify causal effects when unmeasured confounders exist, by leveraging a third variable (the instrument) that affects the treatment but influences the outcome only through the treatment pathway. **Difference-in-Differences (DiD)** compares changes over time between treated and control groups, removing time-invariant confounding under a parallel-trends assumption. **Propensity Score Matching** reweights or matches observational units to mimic a randomized experiment. **Granger Causality** tests whether past values of *X* improve forecasts of *Y* beyond *Y*'s own history in time series. **Convergent Cross Mapping (CCM)** detects causal coupling in nonlinear dynamical systems using the attractor manifold structure of time-series embeddings — particularly suited to ecological systems exhibiting chaotic dynamics.
+
+---
+
+## Advantages
+
+- **Identifies mechanisms, not just associations** — enables attribution of ecosystem responses to specific environmental drivers
+- **Handles confounding explicitly** — DAG-based analysis identifies and adjusts for confounders that bias observational regression
+- **Applicable to observational data** — no experiment needed when design choices (IV, DiD, natural experiments) are available
+- **Quantifies counterfactual scenarios** — answers "what would NPP have been without this extreme event?" — essential for climate impact attribution
+- **Connects to policy** — causal estimates of disturbance effects support management decisions (e.g., effect of fire suppression on forest carbon)
+- **Integrates with ML** — causal ML (double ML, causal forests) combines the flexibility of machine learning with the rigor of causal identification
+
+---
+
+## Disadvantages
+
+- **Strong untestable assumptions** — causal identification requires assumptions (no unmeasured confounding, instrument validity, parallel trends) that cannot be fully verified from data
+- **Weak instruments** — IV estimates become unreliable when the instrument is weakly correlated with the treatment, inflating standard errors
+- **Complex ecological systems** — ecosystems involve bidirectional feedbacks, lagged responses, and non-stationarity that challenge standard causal frameworks
+- **Limited to identified effects** — DAG-based inference requires specifying the full causal graph, which may be uncertain or contested
+- **Granger causality is not true causality** — predictive improvement in time series does not guarantee mechanistic causation; spurious Granger relationships arise from shared drivers
+- **Data requirements** — DiD requires long pre-treatment baselines; CCM requires long time series to reconstruct attractor manifolds
+
+---
+
+## Applications in Ecosystem Research
+
+- **Climate–NPP attribution** — isolating the causal effect of compound dry–hot events on NPP variability from confounding trends in CO₂ fertilization and land use change
+- **Disturbance impact estimation** — causal effect of bark beetle outbreaks on forest carbon stocks using IV or DiD with spatially varying infestation spread
+- **Urban cooling attribution** — separating the causal effect of canopy cover from correlated socioeconomic and land use variables on urban heat islands
+- **Fire–vegetation feedbacks** — CCM to detect bidirectional causal coupling between fire frequency and vegetation greenness in savanna systems
+- **Remote sensing–based attribution** — double ML combining satellite time series with meteorological drivers to causally attribute land surface temperature trends
+
+::: {.callout-note}
+Return to [Machine Learning](methods_ml.qmd) or continue to [Process-Based Models](methods_process.qmd).
+:::

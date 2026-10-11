@@ -1,0 +1,9 @@
+---
+title: "Welcome to My Blog"
+date: "2026-01-18"
+categories: [general]
+---
+
+This is the first post on my blog. I will use this space to share thoughts on remote sensing, LiDAR analysis, forest ecology, and my research journey as a PhD student at Oklahoma State University.
+
+Stay tuned for updates on ongoing projects, field work, and data science tips.

@@ -1,0 +1,194 @@
+---
+title: "Upscaling LiDAR: From Airborne to Spaceborne"
+toc: true
+toc-title: "Contents"
+toc-depth: 2
+---
+
+> *How do we bridge the gap between the centimeter-scale precision of airborne and drone LiDAR and the global but sparse footprints of spaceborne GEDI?*
+
+---
+
+## 1 · The Scaling Problem
+
+LiDAR-based forest monitoring operates across a fundamental scale hierarchy that spans five orders of magnitude in spatial extent — from individual tree crowns measured by terrestrial laser scanning (TLS) at sub-centimeter resolution, to wall-to-wall continental coverage of 3DEP airborne LiDAR at ~1–10 pts/m², to the 25 m circular footprints of GEDI spaced ~600 m apart across the global tropics and temperate zone. Each tier of this hierarchy captures different aspects of forest structure, and no single platform can simultaneously deliver the spatial density, coverage extent, and temporal frequency required for global carbon accounting.
+
+The core challenge of **LiDAR upscaling** is to propagate structural information measured precisely at small scales — tree height, crown volume, canopy density, gap fraction — to the regional and global scales where forest carbon policy operates, while preserving the accuracy inherited from the high-fidelity source data.
+
+---
+
+## 2 · Data Hierarchy and Scale Characteristics
+
+| Platform | Footprint / density | Coverage | Temporal | Key metric |
+|---|---|---|---|---|
+| **TLS / Drone** | 0.5–5 cm | < 1 ha | Campaign | Branch, stem, crown |
+| **Airborne ALS (3DEP, NEON)** | 1–20 pts/m² | Local to national | Periodic | CHM, height pct., density |
+| **GEDI** | 25 m footprint, ~600 m spacing | ±51.6° global | 2019–present | RH metrics, AGBD |
+| **ICESat-2 (ATL08)** | ~100 m segment | Global (±88°) | 91-day repeat | Canopy height, ground |
+
+The spatial mismatch is severe: a single 3DEP ALS tile at 1 pt/m² over a 1 km² area contains ~1,000,000 returns; GEDI provides roughly 3–5 footprints across the same area, each a 25 m circle. The information density ratio is approximately **10,000:1**. Upscaling is therefore fundamentally a **statistical inference** problem — how to learn from the dense but spatially limited ALS record and extrapolate to the globally sparse but spatially extensive GEDI sampling.
+
+---
+
+## 3 · GEDI Waveform Simulation from ALS
+
+Before upscaling can proceed, the two sensor types must be placed on a common footing. The **GEDI Simulator** (Hancock et al., 2019) allows full-waveform GEDI returns to be synthesized from existing ALS point clouds by convolving the 3D point distribution within a simulated 25 m footprint with the instrument's Gaussian pulse, noise model, and detection threshold. This produces simulated GEDI waveforms and derived RH metrics (RH25, RH50, RH75, RH95, RH98, RH100) from ALS data, enabling direct metric-to-metric comparison at the same location.
+
+**Key applications of GEDI simulation from 3DEP / NEON ALS:**
+
+- **Calibration:** Simulated GEDI metrics from ALS are compared to real GEDI acquisitions at co-located footprints to assess bias introduced by GEDI's noise model, sensitivity threshold, and tandem-beam geometry. Studies consistently find that GEDI RH98 overestimates maximum canopy height by 1–3 m in closed-canopy boreal forests due to noise-induced apparent ground returns above the true canopy (Hofton et al., 2020).
+- **Allometric calibration transfer:** ALS-based AGB allometries (calibrated against field plots) can be transferred to GEDI metrics by expressing the allometry in terms of simulated RH metrics, rather than refitting with sparse GEDI footprint–plot pairs.
+- **Filling GEDI gaps:** Cloud cover and topographic shadowing create systematic gaps in GEDI coverage. ALS simulation allows gap-filling in areas with existing airborne coverage.
+
+**Foundational papers:**
+- Blair & Hofton (1999) — original large-footprint waveform simulation framework
+- Hancock et al. (2019) — GEDI Simulator release; benchmark against 3DEP over Pacific Northwest
+- Hofton et al. (2020) — GEDI calibration using airborne waveform LiDAR
+
+---
+
+## 4 · Methodological Frameworks for Upscaling
+
+### 4.1 Area-Based Approach Extended to GEDI
+
+The **Area-Based Approach (ABA)** is the standard methodology for ALS-based forest inventory: field plots provide ground-truth AGB or basal area, ALS-derived metrics (height percentiles, canopy cover, density indices) extracted over plot footprints serve as predictors, and a regression or machine learning model is trained and applied wall-to-wall. The ABA was developed for small-area operational forest inventory and typically achieves RMSE of 15–35 Mg ha⁻¹ for AGB depending on forest type.
+
+Extending ABA to GEDI involves two stages:
+1. **ALS → field calibration:** Train an ALS-based AGB model using plot data
+2. **ALS → GEDI transfer:** Express ALS-derived AGB predictions as a function of GEDI RH metrics within simulated footprints, yielding a GEDI-native allometric model
+
+This two-step transfer is used in the **GEDI L4A algorithm** (Duncanson et al., 2022), which employs 10 continent- and biome-specific models relating GEDI RH metrics to AGB, each calibrated using ALS-derived AGB estimates from co-located field-validated airborne surveys. The 3DEP program has contributed substantially to L4A calibration datasets across the contiguous United States.
+
+---
+
+### 4.2 GEDI as Training Labels for Wall-to-Wall Fusion
+
+The most widely adopted upscaling pathway for global applications uses GEDI footprint-level estimates as **sparse but globally representative training labels**, fused with wall-to-wall optical or SAR imagery to predict at unseen locations. This approach shifts the core problem from LiDAR data fusion to machine learning generalization.
+
+**Canonical workflows:**
+
+**Canopy height (Lang et al., 2022 — ETH/Meta):**
+GEDI L2A RH98 canopy height → training labels; Sentinel-2 spectral-temporal metrics → features; a global CNN (SegFormer-based) trained on ~1 billion pixels predicts 10 m canopy height wall-to-wall. Validated against NEON ALS and 3DEP tiles; global RMSE ~2.8 m.
+
+**Canopy height (Potapov et al., 2021 — NASA/UMD):**
+GEDI L2A canopy height + Landsat 8 OLI annual composites → gradient boosting regression tree → 30 m global canopy height. Explicitly uses 3DEP-derived ALS metrics as independent validation across the CONUS.
+
+**Forest AGB (Wang et al., 2022):**
+GEDI L4A footprint AGB → training; Landsat + Sentinel-1 SAR + Sentinel-2 + SRTM topography → features; deep learning (CNN + XGBoost ensemble) → 30 m global AGB. Achieves rRMSE ~30–45% globally; higher error in tropical dense-canopy forests.
+
+**Key design choices that affect upscaling accuracy:**
+- **Temporal matching:** ALS and GEDI data must be from the same or nearby years to avoid change-induced mismatch; 3DEP tiles from 2012–2019 may predate GEDI (2019–present) by up to 7 years in fast-changing forests
+- **Feature space coverage:** The optical/SAR feature space of training GEDI footprints must cover the full range of the prediction domain; tropical forests with high AGB but few GEDI samples are systematically underrepresented
+- **Saturation:** Both GEDI RH metrics and SAR backscatter saturate above ~150–200 Mg ha⁻¹ AGB — a fundamental ceiling on prediction accuracy in high-biomass forests
+
+---
+
+### 4.3 Hierarchical / Multi-Scale Fusion
+
+A more rigorous framework treats the upscaling as a **hierarchical geostatistical problem**, explicitly modeling the spatial covariance structure at each scale. The GEDI L4B gridded product uses a **Hybrid Model-Based Geostatistical (HMB)** estimator (Saarela et al., 2018) that:
+
+1. Predicts AGB at each GEDI L4A footprint using the biome-specific allometric model
+2. Fits a geostatistical model (variogram) to the spatial correlation of L4A residuals
+3. Uses kriging to interpolate predictions to a 1 km grid with explicit uncertainty propagation
+
+This framework rigorously propagates uncertainty from the allometric model through the spatial interpolation, producing per-pixel standard errors alongside the mean AGBD estimate. 3DEP-derived ALS data from the CONUS contribute to the empirical variogram estimation and out-of-sample validation.
+
+---
+
+### 4.4 Transfer Learning and Domain Adaptation
+
+A critical challenge in upscaling is **geographic extrapolation**: a model trained on GEDI footprints in temperate US forests (well-covered by 3DEP) must predict accurately in tropical forests, boreal zones, or arid woodlands with different structure–spectral relationships. Standard random forest and XGBoost models degrade substantially when applied outside their training domain.
+
+Emerging approaches:
+
+- **Domain-adversarial training:** Forces the feature extractor to learn representations invariant to geographic domain (source = 3DEP/NEON-rich regions; target = tropical regions with only GEDI and optical data), improving cross-domain AGB transfer (Dalponte et al., 2020; Wang et al., 2022)
+- **Self-supervised pre-training on optical imagery:** Pre-train a large vision model on global Sentinel-2/Landsat imagery without labels (SatMAE, SeCo), then fine-tune with GEDI labels — improves generalization to unseen biomes
+- **Physics-informed constraints:** Add loss penalties that enforce known relationships (AGB increases monotonically with canopy height within PFT) to prevent physically implausible predictions in novel environments
+
+---
+
+## 5 · USGS 3DEP as the Upscaling Bridge
+
+The **USGS 3D Elevation Program (3DEP)** occupies a uniquely important position in the ALS-to-GEDI upscaling chain for North American applications. As of FY2025, 3DEP has achieved ~90% CONUS coverage at Quality Level 2 (QL2, ≥2 pts/m²) or better, making it the largest contiguous ALS dataset available anywhere.
+
+**Specific contributions of 3DEP to GEDI upscaling:**
+
+| Role | Mechanism |
+|------|-----------|
+| **GEDI L4A calibration** | 3DEP-derived AGB estimates used as calibration targets in temperate US biomes |
+| **GEDI waveform validation** | Simulated GEDI waveforms from 3DEP compared to real GEDI acquisitions |
+| **Vertical accuracy assessment** | 3DEP DTM used to assess GEDI ground elevation errors in sloped terrain |
+| **Gap-filling** | 3DEP fills GEDI gaps in high-latitude CONUS (>51.6°N not covered by GEDI) |
+| **Temporal change detection** | Multi-year 3DEP acquisitions detect post-disturbance height change independent of GEDI |
+| **Training data for ML models** | 3DEP tiles provide dense labeled AGB/height data for supervised learning |
+
+**Spatial coverage progression:** The animated 3DEP coverage map (FY2013–FY2025) shows steady annual expansion, with priority given to wildfire-prone western states (California, Oregon, Washington) and flood-prone river corridors. By FY2025, 3DEP provides the most comprehensive single-nation ALS archive ever assembled.
+
+**Resolution hierarchy within 3DEP:**
+- **QL0** — experimental, >8 pts/m² (urban, engineering)
+- **QL1** — ≥8 pts/m², ≤12.5 cm vertical RMSE (precision mapping)
+- **QL2** — ≥2 pts/m², ≤10 cm vertical RMSE (**national standard**)
+- **QL3** — ≥0.5 pts/m², ≤20 cm vertical RMSE (legacy coverage)
+
+For upscaling to GEDI, QL2 and above provide sufficient density to reliably simulate GEDI waveforms and estimate canopy height percentiles at 25 m footprint scale.
+
+---
+
+## 6 · Key Challenges
+
+### 6.1 Sensor Physics Mismatch
+GEDI uses a **full-waveform** Gaussian beam with a 25 m diameter and ~6 ns pulse width, recording the continuous distribution of energy returns with height. ALS systems typically record **discrete returns** (first, last, or multiple) from a narrow beam (0.1–0.3 m footprint). Converting ALS discrete returns to simulate GEDI waveforms requires careful modeling of the beam divergence, multiple scattering, and noise floor — errors in this simulation propagate directly into calibration offsets.
+
+### 6.2 Saturation in Dense Canopy
+Both ALS-derived canopy height metrics and GEDI RH metrics show **saturation** at high AGB values (typically >150 Mg ha⁻¹ in tropical forests, >200 Mg ha⁻¹ in temperate conifers). This is because the LiDAR signal is dominated by the uppermost canopy layer, with little sensitivity to biomass accumulated in lower strata or large trunk volumes. Saturation introduces systematic underestimation of AGB in the most carbon-rich forests — precisely those of greatest interest for climate policy.
+
+Mitigations: L-band SAR backscatter (ALOS PALSAR) remains sensitive at higher AGB; combining GEDI RH metrics with SAR reduces saturation bias. The forthcoming **ESA BIOMASS** P-band SAR mission is specifically designed to overcome saturation up to ~500 Mg ha⁻¹.
+
+### 6.3 Temporal Mismatch
+3DEP ALS acquisitions occurred over 2012–2025; GEDI operates 2019–present. In areas with active forest management, fire disturbance, or insect-induced mortality, structural changes between the ALS acquisition and the GEDI overpass can introduce calibration errors. Temporal correction using Landsat/Sentinel-based disturbance maps (LandTrendr, LCMS) is an active area of development.
+
+### 6.4 Slope and Terrain Effects
+GEDI footprint returns on steep slopes appear shifted in height because the circular footprint intercepts ground at multiple elevations. This introduces apparent height errors that can exceed 5 m on slopes >25°, substantially degrading canopy height retrieval in mountainous terrain. Slope correction algorithms exist (Tang & Armston, 2019) but require accurate DTMs — which 3DEP can provide.
+
+### 6.5 Cloud Cover Gaps
+GEDI accumulates coverage over multiple orbital passes, but persistent cloud cover in tropical regions (Amazon, Congo, Southeast Asia) creates systematic acquisition gaps in the very forests that matter most for global carbon accounting. ALS-based upscaling provides an independent path to wall-to-wall mapping in cloud-affected regions.
+
+---
+
+## 7 · Emerging Directions
+
+**Multi-mission fusion:** Combining GEDI (25 m waveform, ±51.6°) with ICESat-2 ATL08 (global, ±88°, photon-counting) extends LiDAR-based canopy height estimation to boreal and Arctic forests beyond GEDI's orbital limit. ICESat-2 and GEDI overlapped in 2019–2023, enabling cross-calibration studies.
+
+**GEDI continuity and GEDI-II:** The original GEDI mission is planned for decommissioning; GEDI-II (under development) would extend the orbital inclination and improve coverage. Meanwhile, commercial spaceborne LiDAR platforms (e.g., Planet's forest carbon products) are beginning to fill gaps.
+
+**Foundation models for forest structure:** Large pre-trained vision transformers trained on multi-source remote sensing data (imagery + LiDAR + SAR) are emerging as universal upscaling engines — a single model can be fine-tuned for canopy height, AGB, or species composition with minimal additional labeled data.
+
+**Drone LiDAR as calibration nodes:** UAS-LiDAR systems (DJI Zenmuse L1/L2, Riegl miniVUX) are increasingly used to acquire plot-level 3D point clouds at <5 cm resolution, bridging the gap between TLS (sub-centimeter, single tree) and ALS (plot to regional). Drone acquisitions co-located with GEDI footprints provide the highest-quality calibration data possible — capturing complete 3D crown structure within the exact 25 m footprint geometry.
+
+---
+
+## 8 · Summary
+
+The upscaling chain from drone/ALS LiDAR to GEDI represents one of the most active frontiers in forest carbon monitoring. The canonical pathway — **field plots → ALS calibration → GEDI allometry → optical/SAR fusion → wall-to-wall map** — has produced the first generation of globally consistent, meter-scale canopy height and biomass products. 3DEP's continental ALS coverage is the backbone of this chain in North America, providing both the calibration data for GEDI allometries and the independent validation benchmark for global products.
+
+Outstanding challenges — sensor physics mismatch, saturation, temporal inconsistency, and geographic extrapolation — are being addressed through waveform simulation, multi-source fusion, and domain-adaptive machine learning. The next decade, with NISAR (L+S band SAR), BIOMASS (P-band SAR), and potential GEDI continuity missions, promises to resolve the saturation problem and extend LiDAR-based biomass monitoring to the full global forest carbon stock.
+
+---
+
+**Key References**
+
+- Blair, J.B. & Hofton, M.A. (1999). Modeling laser altimeter return waveforms over complex vegetation using high-resolution elevation data. *Geophysical Research Letters*, 26(16), 2509–2512.
+- Duncanson, L. et al. (2022). Aboveground biomass density models for NASA's Global Ecosystem Dynamics Investigation (GEDI) lidar mission. *Remote Sensing of Environment*, 270, 112845.
+- Hancock, S. et al. (2019). The GEDI Simulator: A large-footprint waveform lidar simulator for calibration and validation of spaceborne missions. *Earth and Space Science*, 6(2), 294–310.
+- Hofton, M. et al. (2020). Decomposition of Global Forest Heights with full-waveform LiDAR. *AGU Advances*.
+- Lang, N. et al. (2022). A high-resolution canopy height model of the Earth. *Nature Ecology & Evolution*, 7, 1778–1789.
+- Marselis, S.M. et al. (2020). Evaluating the potential of full-waveform lidar for mapping pan-tropical tree height. *Remote Sensing of Environment*, 239, 111588.
+- Patterson, P.L. et al. (2019). Statistical properties of hybrid estimators proposed for GEDI—NASA's global ecosystem dynamics investigation. *Environmental Research Letters*, 14(6), 065007.
+- Potapov, P. et al. (2021). Mapping global forest canopy height through integration of GEDI and Landsat data. *Remote Sensing of Environment*, 253, 112165.
+- Saarela, S. et al. (2018). Model-assisted estimation of growing stock volume using different combinations of LiDAR and Landsat data as auxiliary information. *Remote Sensing of Environment*, 203, 224–236.
+- Tang, H. & Armston, J. (2019). Algorithm Theoretical Basis Document (ATBD) for GEDI L2B Canopy Cover and Vertical Profile Metrics. NASA GSFC.
+- Wang, Y. et al. (2022). A global map of forest canopy height derived from ICESat/GEDI. *Remote Sensing of Environment*.
+
+::: {.callout-note}
+Return to [Research Introduction](projects_intro.qmd) or explore [LiDAR Datasets](datasets_lidar.qmd).
+:::

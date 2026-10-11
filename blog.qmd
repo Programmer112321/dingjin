@@ -1,0 +1,38 @@
+---
+title: "Blog"
+listing:
+  contents: posts
+  sort: "date desc"
+  type: default
+  categories: true
+  feed: true
+toc: true
+toc-title: "Posts"
+toc-depth: 2
+---
+
+## Posts {#posts style="display:none"}
+
+```{=html}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var items = [];
+  document.querySelectorAll('div.quarto-post').forEach(function (post) {
+    var h3   = post.querySelector('h3.listing-title');
+    var link = post.querySelector('a.title-link');
+    if (h3 && link) {
+      items.push({ title: h3.textContent.trim(), url: link.getAttribute('href') });
+    }
+  });
+  if (!items.length) return;
+
+  var tocUl = document.querySelector('#TOC ul');
+  if (!tocUl) return;
+  tocUl.innerHTML = items.map(function (p) {
+    return '<li class="nav-item toc-entry toc-h2">' +
+           '<a class="nav-link" href="' + p.url + '">' + p.title + '</a>' +
+           '</li>';
+  }).join('');
+});
+</script>
+```

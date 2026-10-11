@@ -1,0 +1,118 @@
+---
+title: "Field Investigation Datasets"
+toc: true
+toc-title: "Contents"
+toc-depth: 2
+---
+
+Ground-based forest inventory datasets used for model validation, allometric calibration, and ecological analysis.
+
+::: {style="display:flex; flex-wrap:wrap; gap:0.5rem; margin:1rem 0 1.5rem 0; padding:0.85rem 1rem; background:rgba(0,0,0,0.03); border-radius:8px;"}
+[FIA](#fia){.btn .btn-outline-secondary .btn-sm}
+[NEON](#neon){.btn .btn-outline-secondary .btn-sm}
+[GBIF](#gbif){.btn .btn-outline-secondary .btn-sm}
+[TRY](#try){.btn .btn-outline-secondary .btn-sm}
+[CTFS-ForestGEO](#ctfs){.btn .btn-outline-secondary .btn-sm}
+[FLUXNET](#fluxnet){.btn .btn-outline-secondary .btn-sm}
+:::
+
+---
+
+## FIA — Forest Inventory and Analysis {#fia}
+
+The **USDA Forest Service Forest Inventory and Analysis (FIA)** program is the nation's continuous forest census. FIA plots are systematically distributed across all forested land in the United States and remeasured on a roughly 5–10 year cycle. Each plot records tree species, diameter at breast height (DBH), height, crown class, and site conditions, providing a statistically representative sample of forest composition and structure at national, regional, and state scales.
+
+**Source:** USDA Forest Service FIA Program
+**Coverage:** Contiguous United States, Alaska, Hawaii, and Pacific Islands
+**Key variables:** Species, DBH, tree height, basal area, biomass estimates, forest type, ownership
+
+::: {.callout-note}
+FIA data are freely available through the [FIA DataMart](https://apps.fs.usda.gov/fia/datamart/).
+:::
+
+---
+
+## NEON — National Ecological Observatory Network {#neon}
+
+The **NEON Terrestrial Observation System** collects standardized, long-term ecological data across 81 field sites spanning major climate and vegetation domains in the United States. Vegetation structure data include woody plant cover and height surveys, distributed plot stem maps, and individual tree measurements, designed to align directly with NEON's airborne LiDAR collections for multi-scale validation.
+
+**Source:** National Ecological Observatory Network
+**Coverage:** 81 sites across 20 eco-climatic domains in the U.S.
+**Key variables:** Woody plant percent cover, plant height, stem diameter, species identity, plant phenology
+
+::: {.callout-note}
+NEON field data are freely available through the [NEON Data Portal](https://data.neonscience.org).
+:::
+
+---
+
+## GBIF — Global Biodiversity Information Facility {#gbif}
+
+**GBIF** is the world's largest open-access aggregator of species occurrence records, mobilizing observation data from museums, herbaria, citizen science platforms (e.g., iNaturalist), government surveys, and research expeditions into a single freely searchable database. With over 2.5 billion georeferenced occurrence records spanning plants, animals, fungi, and microbes, it is the primary global resource for macroecological and biogeographic analysis.
+
+**Operator:** GBIF Secretariat (Copenhagen, Denmark) — international intergovernmental organization
+**Coverage:** Global; ~2.5 billion occurrence records from >70,000 datasets and 1,900 institutions
+**Key variables:** Species name (with taxonomic backbone harmonization), geographic coordinates (lat/lon), date, observation type (specimen, human observation, machine observation), data quality flags
+**Temporal range:** Historical records from 1600s to present; density increases sharply from ~2000 onward with citizen science growth
+**Key applications:** Species distribution modeling (SDM), climate–biodiversity relationships, phenology trend analysis, invasive species tracking, biodiversity–ecosystem function studies
+
+::: {.callout-note}
+GBIF data are freely available through [GBIF.org](https://www.gbif.org) with a DOI-citable download system. R users can access data programmatically via the `rgbif` package.
+:::
+
+---
+
+## TRY — Plant Trait Database {#try}
+
+**TRY** is a global database of plant functional traits, assembling standardized measurements of morphological, physiological, and biochemical plant characteristics from field campaigns and published literature worldwide. It is the primary reference database for understanding how plant strategies vary across species, biomes, and environmental gradients — essential for parameterizing global vegetation models and linking remote sensing observations to plant function.
+
+**Operated by:** Max Planck Institute for Biogeochemistry (Jena, Germany); supported by the iDiv German Centre for Integrative Biodiversity Research
+**Coverage:** >280,000 plant taxa; >16 million trait measurements; global coverage across all major biomes
+**Key traits available:** Specific leaf area (SLA), leaf nitrogen and phosphorus content, wood density, plant height, leaf dry matter content, photosynthetic capacity (Vcmax), seed mass, root morphology, hydraulic traits
+**Key applications:** Global vegetation model parameterization, trait-based ecology, remote sensing of plant functional types, climate sensitivity analysis, global carbon cycle modeling
+
+::: {.callout-tip}
+TRY is widely used to calibrate the relationships between spectral remote sensing (e.g., hyperspectral leaf traits) and measured plant functional properties — bridging remote observations to mechanistic vegetation models.
+:::
+
+::: {.callout-note}
+TRY data are freely available (registration required) at [TRY Plant Trait Database](https://www.try-db.org). The R package `rtry` supports structured data download and formatting.
+:::
+
+---
+
+## CTFS-ForestGEO — Global Forest Dynamics Plots {#ctfs}
+
+**CTFS-ForestGEO** (Center for Tropical Forest Science – Forest Global Earth Observatory) is a global network of long-term forest dynamics research plots. Each plot is large (typically 25–52 ha), in which every woody stem ≥1 cm DBH is tagged, mapped, measured, and identified to species on a ~5-year resurvey cycle. The network spans tropical, subtropical, and temperate forests, providing some of the most detailed long-term records of forest demographic processes available anywhere.
+
+**Operator:** Smithsonian Tropical Research Institute (STRI) in partnership with global institutions
+**Coverage:** 75+ plots across 27 countries; sites in tropical America, Africa, Asia, and temperate North America and Europe
+**Plot size:** Typically 25–52 ha per site (~1 ha to 60 ha range)
+**Key variables:** Species identity, stem diameter (DBH), spatial coordinates within plot, growth rates, mortality, recruitment, canopy position, wood density
+**Temporal range:** Many plots have >20 years of census data; some exceed 40 years
+**Key applications:** Forest carbon dynamics and turnover, tropical forest biomass, biodiversity–productivity relationships, climate sensitivity of tree growth, validation of remote sensing biomass products
+
+::: {.callout-note}
+CTFS-ForestGEO data are available (data request required) through the [ForestGEO data portal](https://forestgeo.si.edu/explore-data).
+:::
+
+---
+
+## FLUXNET — Global Eddy Covariance Network {#fluxnet}
+
+**FLUXNET** is a global network of micrometeorological measurement towers that use the eddy covariance technique to continuously monitor the exchange of carbon dioxide, water vapor, and energy between ecosystems and the atmosphere. Tower data provide continuous, multi-year records of ecosystem-scale carbon uptake (GPP), ecosystem respiration, net ecosystem exchange (NEE), and evapotranspiration — the ground truth for calibrating and validating remote sensing products of carbon flux and surface energy balance.
+
+**Operator:** Distributed global network coordinated by Lawrence Berkeley National Laboratory (LBNL); regional networks include AmeriFlux, ICOS (Europe), AsiaFlux, OzFlux, and others
+**Coverage:** >900 registered sites globally; ~400+ sites with data available in FLUXNET2015 data release
+**Key variables:** Net Ecosystem Exchange (NEE), Gross Primary Production (GPP), Ecosystem Respiration (Reco), Latent Heat (LE), Sensible Heat (H), meteorological drivers (air temperature, VPD, precipitation, radiation)
+**Temporal resolution:** Half-hourly raw data; daily, monthly, and annual aggregations available
+**Temporal range:** Many sites have 5–20+ year records; network-wide data release (FLUXNET2015) covers up to 2014; AmeriFlux and ICOS provide more recent data
+**Key applications:** Calibrating satellite GPP products (MODIS MOD17, GOSIF, TROPOMI SIF), validating GEDI and ICESat-2 biomass estimates, understanding seasonal and interannual carbon flux variability, ecosystem carbon budget closure, drought impacts on carbon uptake
+
+::: {.callout-tip}
+FLUXNET tower GPP is the primary benchmark for validating remote sensing–derived productivity estimates. Pairing FLUXNET with co-located satellite observations (Landsat, MODIS, Sentinel-2) is a cornerstone of vegetation remote sensing research.
+:::
+
+::: {.callout-note}
+FLUXNET data are freely available at [FLUXNET.org](https://fluxnet.org). AmeriFlux data are accessible through [AmeriFlux.lbl.gov](https://ameriflux.lbl.gov). ICOS ecosystem data are at [ICOS Carbon Portal](https://www.icos-cp.eu).
+:::

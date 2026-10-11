@@ -1,0 +1,64 @@
+---
+title: "Datasets — Introduction"
+---
+
+Modern ecological and environmental research requires observations spanning multiple platforms, spatial resolutions, and temporal depths. No single sensor or dataset provides a complete picture of ecosystem structure, function, and change — the strength of contemporary analysis lies in integrating complementary data streams that together constrain what no individual source can resolve alone.
+
+---
+
+## Why Multi-Source Data Integration?
+
+Ecosystems operate across a vast range of scales: individual tree crowns at sub-meter resolution, forest stands at tens of meters, landscapes at kilometers, and biomes at continental to global extents. Similarly, ecological processes unfold across timescales from diurnal photosynthetic cycles to century-long successional dynamics. A single sensor designed for one scale inevitably sacrifices information at others.
+
+Multi-source data integration addresses this by combining:
+
+- **High spatial resolution** measurements (airborne LiDAR, NAIP) for fine-scale structural detail
+- **High temporal frequency** observations (MODIS, GOES, VIIRS) for phenological and disturbance dynamics
+- **Long historical archives** (Landsat since 1972, FIA since the 1930s) for decadal trend detection
+- **Global coverage** (GEDI, ICESat-2, Sentinel missions) for analyses beyond locally surveyed regions
+- **Ground truth** (field inventory plots, eddy covariance towers) for model calibration and validation
+
+When combined, these sources enable analyses that are simultaneously spatially explicit, temporally consistent, and ecologically interpretable.
+
+---
+
+## Dataset Categories
+
+This site organizes datasets into five categories, each addressing a distinct observational domain:
+
+| Category | What it measures | Spatial scale | Temporal depth |
+|---|---|---|---|
+| [**LiDAR**](datasets_lidar.qmd) | 3D vegetation structure, terrain, canopy height | 0.01 m – 25 m footprint | Campaign-based to continuous |
+| [**Optical Remote Sensing**](datasets_optical.qmd) | Surface reflectance, vegetation indices, land cover | 0.5 m – 1 km | 1972 – present |
+| [**Radar**](datasets_radar.qmd) | Soil moisture, surface deformation, biomass backscatter | 3 m – 300 km | 2002 – present |
+| [**Field Investigation**](datasets_field.qmd) | Species, biomass, traits, carbon flux | Plot to site | Decades to centuries |
+| [**Derived Products**](datasets_derived.qmd) | Analysis-ready fused outputs (canopy height, land cover, forest change) | 10 m – 1 km | Annual to multi-decadal |
+
+---
+
+## Cross-Scale Validation Framework
+
+A core principle underlying the use of these datasets is **cross-scale validation**: measurements from one platform are used to evaluate or calibrate estimates from another. Common validation chains include:
+
+- **Field plots → Airborne LiDAR → Spaceborne LiDAR (GEDI) → Global maps** for above-ground biomass
+- **Eddy covariance towers (FLUXNET) → MODIS/Sentinel-2 → Global GPP products** for carbon flux
+- **Airborne LiDAR (NEON AOP) → ICESat-2/GEDI footprints → Global canopy height** for forest structure
+
+Each transition up the scale ladder introduces assumptions and uncertainties; a transparent multi-source framework makes those assumptions explicit and testable.
+
+---
+
+## Data Access Philosophy
+
+All datasets described on this site are **freely and openly accessible** to the research community. Where possible, access links point to:
+
+- **Google Earth Engine** — for cloud-based analysis without local download
+- **NASA EarthData / USGS EarthExplorer** — for full-resolution archive access
+- **NEON / FIA data portals** — for standardized ecological field data
+- **Zenodo / PANGAEA** — for community-deposited research datasets
+
+Open data accelerates science by enabling reproducibility, cross-study comparisons, and analyses in data-limited regions where ground-based observations are scarce.
+
+::: {.callout-note}
+Browse each category using the Datasets menu above, or use the table links to jump directly to a section.
+:::

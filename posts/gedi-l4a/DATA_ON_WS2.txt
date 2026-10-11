@@ -1,0 +1,9 @@
+# Raw data for this post lives on ws2 (NREM-1TJZ2Q3): D:\cdj\blog_data$p\data
+# Moved off OneDrive on 2026-10-10; copy verified by sha256 on both sides.
+# Restore: scp -O -r ws2:D:/cdj/blog_data/gedi-l4a/data .
+# sha256  path
+4aaf962ed664c97d91024766d7580f78e264e034e51a565fe34ad68c0dc30508  gedi-l4a/data/gedi_l4a/GEDI04_A_2019131103750_O02323_03_T03998_02_002_02_V002.h5
+f9ad0034950e6e1e42ed3df1c43da02a0b4e34e02a767927d69deeb78bbe417b  gedi-l4a/data/gedi_l4a/GEDI04_A_2020071033031_O07050_02_T05371_02_002_02_V002.h5
+4982370567bb327fb2f7aaa4d33556b60cd66c754f1bc0f4239e87d94212f25e  gedi-l4a/data/gedi_l4a/GEDI04_A_2020349132258_O11366_02_T02525_02_002_02_V002.h5
+6ceffd93ee36836cf88362ea55d3f0eb91734be183c22892122ae639b486a057  gedi-l4a/data/gedi_l4a/GEDI04_A_2021260234023_O15666_02_T11063_02_002_02_V002.h5
+542e2622441f9f30e23bccb46068f3019e82945d25728ab3f02bd1d225bbb73e  gedi-l4a/data/gedi_l4a/GEDI04_A_2022263044630_O21360_03_T03845_02_003_01_V002.h5

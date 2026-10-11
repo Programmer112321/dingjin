@@ -1,0 +1,15 @@
+library(lidR)
+
+cat("=== central_park.laz ===\n")
+las1 <- readLAS("C:/Users/dchu/OneDrive - Oklahoma A and M System/code/Dingjin_blog/data/central_park.laz")
+print(las1)
+cat("Z range:", range(las1$Z), "\n")
+cat("Classification table:\n")
+print(table(las1$Classification))
+
+cat("\n=== tree.laz ===\n")
+las2 <- readLAS("C:/Users/dchu/OneDrive - Oklahoma A and M System/code/Dingjin_blog/data/tree.laz")
+print(las2)
+cat("Z range:", range(las2$Z), "\n")
+cat("Classification table:\n")
+print(table(las2$Classification))

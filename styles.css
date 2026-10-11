@@ -44,7 +44,7 @@ h2 {
 }
 
 /* Highlight Contact Me link */
-.navbar-nav .nav-link[href$="contact.html"] {
+.navbar-nav .nav-link[href$="#contact-me"] {
   color: #fff !important;
   background-color: #0d6efd;
   border-radius: 6px;
@@ -53,7 +53,7 @@ h2 {
   margin-left: 0.25rem;
 }
 
-.navbar-nav .nav-link[href$="contact.html"]:hover {
+.navbar-nav .nav-link[href$="#contact-me"]:hover {
   background-color: #0b5ed7;
 }
 
@@ -130,3 +130,17 @@ hr {
   font-size: 0.85rem;
   color: #888;
 }
+
+/* Prevent image drag-and-drop */
+img {
+  -webkit-user-drag: none;
+  -moz-user-drag: none;
+  user-drag: none;
+  pointer-events: none;
+}
+
+/* Re-enable pointer events on linked images */
+a img {
+  pointer-events: auto;
+}
+

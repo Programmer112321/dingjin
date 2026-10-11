@@ -8,3 +8,8 @@
 .httr-oauth
 .DS_Store
 .quarto
+
+# Raw LiDAR/data files stay out of git
+*.laz
+*.las
+posts/*/data/

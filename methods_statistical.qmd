@@ -1,0 +1,48 @@
+---
+title: "Statistical Modeling"
+toc: true
+toc-title: "Contents"
+toc-depth: 2
+---
+
+Statistical modeling describes the probabilistic relationship between a response variable and one or more predictors through a mathematical framework that explicitly characterizes data-generating processes and uncertainty. Core approaches range from classical linear and generalized linear models (GLMs) to hierarchical mixed-effects models, Bayesian inference, and time-series methods.
+
+---
+
+## Basic Mechanisms
+
+**Linear and generalized linear models** assume that the response is a (possibly transformed) linear function of predictors plus random error drawn from a specified distribution (Gaussian, Poisson, binomial, gamma). **Mixed-effects models** extend this by partitioning variance into fixed effects (population-level relationships) and random effects (site-, species-, or plot-level deviations), making them well-suited to nested ecological data structures. **Bayesian inference** frames parameter estimation as updating prior beliefs with observed data via Bayes' theorem, producing full posterior distributions rather than point estimates. **Time-series methods** — including autoregressive models, spectral decomposition, and change-point detection algorithms such as LandTrendr and CCDC — characterize temporal trends, seasonality, and abrupt shifts in remote sensing records.
+
+---
+
+## Advantages
+
+- **Interpretability** — model coefficients have direct physical or ecological meaning (e.g., sensitivity of NPP to temperature)
+- **Formal uncertainty quantification** — confidence intervals and posterior distributions propagate parameter uncertainty into predictions
+- **Well-established theory** — decades of methodological literature support robust diagnostics and assumption testing
+- **Efficient with small samples** — parametric assumptions reduce the data needed relative to flexible ML approaches
+- **Handles structured data** — mixed-effects and hierarchical models naturally accommodate repeated measures, nested designs, and spatial autocorrelation
+
+---
+
+## Disadvantages
+
+- **Distributional assumptions** — misspecified error distributions or link functions produce biased inference
+- **Limited nonlinearity** — polynomial and spline extensions help, but classical regression struggles with highly complex, high-dimensional response surfaces
+- **Sensitivity to outliers** — least-squares estimation is strongly influenced by extreme observations
+- **Collinearity** — correlated predictors inflate variance inflation factors and destabilize coefficient estimates
+- **Stationarity assumptions** — many time-series methods assume stationary relationships that may not hold under climate non-stationarity
+
+---
+
+## Applications in Ecosystem Research
+
+- Quantifying climate sensitivity of net primary production (NPP) across models and scenarios
+- Allometric regression linking tree diameter and height to above-ground biomass
+- Mixed-effects models for urban cooling intensity as a function of canopy structure across cities
+- LandTrendr / CCDC for detecting and dating forest disturbance from Landsat time series
+- Bayesian hierarchical models for integrating multi-source biomass observations with uncertainty
+
+::: {.callout-note}
+Return to [Methods Introduction](methods_intro.qmd) or continue to [Machine Learning](methods_ml.qmd).
+:::

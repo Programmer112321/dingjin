@@ -1,0 +1,49 @@
+---
+title: "Key Assumptions"
+toc: true
+toc-title: "Contents"
+toc-depth: 2
+---
+
+Every analytical method rests on assumptions that define the conditions under which its results are valid. Being explicit about these assumptions is not a limitation — it is a prerequisite for rigorous, reproducible science. The assumptions below are organized by the research contexts in which they most commonly arise across forest biomass estimation, urban green space cooling, and ecosystem responses to climate extremes.
+
+---
+
+## Statistical & Machine Learning Assumptions
+
+- **Stationarity** — relationships between predictors (e.g., spectral features, LiDAR metrics) and response variables (AGB, LST) are assumed stable across space and time; violated when training in one biome and predicting in another
+- **Representativeness of training data** — field plots or GEDI footprints used as labels are assumed to be spatially and structurally representative of the broader landscape
+- **Spatial independence** — most ML models assume training and test samples are independent; in practice, spatial autocorrelation inflates accuracy if not handled with spatial cross-validation
+- **Error-in-variables** — field AGB measurements used as ground truth carry allometric model uncertainty, which is rarely propagated into the final product uncertainty
+
+---
+
+## Remote Sensing & Data Assumptions
+
+- **Radiometric consistency** — multi-temporal Landsat/Sentinel composites assume atmospheric correction removes inter-scene differences; residual BRDF effects can bias spectral indices
+- **GEDI footprint representativeness** — GEDI samples ~25 m footprints; gridded products (L4B) assume these footprints statistically represent the surrounding 1 km cell
+- **Allometric generality** — biomass allometric equations (height → AGB) developed in one region are applied globally, assuming structural similarity across forests
+- **LiDAR height = biomass proxy** — canopy height metrics (RH98, top-of-canopy height) correlate with AGB, but the relationship varies by wood density, species composition, and stand structure
+
+---
+
+## Causal & Process-Based Assumptions
+
+- **Temporal precedence** — in climate–NPP studies, climate drivers are assumed to precede and cause ecosystem responses, not the reverse (violated under strong vegetation–climate feedbacks)
+- **No unmeasured confounding** — attribution of NPP variability to temperature or drought requires that other co-varying drivers (CO₂, nitrogen deposition, land use) are either measured or assumed negligible
+- **Process stationarity in PBMs** — DGVMs assume fixed plant functional type parameters (V~cmax~, allocation fractions) that do not adapt over the simulation period; violated under rapid climate change or species migration
+- **Steady-state carbon balance** — many biomass estimation studies assume old-growth forests are near carbon equilibrium; violated in post-disturbance recovering stands
+
+---
+
+## Urban Cooling Assumptions
+
+- **Uniform atmospheric demand** — the Penman–Monteith / TRM framework assumes spatially uniform VPD and reference ET conditions across a city; urban heterogeneity in humidity and wind speed violates this
+- **Independent cooling pathways** — studies that estimate shading and ET cooling separately often assume additivity, but shading reduces ET by lowering leaf temperature, creating a negative interaction
+- **LST as air temperature proxy** — land surface temperature (Landsat, ECOSTRESS) is used as a proxy for human thermal comfort, but the LST–T~air~ relationship varies strongly with surface type and wind speed
+
+---
+
+::: {.callout-note}
+Return to [Process-Based Models](methods_process.qmd) or go back to [Methods Introduction](methods_intro.qmd).
+:::

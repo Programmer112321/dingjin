@@ -1,0 +1,204 @@
+---
+title: "Optical Remote Sensing Datasets"
+toc: true
+toc-title: "Contents"
+toc-depth: 2
+---
+
+Multispectral and hyperspectral satellite imagery from open-access programs widely used in land cover mapping, vegetation monitoring, and environmental change detection.
+
+::: {style="display:flex; flex-wrap:wrap; gap:0.5rem; margin:1rem 0 1.5rem 0; padding:0.85rem 1rem; background:rgba(0,0,0,0.03); border-radius:8px;"}
+[Landsat](#landsat){.btn .btn-outline-secondary .btn-sm}
+[Sentinel-2](#sentinel2){.btn .btn-outline-secondary .btn-sm}
+[HLS](#hls){.btn .btn-outline-secondary .btn-sm}
+[ECOSTRESS](#ecostress){.btn .btn-outline-secondary .btn-sm}
+[MODIS](#modis){.btn .btn-outline-secondary .btn-sm}
+[VIIRS](#viirs){.btn .btn-outline-secondary .btn-sm}
+[GOES](#goes){.btn .btn-outline-secondary .btn-sm}
+[NAIP](#naip){.btn .btn-outline-secondary .btn-sm}
+:::
+
+---
+
+## Landsat — USGS / NASA {#landsat}
+
+**Landsat** is the longest-running Earth observation satellite program, continuously collecting multispectral imagery since 1972. Operated jointly by USGS and NASA, the program provides a free and open archive essential for long-term land surface change analysis.
+
+**Current sensors:** Landsat 8 OLI/TIRS · Landsat 9 OLI-2/TIRS-2
+**Spatial resolution:** 30 m (multispectral) · 15 m (panchromatic) · 100 m (thermal)
+**Temporal resolution:** 16-day revisit per satellite (~8 days combined)
+**Spectral bands:** Coastal/aerosol, Blue, Green, Red, NIR, SWIR1, SWIR2, Panchromatic, Thermal
+**Coverage:** Global, continuous since 1972
+**Key applications:** Land cover change, deforestation, urban expansion, agricultural monitoring, wildfire burn severity, surface temperature
+
+::: {.callout-note}
+Landsat data are freely available through [USGS EarthExplorer](https://earthexplorer.usgs.gov) and [Google Earth Engine](https://earthengine.google.com).
+:::
+
+---
+
+## Sentinel-2 — ESA Copernicus {#sentinel2}
+
+**Sentinel-2** is a high-resolution multispectral mission from the European Space Agency (ESA) under the Copernicus Earth Observation Programme. Its combination of high spatial resolution, frequent revisit time, and free data access has made it one of the most widely used satellites in vegetation and land surface research.
+
+**Sensors:** MultiSpectral Instrument (MSI) — Sentinel-2A and Sentinel-2B
+**Spatial resolution:** 10 m (B2, B3, B4, B8) · 20 m (B5, B6, B7, B8A, B11, B12) · 60 m (B1, B9, B10)
+**Temporal resolution:** ~5-day revisit (combined twin satellites)
+**Spectral bands:** 13 bands from visible to SWIR, including red-edge bands for vegetation analysis
+**Coverage:** Global land surface
+**Key applications:** Forest canopy health, LAI estimation, crop monitoring, urban green space mapping, water body detection
+
+::: {.callout-note}
+Sentinel-2 data are freely available through the [Copernicus Data Space](https://dataspace.copernicus.eu) and [Google Earth Engine](https://earthengine.google.com).
+:::
+
+---
+
+## HLS — Harmonized Landsat and Sentinel-2 (NASA) {#hls}
+
+**HLS** is a NASA-produced data product that harmonizes observations from the Landsat 8/9 OLI and Sentinel-2A/B MSI sensors into a consistent surface reflectance time series. By cross-calibrating the two satellite programs, HLS provides a near-seamless 30 m multispectral record with a ~2–3 day effective revisit, significantly reducing the data gaps introduced by cloud cover.
+
+**Agency:** NASA Goddard Space Flight Center
+**Sensors:** Landsat 8 OLI · Landsat 9 OLI-2 · Sentinel-2A MSI · Sentinel-2B MSI (harmonized jointly)
+**Spatial resolution:** 30 m
+**Temporal resolution:** ~2–3 day effective revisit (combined four sensors)
+**Spectral bands:** 10 common bands (Coastal/Aerosol, Blue, Green, Red, NIR, SWIR1, SWIR2, Cirrus, SWIR-S2 equivalent) consistently cross-calibrated across sensors
+**Products:**
+- **HLSL30** — Landsat-derived surface reflectance (30 m)
+- **HLSS30** — Sentinel-2-derived surface reflectance (30 m, resampled)
+**Coverage:** Global land, from 2013 (Landsat 8) onward
+**Key applications:** Dense time-series vegetation phenology, crop monitoring, forest disturbance detection, intra-seasonal land cover change, gap-filling cloud-contaminated records
+
+::: {.callout-tip}
+HLS is especially powerful for detecting short-duration events (e.g., crop harvest, defoliation outbreaks, wildfire) that require sub-weekly sampling, which neither Landsat nor Sentinel-2 alone can reliably provide.
+:::
+
+::: {.callout-note}
+HLS data are freely available through [NASA EarthData](https://earthdata.nasa.gov) (`HLSL30` and `HLSS30` collections) and [Google Earth Engine](https://earthengine.google.com) (`NASA/HLS`).
+:::
+
+---
+
+## ECOSTRESS — ECOsystem Spaceborne Thermal Radiometer Experiment on Space Station (NASA / JPL) {#ecostress}
+
+**ECOSTRESS** is a NASA thermal infrared multispectral radiometer mounted on the International Space Station (ISS), designed to measure land surface temperature (LST) and evapotranspiration (ET) at fine spatial resolution (~70 m). Unlike sun-synchronous satellites that always acquire data at the same local time, ECOSTRESS benefits from the ISS's precessing orbit — sampling a given location at varying times of day across repeated overpasses, enabling the capture of diurnal LST and ET cycles invisible to Landsat or Sentinel-based thermal products. This makes it uniquely suited for studying plant water stress responses, urban heat island dynamics, and irrigation water use across diverse ecosystems.
+
+**Agency:** NASA Jet Propulsion Laboratory (JPL) — Principal Investigators: Josh Fisher, Simon Hook
+**Platform:** International Space Station (ISS), orbit inclination ~51.6°
+**Launch:** June 2018
+**Sensor:** 5-band thermal infrared radiometer (TIR), 8.0–12.0 μm
+**Spatial resolution:** ~70 m (resampled from native ~38 m × 69 m instantaneous field of view)
+**Temporal resolution:** Irregular (~4-day average revisit); ISS precession provides diurnal sampling diversity
+**Coverage:** ±51.6° latitude (ISS orbital limit)
+**Key data products:**
+
+| Product | Description |
+|---------|-------------|
+| **ECO2LSTE** | Land Surface Temperature & Emissivity (70 m) |
+| **ECO3ETPTJPL** | Evapotranspiration — PT-JPL model (70 m) |
+| **ECO3ETALEXI** | ET — Atmosphere-Land Exchange Inverse (ALEXI) model |
+| **ECO4ESIPTJPL** | Evaporative Stress Index (ESI) — plant water stress indicator |
+| **ECO4WUE** | Water Use Efficiency (GPP / ET) |
+
+**Key applications:**
+- **Urban heat island analysis** — 70 m LST resolves individual city blocks, parks, and street canyons far better than Landsat's 100 m thermal band; ideal for quantifying the cooling effect of urban green space
+- **Drought and plant water stress** — Evaporative Stress Index (ESI) detects early-onset drought stress before visible spectral changes occur
+- **Agricultural ET and irrigation mapping** — field-scale ET products compatible with crop water use models
+- **Ecosystem carbon–water coupling** — Water Use Efficiency (WUE) links carbon assimilation to transpiration demand across biomes
+
+::: {.callout-tip}
+ECOSTRESS's ~70 m thermal resolution is the finest available from a spaceborne platform, making it the preferred dataset for city-scale LST studies where Landsat's 100 m thermal product cannot resolve the spatial heterogeneity of urban green space patches, impervious surfaces, and building rooftops.
+:::
+
+::: {.callout-note}
+ECOSTRESS data are freely available through [NASA EarthData / LP DAAC](https://lpdaac.usgs.gov/product_search/?collections=ECOSTRESS) and [Google Earth Engine](https://earthengine.google.com) (`NASA/ECOSTRESS/ETinst`). The full product suite is documented at the [ECOSTRESS mission page](https://ecostress.jpl.nasa.gov).
+:::
+
+---
+
+## MODIS — NASA Terra & Aqua {#modis}
+
+**MODIS** (Moderate Resolution Imaging Spectroradiometer) is a key instrument aboard NASA's Terra and Aqua satellites. While its spatial resolution is coarser than Landsat or Sentinel-2, its near-daily global coverage and long record (since 1999) make it indispensable for large-scale vegetation dynamics, land surface temperature, and fire monitoring.
+
+**Agency:** NASA Goddard Space Flight Center
+**Sensors:** MODIS aboard Terra (EOS AM-1) and Aqua (EOS PM-1)
+**Spatial resolution:** 250 m (bands 1–2) · 500 m (bands 3–7) · 1000 m (bands 8–36)
+**Temporal resolution:** Daily global coverage (1–2 days revisit)
+**Spectral bands:** 36 bands from visible to thermal infrared (0.4–14.4 μm)
+**Record length:** Terra since February 2000 · Aqua since July 2002
+**Key products:**
+- **MOD13 / MYD13** — Vegetation indices (NDVI, EVI) at 250 m / 500 m / 1 km
+- **MOD15** — Leaf Area Index (LAI) and FPAR
+- **MOD17** — Gross/Net Primary Production (GPP/NPP)
+- **MOD44B** — Vegetation continuous fields (tree cover, non-tree, bare ground)
+- **MCD64A1** — Monthly burned area
+- **MOD11** — Land surface temperature and emissivity
+**Key applications:** Global vegetation phenology, drought monitoring, wildfire detection, land cover classification, carbon flux estimation, urban heat islands
+
+::: {.callout-note}
+MODIS data are freely available through [NASA EarthData](https://earthdata.nasa.gov) and [Google Earth Engine](https://earthengine.google.com).
+:::
+
+---
+
+## VIIRS — Visible Infrared Imaging Radiometer Suite (NOAA / NASA) {#viirs}
+
+**VIIRS** is the primary visible-to-thermal sensor aboard the Suomi-NPP, NOAA-20, and NOAA-21 satellites. It is the operational successor to MODIS, offering improved radiometric calibration, a wider swath, and a dedicated day-night band (DNB) that enables detection of city lights, gas flares, and fires at night. Its near-daily global coverage makes it a cornerstone dataset for large-scale land and ocean monitoring.
+
+**Agency:** NOAA / NASA
+**Satellites:** Suomi-NPP (2011–present) · NOAA-20 / JPSS-1 (2017–present) · NOAA-21 / JPSS-2 (2022–present)
+**Spatial resolution:** 375 m (I-bands, visible/NIR/SWIR/TIR) · 750 m (M-bands, moderate resolution) · ~750 m (DNB)
+**Temporal resolution:** ~1-day global revisit
+**Spectral bands:** 22 bands from visible (0.41 μm) to longwave thermal infrared (12.5 μm), including a dedicated Day-Night Band (DNB)
+**Key products:**
+- **VNP13** — Vegetation indices (NDVI, EVI) at 500 m
+- **VNP09** — Daily surface reflectance
+- **VNP46** — Black Marble nighttime lights
+- **VNP14** — Active fire and thermal anomalies
+- **VJ102IMG** — Calibrated top-of-atmosphere radiance (I-bands)
+**Key applications:** Nighttime light mapping, active fire detection, vegetation phenology, snow and ice extent, sea surface temperature, aerosol optical depth
+
+::: {.callout-note}
+VIIRS data are freely available through [NASA EarthData](https://earthdata.nasa.gov) and [Google Earth Engine](https://earthengine.google.com). The Black Marble (VNP46) nighttime lights product is also accessible via the [NASA Black Marble website](https://blackmarble.gsfc.nasa.gov).
+:::
+
+---
+
+## GOES — Geostationary Operational Environmental Satellite (NOAA / NASA) {#goes}
+
+**GOES** (GOES-16, GOES-17, GOES-18) is NOAA's geostationary Earth observation system covering the Western Hemisphere. Unlike polar-orbiting sensors, GOES provides nearly continuous observations of a fixed region — as frequently as every 30 seconds during rapid-scan events — making it uniquely suited for near-real-time monitoring of weather, wildfires, and vegetation stress at continental scale.
+
+**Agency:** NOAA / NASA
+**Satellites:** GOES-16 (East, 75.2°W) · GOES-18 (West, 137.2°W)
+**Sensor:** ABI — Advanced Baseline Imager
+**Spatial resolution:** 0.5 km (visible Band 2) · 1 km (near-IR bands) · 2 km (IR bands)
+**Temporal resolution:** Full-disk scan every 10–15 minutes; CONUS sector every 5 minutes; mesoscale every 30–60 seconds
+**Spectral bands:** 16 bands from visible (0.47 μm) to longwave IR (13.3 μm)
+**Key products:** Cloud cover, fire detection, aerosol optical depth, land surface temperature, vegetation index, lightning mapper (GLM), sea surface temperature
+**Key applications:** Wildfire detection and progression, severe weather monitoring, land surface temperature, near-real-time drought assessment, atmospheric water vapor
+
+::: {.callout-note}
+GOES-ABI data are freely available through [NOAA's AWS S3 bucket](https://registry.opendata.aws/noaa-goes/) (real-time), [NOAA CLASS](https://www.class.noaa.gov) (archive), and [Google Earth Engine](https://earthengine.google.com) (`NOAA/GOES`).
+:::
+
+---
+
+## NAIP — National Agriculture Imagery Program (USDA) {#naip}
+
+**NAIP** (National Agriculture Imagery Program) is a high-resolution aerial imagery program operated by the USDA Farm Service Agency (FSA). It acquires leaf-on orthorectified imagery across the contiguous United States (CONUS) during agricultural growing seasons, making it one of the highest-resolution freely available datasets for land surface analysis in the US.
+
+**Agency:** USDA Farm Service Agency (FSA)
+**Spatial resolution:** 1 m (standard) · 0.6 m (select states and years)
+**Temporal resolution:** State-level acquisition cycles, typically every 2–3 years per state
+**Spectral bands:** Red, Green, Blue (RGB) · Near-Infrared (NIR) added since 2007; some products include a 5th band (Red Edge, select years)
+**Coverage:** Contiguous United States (CONUS); acquired during peak growing season (leaf-on conditions)
+**Format:** Cloud Optimized GeoTIFF (COG); also available as tiled web services
+**Key applications:** Land cover and land use mapping, crop type identification, urban tree canopy assessment, riparian vegetation monitoring, change detection at local scale, training data for machine learning models
+
+::: {.callout-tip}
+Because NAIP is acquired leaf-on and at ~1 m resolution, it is widely used as high-resolution ground truth or training data for coarser satellite products (Landsat, Sentinel-2). NDVI derived from NAIP's NIR band can resolve individual tree crowns.
+:::
+
+::: {.callout-note}
+NAIP imagery is freely available through [USGS EarthExplorer](https://earthexplorer.usgs.gov), [USDA Box](https://nrcs.app.box.com/v/naip), and [Google Earth Engine](https://earthengine.google.com) (`USDA/NAIP/DOQQ`).
+:::

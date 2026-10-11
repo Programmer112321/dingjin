@@ -1,0 +1,376 @@
+---
+title: "Evaluation Metrics"
+toc: true
+toc-title: "Contents"
+toc-depth: 2
+---
+
+Quantitative metrics are the language through which model performance, dataset quality, and trend significance are communicated. Choosing the right metric — and understanding what it does and does not capture — is as important as the model itself. This page documents the metrics most commonly used across forest biomass estimation, urban cooling analysis, and ecosystem response studies.
+
+::: {style="display:flex; flex-wrap:wrap; gap:0.5rem; margin:1rem 0 1.5rem 0; padding:0.85rem 1rem; background:rgba(0,0,0,0.03); border-radius:8px;"}
+[R²](#r2){.btn .btn-outline-secondary .btn-sm}
+[r / r²](#pearson){.btn .btn-outline-secondary .btn-sm}
+[RMSE](#rmse){.btn .btn-outline-secondary .btn-sm}
+[rRMSE](#rrmse){.btn .btn-outline-secondary .btn-sm}
+[MAE](#mae){.btn .btn-outline-secondary .btn-sm}
+[Bias](#bias){.btn .btn-outline-secondary .btn-sm}
+[MBE](#mbe){.btn .btn-outline-secondary .btn-sm}
+[MAPE](#mape){.btn .btn-outline-secondary .btn-sm}
+[NSE](#nse){.btn .btn-outline-secondary .btn-sm}
+[IoA](#ioa){.btn .btn-outline-secondary .btn-sm}
+[Trend](#trend){.btn .btn-outline-secondary .btn-sm}
+[Mann-Kendall](#mk){.btn .btn-outline-secondary .btn-sm}
+[Cross-validation](#cv){.btn .btn-outline-secondary .btn-sm}
+[Overfitting](#overfit){.btn .btn-outline-secondary .btn-sm}
+[AIC / BIC](#aic){.btn .btn-outline-secondary .btn-sm}
+:::
+
+---
+
+## Goodness-of-Fit Metrics
+
+---
+
+### R² — Coefficient of Determination {#r2}
+
+$$R^2 = 1 - \frac{\sum_{i=1}^{n}(y_i - \hat{y}_i)^2}{\sum_{i=1}^{n}(y_i - \bar{y})^2}$$
+
+**Interpretation:** The proportion of variance in the observed values $y_i$ explained by the model predictions $\hat{y}_i$. Ranges from $-\infty$ to 1; a value of 1 indicates perfect prediction, 0 indicates the model performs no better than the mean, and negative values indicate the model is worse than predicting the mean.
+
+**Common use:** Biomass model fit, LST prediction accuracy, NPP–climate regression.
+
+**Pitfalls:**
+- A high R² does not guarantee low prediction error — the model may explain variance but still have large systematic offsets
+- R² increases monotonically as predictors are added; use **adjusted R²** for comparing models of different complexity
+- R² is sensitive to the range of $y$: artificially wide ranges inflate R²
+
+::: {.callout-tip}
+In remote sensing regression (e.g., GEDI AGB vs. field AGB), R² is almost always reported alongside RMSE — R² quantifies explanatory power, RMSE quantifies prediction error in the original units.
+:::
+
+---
+
+### r and r² — Pearson Correlation Coefficient {#pearson}
+
+$$r = \frac{\sum_{i=1}^{n}(x_i - \bar{x})(y_i - \bar{y})}{\sqrt{\sum(x_i-\bar{x})^2 \cdot \sum(y_i-\bar{y})^2}}$$
+
+**Interpretation:** $r$ measures the linear association between two variables, ranging from −1 (perfect negative) to +1 (perfect positive). $r^2$ is the square of the Pearson correlation — it equals R² **only** when the regression passes through the origin and is fit by OLS without an intercept. In general, $r^2 \neq R^2$.
+
+**Key distinction from R²:**
+| Metric | What it measures | Range |
+|--------|-----------------|-------|
+| $r$    | Strength and direction of linear association | −1 to 1 |
+| $r^2$  | Proportion of shared variance (symmetric) | 0 to 1 |
+| $R^2$  | Proportion of $y$ variance explained by the model (asymmetric) | $-\infty$ to 1 |
+
+**Common use:** Climate–NPP relationships, canopy height vs. AGB, LST vs. canopy cover correlations.
+
+**Pitfalls:**
+- $r$ detects only **linear** association; nonlinear relationships can yield $r \approx 0$ even when a strong relationship exists
+- Sensitive to outliers — a single extreme point can substantially inflate $r$
+- For non-normal data, use **Spearman's** $\rho$ (rank correlation) instead
+
+---
+
+## Error Metrics
+
+---
+
+### RMSE — Root Mean Square Error {#rmse}
+
+$$\text{RMSE} = \sqrt{\frac{1}{n}\sum_{i=1}^{n}(\hat{y}_i - y_i)^2}$$
+
+**Interpretation:** The square root of the average squared residual — expressed in the **same units** as $y$. RMSE penalizes large errors more heavily than small ones due to the squaring, making it sensitive to outliers.
+
+**Common use:** AGB prediction error (Mg ha⁻¹), LST prediction error (°C), ET estimation error (mm/day).
+
+**Pitfalls:**
+- Not scale-free — cannot compare RMSE across datasets with different units or ranges; use **rRMSE** instead
+- Dominated by large errors, which may or may not be ecologically meaningful
+- Does not reveal the direction of error (use **MBE** or **Bias** for that)
+
+---
+
+### rRMSE — Relative RMSE {#rrmse}
+
+$$\text{rRMSE} = \frac{\text{RMSE}}{\bar{y}} \times 100\%$$
+
+**Interpretation:** RMSE expressed as a percentage of the mean observed value. Scale-free, enabling comparison across datasets, sensors, or biomes.
+
+**Common use:** Comparing biomass estimation accuracy across tropical vs. boreal forests; benchmarking different sensor combinations.
+
+**Typical thresholds (AGB remote sensing):**
+- rRMSE < 20% — excellent
+- rRMSE 20–40% — acceptable
+- rRMSE > 40% — poor
+
+---
+
+### MAE — Mean Absolute Error {#mae}
+
+$$\text{MAE} = \frac{1}{n}\sum_{i=1}^{n}|\hat{y}_i - y_i|$$
+
+**Interpretation:** The average absolute residual in the original units of $y$. Unlike RMSE, MAE weights all errors equally regardless of magnitude, making it more robust to outliers.
+
+**When to prefer MAE over RMSE:**
+- When large errors should not be disproportionately penalized
+- When the error distribution is heavy-tailed (e.g., biomass in high-density old-growth stands)
+- When communicating results to non-technical audiences (more interpretable)
+
+**Common use:** Canopy height error, NPP prediction error, urban LST estimation.
+
+---
+
+### Bias (%) — Systematic Prediction Offset {#bias}
+
+$$\text{Bias (\%)} = \frac{1}{n}\sum_{i=1}^{n}\frac{\hat{y}_i - y_i}{y_i} \times 100\%$$
+
+**Interpretation:** The average relative over- or under-prediction as a percentage of the observed value. A positive bias means the model systematically overestimates; negative means underestimation.
+
+**Why it matters:** RMSE and MAE measure scatter around the 1:1 line but cannot distinguish systematic bias from random error. A model can have low RMSE yet a large consistent bias.
+
+**Common use:**
+- AGB products tend to underestimate in high-biomass tropical forests (saturation bias)
+- LST products may show cold or warm biases in urban canyon geometries
+- DGVM NPP may exhibit systematic overestimation in drought years
+
+::: {.callout-tip}
+Always report Bias alongside RMSE. Low RMSE + low Bias together indicate both high precision and high accuracy. Low RMSE + high Bias indicates a well-correlated but systematically shifted model.
+:::
+
+---
+
+### MBE — Mean Bias Error {#mbe}
+
+$$\text{MBE} = \frac{1}{n}\sum_{i=1}^{n}(\hat{y}_i - y_i)$$
+
+**Interpretation:** The average signed residual in the original units. Positive MBE = model overestimates on average; negative = underestimates. Unlike Bias (%), MBE is expressed in the units of $y$.
+
+**Relationship to other metrics:**
+
+$$\text{RMSE}^2 = \text{MBE}^2 + \sigma_\varepsilon^2$$
+
+where $\sigma_\varepsilon^2$ is the variance of residuals. This decomposition separates systematic bias from random scatter — useful for diagnosing model errors.
+
+---
+
+### MAPE — Mean Absolute Percentage Error {#mape}
+
+$$\text{MAPE} = \frac{100\%}{n}\sum_{i=1}^{n}\left|\frac{y_i - \hat{y}_i}{y_i}\right|$$
+
+**Interpretation:** Scale-free version of MAE expressed as a percentage. Widely used in forecasting and ecosystem modeling.
+
+**Pitfall:** Undefined or unstable when $y_i \approx 0$ — problematic for sparse biomass areas, bare soil, or near-zero NPP in semi-arid regions. Use **rRMSE** or **MAE** in those cases.
+
+---
+
+## Model Efficiency Metrics
+
+---
+
+### NSE — Nash–Sutcliffe Efficiency {#nse}
+
+$$\text{NSE} = 1 - \frac{\sum_{i=1}^{n}(y_i - \hat{y}_i)^2}{\sum_{i=1}^{n}(y_i - \bar{y})^2}$$
+
+**Interpretation:** Dimensionless index (−∞ to 1) widely used in hydrology and ecosystem modeling. NSE = 1 is perfect; NSE = 0 means the model is no better than the observed mean; NSE < 0 means the mean is a better predictor than the model.
+
+**Common use:** Evaluating DGVM-simulated GPP, ET, and runoff against eddy covariance or streamflow observations; validating process-based urban ET models.
+
+**Key relationship:** NSE is identical to R² when computed between observed and simulated values from regression through the origin — but for general predictions NSE ≠ R².
+
+---
+
+### IoA — Index of Agreement {#ioa}
+
+$$\text{IoA} = 1 - \frac{\sum_{i=1}^{n}(y_i - \hat{y}_i)^2}{\sum_{i=1}^{n}(|\hat{y}_i - \bar{y}| + |y_i - \bar{y}|)^2}$$
+
+**Interpretation:** Ranges from 0 to 1. Unlike NSE, IoA is bounded below by 0, making it less sensitive to extreme over/underestimation. Values > 0.8 generally indicate good model–observation agreement.
+
+**Common use:** Process-based model evaluation (DGVMs, urban energy balance models), satellite LST vs. ground measurement comparison.
+
+---
+
+## Trend Metrics {#trend}
+
+---
+
+### Linear Trend — OLS Slope
+
+$$\hat{\beta}_1 = \frac{\sum_{t=1}^{T}(t - \bar{t})(y_t - \bar{y})}{\sum_{t=1}^{T}(t - \bar{t})^2}$$
+
+**Interpretation:** The ordinary least squares slope of $y$ on time $t$, expressed in units of $y$ per year. Simple, widely used, but sensitive to outliers and non-stationarity.
+
+**Common use:** Long-term NPP trends from MODIS MOD17, LST warming trends in urban areas, AGB change rates from multi-year LiDAR.
+
+**Pitfall:** Assumes normally distributed residuals and stationarity. Use Mann-Kendall for non-parametric trend detection when these assumptions are violated.
+
+---
+
+### Mann-Kendall Test — Non-Parametric Trend {#mk}
+
+The Mann-Kendall test evaluates whether a monotonic upward or downward trend exists in a time series without assuming normality.
+
+**Test statistic:**
+$$S = \sum_{i=1}^{n-1}\sum_{j=i+1}^{n} \text{sgn}(y_j - y_i)$$
+
+where $\text{sgn}(\cdot)$ is the sign function (+1, 0, −1).
+
+**Interpretation:** $S > 0$ suggests an upward trend; $S < 0$ a downward trend. Statistical significance is assessed via the standardized $Z$ statistic.
+
+**Sen's Slope** — the median of all pairwise slopes $\frac{y_j - y_i}{j - i}$ — is reported alongside the Mann-Kendall $p$-value as a robust trend magnitude estimate.
+
+**Common use:**
+- Detecting significant NPP trends in Central Asia despite high interannual variability
+- Identifying long-term LST warming trends in cities
+- Forest biomass change detection in repeat LiDAR surveys
+
+::: {.callout-tip}
+Use Mann-Kendall + Sen's Slope together: Mann-Kendall provides the significance test, Sen's Slope provides the magnitude. Both are robust to non-normality and are the standard in ecological trend analysis.
+:::
+
+---
+
+## Validation & Model Selection
+
+---
+
+### Cross-Validation Metrics {#cv}
+
+**k-fold cross-validation** partitions the dataset into $k$ folds, training on $k-1$ and testing on the held-out fold, repeating $k$ times. The reported RMSE, MAE, and R² are averaged across folds.
+
+**Spatial cross-validation** — critical in remote sensing — ensures training and test sets are spatially separated to prevent spatial autocorrelation from inflating accuracy. Methods include:
+- **Spatial block CV** — geographic blocking by grid cells or regions
+- **Buffered leave-one-out CV (BLOO-CV)** — excludes a spatial buffer around each test point
+- **Stratified CV by biome or land cover** — ensures representation of all ecosystem types
+
+::: {.callout-important}
+Standard random k-fold CV applied to spatially autocorrelated remote sensing data can overestimate R² by 0.1–0.3 and underestimate RMSE by 20–40%. Always use spatial CV for LiDAR-based AGB and satellite-derived LST models.
+:::
+
+---
+
+### Overfitting Detection {#overfit}
+
+Overfitting occurs when a model captures noise in the training data rather than the underlying signal — yielding low training error but high generalisation error. It is one of the most consequential failure modes in remote sensing regression, where field samples are scarce relative to the number of candidate predictors.
+
+#### 1. Bias-Variance Tradeoff
+
+The expected prediction error of any model decomposes as:
+
+$$\text{MSE}(\hat{f}) = \underbrace{\left[\text{Bias}(\hat{f})\right]^2}_{\text{systematic error}} + \underbrace{\text{Var}(\hat{f})}_{\text{estimation noise}} + \underbrace{\sigma_\varepsilon^2}_{\text{irreducible noise}}$$
+
+| Regime | Bias | Variance | Interpretation |
+|--------|------|----------|----------------|
+| Underfitting | High | Low | Model too simple; misses real patterns |
+| Well-generalised | Low | Low | Ideal — train ≈ test performance |
+| Overfitting | Low | High | Model memorises training noise; test error explodes |
+
+Model complexity (tree depth, number of features, polynomial degree) increases variance and decreases bias. The optimal complexity minimises their sum.
+
+#### 2. Train–Test Performance Gap
+
+The most direct overfitting diagnostic: compare metrics on held-out data to metrics on training data.
+
+$$\Delta R^2 = R^2_{\text{train}} - R^2_{\text{test}}, \qquad \Delta\text{RMSE} = \text{RMSE}_{\text{test}} - \text{RMSE}_{\text{train}}$$
+
+**Rules of thumb for AGB / LST regression:**
+
+| $\Delta R^2$ | $\text{RMSE}_{\text{test}} / \text{RMSE}_{\text{train}}$ | Diagnosis |
+|---|---|---|
+| < 0.05 | < 1.15 | Acceptable generalisation |
+| 0.05–0.15 | 1.15–1.40 | Mild overfitting — consider regularisation or fewer features |
+| > 0.15 | > 1.40 | Severe overfitting — model is memorising training data |
+
+::: {.callout-important}
+Always report **both** training and test metrics in publications. Reporting only training R² conceals overfitting and inflates the perceived quality of the model.
+:::
+
+#### 3. Learning Curves
+
+A learning curve plots training and validation error (e.g., RMSE) as a function of training sample size $n$. It separates two fundamentally different failure modes:
+
+- **High variance (overfitting):** training RMSE is low; validation RMSE is high; the gap does not close as $n$ grows — more data is needed.
+- **High bias (underfitting):** both training and validation RMSE converge at a high error level — the model family is too simple.
+
+In AGB remote sensing, learning curves are particularly informative for diagnosing whether additional field plots would substantially reduce prediction error or whether the bottleneck is model architecture.
+
+#### 4. Regularisation
+
+Regularisation constrains model complexity by adding a penalty on parameter magnitudes to the loss function.
+
+**Lasso (L1):**
+$$\min_{\boldsymbol{\beta}} \frac{1}{n}\|\mathbf{y} - \mathbf{X}\boldsymbol{\beta}\|^2 + \lambda\sum_{j=1}^{p}|\beta_j|$$
+
+Lasso drives some $\beta_j$ exactly to zero — effectively performing feature selection. Useful when most predictors are irrelevant (e.g., hundreds of spectral bands for AGB prediction).
+
+**Ridge (L2):**
+$$\min_{\boldsymbol{\beta}} \frac{1}{n}\|\mathbf{y} - \mathbf{X}\boldsymbol{\beta}\|^2 + \lambda\sum_{j=1}^{p}\beta_j^2$$
+
+Ridge shrinks all coefficients but retains all features. Handles multicollinearity well — important for optical remote sensing where spectral bands are highly correlated.
+
+**ElasticNet (L1 + L2 combined):**
+$$\min_{\boldsymbol{\beta}} \frac{1}{n}\|\mathbf{y} - \mathbf{X}\boldsymbol{\beta}\|^2 + \lambda_1\sum_{j}|\beta_j| + \lambda_2\sum_{j}\beta_j^2$$
+
+Balances sparsity (Lasso) and stability (Ridge). The hyperparameter $\lambda$ (or $\lambda_1, \lambda_2$) is selected via cross-validated RMSE.
+
+**For tree-based models** (Random Forest, XGBoost), regularisation is implicit in hyperparameters:
+
+| Parameter | Effect on overfitting |
+|-----------|----------------------|
+| `max_depth` (XGBoost) | Deeper trees → higher variance |
+| `min_samples_leaf` (RF) | Higher → smoother decision boundary |
+| `subsample`, `colsample_bytree` (XGBoost) | Stochastic sampling reduces variance |
+| `lambda`, `alpha` (XGBoost L2/L1) | Direct regularisation on leaf weights |
+| `n_estimators` (RF/XGBoost) | More trees reduce variance (RF) or require early stopping (XGBoost) |
+
+#### 5. Feature Importance Stability (SHAP Variance Across Folds)
+
+A well-generalised model should assign consistent importance to the same features across different CV folds. If SHAP value rankings change substantially from fold to fold, the model is overfitting to idiosyncratic patterns in each training partition.
+
+**Practical check:** compute SHAP values for each CV fold; report the mean and standard deviation of each feature's mean |SHAP|. Features with high standard deviation relative to their mean importance are contributing noise, not signal.
+
+#### 6. Remote-Sensing-Specific Overfitting Risks
+
+**Saturation in high-biomass forests:**
+Field plots with AGB > 300 Mg ha⁻¹ are rare in most datasets. A model that memorises these extreme observations performs well on training data but generalises poorly to unseen high-biomass stands. Detecting this: plot residuals vs. observed AGB — if large residuals cluster at high AGB only in the test set, saturation-driven overfitting is likely.
+
+**Spectral collinearity:**
+Optical datasets (Landsat 8 bands, Sentinel-2 12 bands) are highly correlated. High VIF (Variance Inflation Factor > 10) among predictors inflates coefficient variance in linear models and destabilises feature importance in tree models. Remedies: PCA preprocessing, Lasso, or explicit VIF filtering.
+
+**Spatial pseudoreplication (see also Spatial CV above):**
+Spatially proximate training and test points share similar spectral and structural properties, creating the illusion of high accuracy. Random k-fold CV inflates $R^2$ by 0.1–0.3 in LiDAR AGB models with high spatial autocorrelation. Spatial block CV or BLOO-CV is mandatory.
+
+::: {.callout-tip}
+A complete overfitting checklist for AGB / LST / NPP models:
+
+1. ☐ Report $\Delta R^2$ and $\Delta\text{RMSE}$ (train vs. spatial-CV test)
+2. ☐ Use spatial block CV or BLOO-CV — never random k-fold alone
+3. ☐ Check learning curves: does validation RMSE plateau far above training RMSE?
+4. ☐ Apply regularisation (Lasso / Ridge / ElasticNet) or tune tree complexity
+5. ☐ Check SHAP stability across CV folds for top-ranked features
+6. ☐ Plot residuals vs. predicted and vs. key covariates (especially AGB range)
+7. ☐ Check VIF among predictors; remove or decorrelate features with VIF > 10
+:::
+
+---
+
+### AIC / BIC — Model Selection Criteria {#aic}
+
+$$\text{AIC} = 2k - 2\ln(\hat{L}), \qquad \text{BIC} = k\ln(n) - 2\ln(\hat{L})$$
+
+where $k$ = number of parameters, $n$ = sample size, $\hat{L}$ = maximized likelihood.
+
+**Interpretation:** Both penalize model complexity to prevent overfitting. Lower AIC/BIC = better model. BIC penalizes complexity more strongly than AIC for $n > 7$.
+
+**$\Delta$AIC rules of thumb:**
+- $\Delta$AIC < 2 — models are statistically equivalent
+- $\Delta$AIC 4–7 — some evidence for the lower-AIC model
+- $\Delta$AIC > 10 — strong evidence the lower-AIC model is better
+
+**Common use:** Comparing mixed-effects model structures for biomass–canopy relationships; selecting predictor sets in NPP–climate regression; choosing between spatial autocorrelation model structures.
+
+---
+
+::: {.callout-note}
+Return to [Key Assumptions](methods_assumptions.qmd) or go back to [Methods Introduction](methods_intro.qmd).
+:::

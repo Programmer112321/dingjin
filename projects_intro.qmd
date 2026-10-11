@@ -1,0 +1,34 @@
+---
+title: "Research — Introduction"
+---
+
+## Aims
+
+Integrate field investigations, remote sensing, and modeling to reveal cross-scale mechanisms, thereby supporting the development of robust models for understanding ecosystems — particularly forests — and improving forest management to enhance human well-being.
+
+---
+
+## Research Topics
+
+| Topic | Core question |
+|---|---|
+| [**Forest Above-Ground Biomass Estimation**](projects_agb.qmd) | How to estimate forest AGB across large spatial scales? |
+| [**Ecosystem Response to Disturbances**](projects_disturbance.qmd) | How do disturbances regulate ecosystem functioning and drive forest loss? |
+| [**Cooling Effect of Urban Green Space**](projects_urban.qmd) | How does urban green space regulate temperature? |
+
+---
+
+## Overarching Theme
+
+Forests and urban ecosystems are simultaneously shaped by climate variability, disturbance regimes, and human land management. Understanding how these forces interact — and quantifying their effects on carbon stocks, biodiversity, and human well-being — requires observations spanning from individual tree crowns to global scales, and methods ranging from empirical field measurements to process-based simulation.
+
+My research integrates:
+
+- **Multi-platform remote sensing** (airborne LiDAR, spaceborne LiDAR, optical, radar) to characterize ecosystem structure across spatial scales
+- **Field inventory data** (FIA, NEON) to calibrate and validate remote sensing-derived estimates
+- **Statistical and machine learning models** to map ecosystem properties and detect change at landscape to continental scales
+- **Causal inference and process-based models** to attribute observed changes to specific drivers and project future dynamics under climate change
+
+::: {.callout-note}
+More projects and reproducible notebooks will be added over time. See the [Blog/Notes](blog.qmd) section for detailed methods and code.
+:::

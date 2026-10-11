@@ -1,0 +1,445 @@
+---
+title: "Derived Products"
+toc: true
+toc-title: "Contents"
+toc-depth: 2
+---
+
+Gridded analysis-ready products derived by fusing multiple sensor types — LiDAR, optical, radar, and model outputs — into spatially continuous, wall-to-wall datasets. These products go beyond what any single sensor can observe, combining the measurement strengths of several data streams to produce ready-to-use maps of forest structure, vegetation function, and ecosystem state. This section also includes coordinated multi-model ensemble programs (CMIP6, TRENDY) that provide standardized climate and land carbon projections for ecosystem research.
+
+::: {style="display:flex; flex-wrap:wrap; gap:0.5rem; margin:1rem 0 1.5rem 0; padding:0.85rem 1rem; background:rgba(0,0,0,0.03); border-radius:8px;"}
+**AGB:** [GEDI L4B](#gedil4b){.btn .btn-outline-secondary .btn-sm} [ESA CCI AGB](#esaagb){.btn .btn-outline-secondary .btn-sm} [LandTrendr](#landtrendr){.btn .btn-outline-secondary .btn-sm} [Chloris](#chloris){.btn .btn-outline-secondary .btn-sm} [CTrees](#ctrees){.btn .btn-outline-secondary .btn-sm} [terraPulse](#terrapulse){.btn .btn-outline-secondary .btn-sm} [Saatchi et al.](#saatchi){.btn .btn-outline-secondary .btn-sm} [Wang et al.](#wang){.btn .btn-outline-secondary .btn-sm}
+
+**Canopy & Cover:** [ETH Canopy Height](#eth-height){.btn .btn-outline-secondary .btn-sm} [NASA Canopy Height](#nasa-height){.btn .btn-outline-secondary .btn-sm} [Hansen GFC](#hansen){.btn .btn-outline-secondary .btn-sm} [MOD44B](#mod44b){.btn .btn-outline-secondary .btn-sm} [NLCD](#nlcd){.btn .btn-outline-secondary .btn-sm} [TreeMap](#treemap){.btn .btn-outline-secondary .btn-sm} [LCMS](#lcms){.btn .btn-outline-secondary .btn-sm} [WorldCover](#worldcover){.btn .btn-outline-secondary .btn-sm} [ESA CCI LC](#esacci){.btn .btn-outline-secondary .btn-sm} [deadtrees.earth](#deadtrees){.btn .btn-outline-secondary .btn-sm}
+
+**Climate & Models:** [CMIP6](#cmip6){.btn .btn-outline-secondary .btn-sm} [TRENDY](#trendy){.btn .btn-outline-secondary .btn-sm}
+:::
+
+---
+
+## Above-Ground Biomass (AGB) Derived Products
+
+Global and regional maps of forest above-ground biomass (AGB, Mg ha⁻¹ dry weight) are critical for carbon accounting, REDD+ reporting, and benchmarking ecosystem models. These products are derived by fusing active sensors (LiDAR, SAR) with optical imagery and/or field inventory data, each with distinct spatial resolution, temporal coverage, and forest type strengths.
+
+---
+
+### GEDI L4B — Global Gridded Aboveground Biomass Density (NASA / ORNL DAAC) {#gedil4b}
+
+**GEDI L4B** is a 1 km global gridded aboveground biomass density (AGBD, Mg ha⁻¹) product derived from GEDI Level 4A footprint-level AGB estimates using a hybrid model-based geostatistical (HMB) estimator. L4A footprint AGBD is predicted from GEDI L2A relative height metrics (RH50, RH98, etc.) using continent- and biome-specific allometric models calibrated against ~10,000 forest inventory plots globally. Version 2.1 covers 2019–2023.
+
+**Source:** NASA / ORNL DAAC (Ralph Dubayah et al.)
+**Input sensors:** GEDI full-waveform spaceborne LiDAR
+**Spatial resolution:** 1 km (gridded from ~25 m footprints at ~600 m cross-track spacing)
+**Coverage:** ~51.6°N to 51.6°S
+**Temporal coverage:** 2019–2023
+**Key outputs:** Mean AGBD · Standard error · Sample count · Quality flags
+**Key applications:** Global forest carbon stock assessment, IPCC Tier 1 reporting, benchmarking SAR- and optical-based biomass products, calibrating DGVMs
+
+::: {.callout-note}
+GEDI L4B Version 2.1 is freely available through [NASA EarthData / ORNL DAAC](https://daac.ornl.gov/cgi-bin/dsviewer.pl?ds_id=2299) and [Google Earth Engine](https://earthengine.google.com) (`LARSE/GEDI/GEDI04_B_002`).
+:::
+
+---
+
+### ESA CCI AGB — Global Forest Biomass at 100 m (Santoro et al.) {#esaagb}
+
+The **ESA Climate Change Initiative AGB** product provides global AGB maps at 100 m resolution for multiple epochs (2010, 2017, 2018, 2019, 2020), produced by fusing multi-source SAR — ALOS PALSAR, ALOS-2 PALSAR-2, Sentinel-1, JERS-1 — with optical ancillary data. The retrieval uses a Water Cloud Model (WCM) combined with an empirical lookup-table inversion, constrained by global forest inventory data. The multi-epoch design makes it uniquely suited for detecting decadal biomass change in both tropical and boreal forests.
+
+**Source:** ESA Climate Change Initiative (Maurizio Santoro, Oliver Cartus et al.)
+**Input sensors:** ALOS PALSAR / ALOS-2 PALSAR-2 (L-band SAR) · Sentinel-1 (C-band SAR) · JERS-1 (L-band SAR)
+**Spatial resolution:** 100 m
+**Coverage:** Global (land)
+**Epochs available:** 2010 · 2017 · 2018 · 2019 · 2020
+**Uncertainty layers:** Per-pixel standard deviation included
+**Key applications:** Multi-decadal forest carbon change, SAR-based biomass retrieval benchmarking, REDD+ baseline mapping, tropical and boreal forest carbon stocks
+
+::: {.callout-note}
+ESA CCI AGB is freely available through the [ESA CCI Open Data Portal](https://climate.esa.int/en/projects/biomass/data/) and the [CEDA Archive](https://catalogue.ceda.ac.uk).
+:::
+
+---
+
+### LandTrendr Biomass — Annual Forest Carbon Maps (eMapR / Oregon State) {#landtrendr}
+
+The **eMapR LandTrendr Biomass** product applies the LandTrendr (Landsat-based Detection of Trends in Disturbance and Recovery) spectral-temporal segmentation algorithm to dense Landsat time series (1986–present) to produce annual 30 m maps of forest carbon stocks and carbon change across the western United States and Pacific Northwest. Carbon estimates are linked to FIA plot data via gradient nearest-neighbor imputation, yielding stand-level above-ground live carbon (Mg C ha⁻¹) with annual disturbance and recovery trajectories.
+
+**Source:** eMapR Lab, Oregon State University (Robert Kennedy et al.)
+**Input sensors:** Landsat TM / ETM+ / OLI annual composites
+**Algorithm:** LandTrendr spectral segmentation + FIA GNN imputation
+**Spatial resolution:** 30 m
+**Temporal coverage:** Annual, 1986–present
+**Coverage:** Western United States (Pacific Northwest focus); GEE implementation extensible
+**Key outputs:** Above-ground live carbon (Mg C ha⁻¹) · Annual carbon change · Disturbance year and magnitude
+**Key applications:** Annual forest carbon flux tracking, disturbance attribution (fire, harvest, drought), post-disturbance recovery monitoring, regional REDD+ assessments
+
+::: {.callout-note}
+LandTrendr Biomass outputs and the LandTrendr GEE API are available through the [eMapR Lab GitHub](https://github.com/eMapR/LT-GEE) and [Google Earth Engine](https://earthengine.google.com). The LT-GEE guide provides full documentation for reproducing annual biomass maps in any Landsat-covered region.
+:::
+
+---
+
+### Chloris Vegetation Monitor — Tropical AGB & Carbon Change {#chloris}
+
+**Chloris** is a cloud-based vegetation monitoring platform developed to track above-ground carbon stocks and annual carbon fluxes in tropical and subtropical forests using dense Landsat and Sentinel-2 time series. It produces annual wall-to-wall AGB and carbon change maps at 30 m resolution, applying Random Forest models calibrated with field plots and GEDI footprints. Chloris is particularly designed for national-scale REDD+ monitoring, reporting, and verification (MRV) systems in tropical countries where AGB data have historically been sparse.
+
+**Source:** Chloris Geospatial (David Lagomasino et al.)
+**Input sensors:** Landsat 8/9 OLI + Sentinel-2 MSI + GEDI (calibration)
+**Spatial resolution:** 30 m
+**Coverage:** Tropics and subtropics (expandable to any forested region)
+**Temporal coverage:** Annual, ~2016–present
+**Key outputs:** AGB (Mg ha⁻¹) · Annual AGB change · Carbon stock and flux
+**Key applications:** National REDD+ MRV, tropical deforestation carbon emissions, forest degradation mapping, carbon credit project monitoring
+
+::: {.callout-note}
+Chloris is accessible via the [Chloris Geospatial platform](https://www.chlorisgeospatial.com) and select outputs are available through partner data portals.
+:::
+
+---
+
+### CTrees — Global Forest Carbon Monitoring {#ctrees}
+
+**CTrees** is an independent non-profit organization that produces globally consistent, high-resolution (≤30 m) forest carbon maps by integrating GEDI spaceborne LiDAR, Sentinel-1 SAR, Sentinel-2 optical, and Landsat imagery with machine learning models trained on field inventory data. CTrees provides both tree-cover-level AGB estimates and country-level carbon accounting products aligned with IPCC guidelines, supporting national forest inventories and voluntary carbon market projects.
+
+**Source:** CTrees (Sassan Saatchi et al.)
+**Input sensors:** GEDI · Sentinel-1 SAR · Sentinel-2 MSI · Landsat OLI
+**Spatial resolution:** ≤30 m
+**Coverage:** Global tropical and temperate forests
+**Temporal coverage:** Annual updates
+**Key outputs:** AGB (Mg ha⁻¹) · Carbon stock · Annual deforestation and degradation emissions
+**Key applications:** Country-level REDD+ accounting, voluntary carbon market (VCM) project baseline and monitoring, global tropical forest carbon benchmarking
+
+::: {.callout-note}
+CTrees data and country profiles are accessible through the [CTrees Data Hub](https://ctrees.org/data).
+:::
+
+---
+
+### terraPulse — GEDI-Based Global Biomass Products {#terrapulse}
+
+**terraPulse** develops commercial-grade global forest biomass and ecosystem carbon products anchored to GEDI spaceborne LiDAR, founded by the GEDI principal investigator team (Ralph Dubayah, University of Maryland). terraPulse's products bridge the gap between NASA open-access GEDI data and operational forest carbon monitoring by providing higher-level, analysis-ready AGB layers calibrated with extensive field data and compatible with IPCC carbon reporting frameworks.
+
+**Source:** terraPulse, Inc. (Ralph Dubayah et al., University of Maryland lineage)
+**Input sensors:** GEDI full-waveform LiDAR + multisource optical / SAR fusion
+**Spatial resolution:** 25 m (footprint) to 1 km (gridded)
+**Coverage:** Global (GEDI orbital range, ~51.6°N–S)
+**Key applications:** Operational forest carbon inventory, carbon credit MRV, national biomass baselines, ecosystem service valuation
+
+::: {.callout-note}
+terraPulse products are available through [terraPulse, Inc.](https://terrapulse.com). Methodological details are described in publications from the GEDI science team at the University of Maryland.
+:::
+
+---
+
+### Saatchi et al. — Pan-Tropical Forest Biomass Benchmark {#saatchi}
+
+**Saatchi et al. (2011)** produced the first pantropical AGB map at 1 km resolution, covering the three major tropical forest regions (Amazon, Congo, Southeast Asia) by fusing ICESAT GLAS lidar, MODIS vegetation indices, and field inventory data via a maximum entropy (MaxEnt) approach. This benchmark map remains widely used for cross-validation, historical baselines, and as a reference for subsequent higher-resolution products.
+
+**Source:** Jet Propulsion Laboratory / NASA (Sassan Saatchi et al.)
+**Input sensors:** ICESAT GLAS (spaceborne LiDAR) · MODIS · SRTM · QuikSCAT
+**Spatial resolution:** 1 km
+**Coverage:** Pan-tropical forests (lat 23°N–23°S)
+**Reference year:** ~2000–2006
+**Citation:** Saatchi et al. (2011), *PNAS*, [DOI: 10.1073/pnas.1019576108](https://doi.org/10.1073/pnas.1019576108)
+**Key applications:** Historical pan-tropical carbon stock baseline, cross-validation of newer products, tropical deforestation carbon emission estimates
+
+---
+
+### Wang et al. — Global 30 m Forest AGB via Deep Learning {#wang}
+
+**Wang et al. (2022)** produced a global 30 m AGB map by training a deep learning model (combining CNNs and gradient boosting) on GEDI L4A footprint-level AGB labels fused with Landsat spectral metrics, Sentinel-1 SAR backscatter, Sentinel-2 vegetation indices, and SRTM topography. This product extends spatial continuity from GEDI's sparse footprint sampling to wall-to-wall global coverage at 30 m — compatible with Hansen GFC, NLCD, and other Landsat-resolution products.
+
+**Source:** Beijing Normal University / CAS (Wang et al.)
+**Input sensors:** GEDI L4A · Landsat OLI · Sentinel-1 SAR · Sentinel-2 MSI · SRTM
+**Spatial resolution:** 30 m
+**Coverage:** Global forests
+**Reference year:** ~2019–2020
+**Method:** Deep learning (CNN + gradient boosting) with GEDI L4A as training labels
+**Key applications:** Global forest AGB mapping at Landsat resolution, cross-sensor biomass product comparison, carbon stock and flux integration with 30 m change detection products
+
+---
+
+## Global Canopy Height Map — ETH Zurich / Meta AI Research (2020) {#eth-height}
+
+The **Global Canopy Height Map** is a wall-to-wall 10 m resolution forest canopy height product covering the entire vegetated land surface. It was produced by fusing spaceborne GEDI full-waveform LiDAR observations with Sentinel-2 multispectral imagery using a large-scale deep learning framework trained at global scale. This dataset is one of the first openly available global canopy height products at meter-scale spatial resolution, enabling landscape-level forest structure analysis without airborne surveys.
+
+**Source:** ETH Zurich (Institut für Kartographie und Geoinformation) + Meta AI Research
+**Input sensors:** GEDI L2A (spaceborne LiDAR) + Sentinel-2 MSI (optical)
+**Year:** 2020 (released 2023)
+**Spatial resolution:** 10 m
+**Coverage:** Global vegetated land surface
+**Method:** GEDI L2A canopy height used as training labels; Sentinel-2 multispectral imagery used as input features; trained via deep learning (CNN regression) at global scale
+**Accuracy:** RMSE ~2.8 m (global), variable by biome and canopy closure
+**Key applications:** Global forest biomass estimation, carbon stock mapping, global tree height benchmarking, habitat connectivity analysis, biodiversity modeling, training/validation for other canopy height models
+
+::: {.callout-tip}
+Compared to GEDI alone (discrete footprints at ~600 m cross-track spacing), this product provides spatially continuous canopy height globally at 10 m — useful for connecting plot-scale field measurements to regional and global analyses without requiring airborne LiDAR coverage.
+:::
+
+::: {.callout-note}
+The Global Canopy Height Map is freely available on [Google Earth Engine](https://earthengine.google.com) (`users/nlang/ETH_GlobalCanopyHeight_2020_10m_v1`) and for direct download via [ETH Research Collection](https://doi.org/10.3929/ethz-b-000609802).
+:::
+
+---
+
+## Global Forest Canopy Height — NASA / GEDI + Landsat (Lang et al. 2023) {#nasa-height}
+
+A complementary 30 m global canopy height product produced by NASA in collaboration with ETH Zurich, using GEDI L4B aggregated canopy height paired with Landsat spectral-temporal metrics. The coarser resolution makes it more compatible with Landsat-era time series analyses and global forest inventory cross-walks.
+
+**Source:** NASA Goddard Space Flight Center + ETH Zurich
+**Input sensors:** GEDI L4B (spaceborne LiDAR) + Landsat 8 OLI (optical)
+**Spatial resolution:** 30 m
+**Coverage:** ~51.6°N to 51.6°S (GEDI orbital coverage)
+**Year:** ~2019–2021 composite
+**Key applications:** Global biomass mapping, carbon accounting, compatibility with Landsat-era change detection products
+
+::: {.callout-note}
+Available on [Google Earth Engine](https://earthengine.google.com) (`NASA/GEDI04_B_002`) and [NASA EarthData](https://earthdata.nasa.gov).
+:::
+
+---
+
+## Hansen Global Forest Change — University of Maryland / Google {#hansen}
+
+**Hansen Global Forest Change** (GFC) is the most widely used global forest cover and loss product. It maps tree cover extent in the year 2000 and tracks annual tree cover loss and gain from 2001 to the present at 30 m resolution using dense Landsat time series. The product is the primary global benchmark for deforestation monitoring, carbon accounting under REDD+, and forest policy assessment.
+
+**Source:** University of Maryland (Matthew Hansen et al.) + Google
+**Input sensors:** Landsat 5/7/8 TM/ETM+/OLI time series
+**Spatial resolution:** 30 m
+**Coverage:** Global (80°N to 80°S)
+**Temporal range:** 2000 baseline; annual loss layers 2001–present
+**Key layers:**
+- **treecover2000** — Percent tree canopy cover in year 2000
+- **loss** — Binary annual tree cover loss (1 = loss event in that year)
+- **lossyear** — Year of first detected loss (2001–present)
+- **gain** — Tree cover gain 2000–2012 (binary)
+- **datamask** — Land/water/no-data mask
+**Key applications:** Deforestation monitoring, REDD+ carbon accounting, forest fragmentation analysis, tropical forest dynamics, fire-driven forest loss, legal compliance monitoring
+
+::: {.callout-note}
+Hansen GFC is freely available on [Google Earth Engine](https://earthengine.google.com) (`UMD/hansen/global_forest_change_YYYY_vX`) and for direct download from the [Global Forest Watch platform](https://www.globalforestwatch.org).
+:::
+
+---
+
+## MODIS Vegetation Continuous Fields (MOD44B) — NASA {#mod44b}
+
+**MOD44B** is an annual sub-pixel tree cover product derived from MODIS spectral bands and trained against high-resolution reference data. It provides proportional estimates (0–100%) of tree canopy, non-tree vegetation, and bare ground per 250 m pixel — useful for global vegetation cover fractions, ecosystem boundary delineation, and land surface model parameterization.
+
+**Source:** NASA Goddard Space Flight Center
+**Input sensors:** MODIS Terra (MOD) and Aqua (MYD)
+**Spatial resolution:** 250 m
+**Temporal resolution:** Annual composites
+**Temporal range:** 2000–present
+**Key layers:** Percent tree cover · Percent non-tree vegetation · Percent bare ground · Quality assessment flags
+**Key applications:** Global land surface parameterization, forest/non-forest fraction, savanna and dryland vegetation cover, multi-decadal tree cover trends
+
+::: {.callout-note}
+MOD44B is freely available through [NASA EarthData](https://earthdata.nasa.gov) (LP DAAC) and [Google Earth Engine](https://earthengine.google.com) (`MODIS/006/MOD44B`).
+:::
+
+---
+
+## NLCD — National Land Cover Database (USGS / MRLC) {#nlcd}
+
+**NLCD** is the definitive land cover classification product for the United States, produced by the Multi-Resolution Land Characteristics (MRLC) Consortium — a partnership of USGS, USFS, EPA, NOAA, and NASA. Each edition maps land surface into 16–20 Anderson Level II classes using Landsat imagery, and the consistent methodology across editions makes NLCD the standard dataset for tracking long-term land cover and impervious surface change in the U.S.
+
+**Agency:** USGS / MRLC Consortium (USFS, EPA, NOAA, NASA)
+**Input sensors:** Landsat TM / ETM+ / OLI multispectral imagery
+**Spatial resolution:** 30 m
+**Coverage:** Contiguous United States (CONUS), Alaska, Hawaii, Puerto Rico
+**Temporal coverage:** Editions available for 2001, 2004, 2006, 2008, 2011, 2013, 2016, 2019, 2021
+**Land cover classes (selected):** Open water, developed (4 intensity levels), barren, deciduous/evergreen/mixed forest, shrubland, herbaceous, pasture/hay, cultivated crops, woody/emergent wetlands
+**Key layers:**
+- **Land Cover** — Discrete 30 m classification (16–20 classes)
+- **Impervious Surface** — Percent impervious cover per pixel
+- **Tree Canopy Cover** — Percent tree canopy per pixel
+- **Change Index** — Pixel-level land cover change between edition pairs
+**Key applications:** Urban growth and impervious surface trends, forest cover change, agricultural land use, wildland–urban interface mapping, habitat fragmentation, hydrological runoff modeling, national-scale biodiversity assessments
+
+::: {.callout-note}
+NLCD data are freely available through the [MRLC website](https://www.mrlc.gov/data) and [Google Earth Engine](https://earthengine.google.com) (`USGS/NLCD_RELEASES`).
+:::
+
+---
+
+## TreeMap — National Forest Structure Map (USFS) {#treemap}
+
+**TreeMap** is a 30 m spatially explicit forest structure and composition product for the contiguous United States. Developed by the USDA Forest Service Rocky Mountain Research Station, it attributes every forested 30 m pixel with plot-level forest inventory variables imputed from FIA (Forest Inventory and Analysis) ground measurements using Random Forest-based nearest-neighbor imputation. The result is a seamless, species-resolved raster of forest stand structure at national scale.
+
+**Agency:** USDA Forest Service, Rocky Mountain Research Station
+**Input data:** FIA ground plot measurements (species, structure) + NLCD tree canopy mask + Landsat spectral-temporal metrics + topographic variables (DEM derivatives)
+**Method:** Gradient nearest-neighbor (GNN) / Random Forest imputation — each pixel is assigned the most similar FIA plot based on spectral and topographic predictors
+**Spatial resolution:** 30 m
+**Coverage:** CONUS forested land (non-forested pixels masked)
+**Editions:** TreeMap 2016 (primary public release); TreeMap 2014 also available
+**Key variables per pixel:** Tree species composition (basal area by species), stand basal area (m²/ha), trees per hectare, quadratic mean diameter (QMD), stand age, canopy cover, above-ground live biomass (dry weight Mg/ha), snag density
+**Key applications:** National-scale forest carbon accounting, fire behavior and risk modeling (feeds into LANDFIRE), habitat suitability for wildlife, timber volume estimation, cross-validation with GEDI and airborne LiDAR biomass products
+
+::: {.callout-tip}
+TreeMap is the only publicly available product that maps *species-resolved* forest structure continuously at 30 m for the entire CONUS, making it particularly valuable for species-specific carbon allocation models and biodiversity–structure analyses.
+:::
+
+::: {.callout-note}
+TreeMap 2016 data are freely available through the [USFS Rocky Mountain Research Station data portal](https://www.fs.usda.gov/rds/archive/Catalog/RDS-2021-0074) and [Google Earth Engine](https://earthengine.google.com) (`USFS/GTAC/LCMS/v2023-9`).
+:::
+
+---
+
+## LCMS — Landscape Change Monitoring System (USFS / Google) {#lcms}
+
+**LCMS** is an annual 30 m land change mapping product for the contiguous United States and Southeast Alaska, developed by the USDA Forest Service Geospatial Technology and Applications Center (GTAC) using Google Earth Engine and dense Landsat time series. LCMS applies spectral-change detection algorithms (LandTrendr, CCDC) to characterize not only land *cover* and land *use*, but also the specific *type* and *rate* of change — distinguishing slow gradual disturbances from fast abrupt events. This makes LCMS particularly powerful for detecting bark beetle outbreaks, fire severity gradients, urban encroachment, and post-disturbance forest recovery.
+
+**Agency:** USDA Forest Service (GTAC) in partnership with Google Earth Engine
+**Input sensors:** Landsat 5/7/8/9 TM/ETM+/OLI time series
+**Spatial resolution:** 30 m
+**Temporal coverage:** Annual maps from 1985 to present
+**Coverage:** Contiguous United States + Southeast Alaska
+**Key map layers:**
+- **Land Cover** — 7 classes: Trees, Tall Shrubs/Shrubs, Short Shrubs/Herbaceous, Barren, Snow/Ice, Water, Developed
+- **Land Use** — 5 classes: Agriculture, Developed, Forest, Other, Water/Wetland
+- **Change** — 11 classes distinguishing: Slow Loss (stress/defoliation), Fast Loss (fire/harvest/wind), Very Fast Loss; Gain (vegetation recovery); Stable
+**Key applications:** Annual forest disturbance mapping (fire, harvest, insects/disease, drought stress), post-disturbance recovery tracking, land use intensification, fuel load and fire risk assessment, carbon flux modeling
+
+::: {.callout-tip}
+Unlike Hansen GFC which flags any tree cover loss, LCMS explicitly classifies the *speed* and *cause* of change — "slow loss" signals drought stress or insect defoliation years before canopy mortality appears, providing early warning capability not possible with threshold-based products.
+:::
+
+::: {.callout-note}
+LCMS data are freely available through the [USFS LCMS viewer](https://apps.fs.usda.gov/lcms-viewer/) and [Google Earth Engine](https://earthengine.google.com) (`USFS/GTAC/LCMS/v2023-9`). Annual updates are released each year.
+:::
+
+---
+
+## ESA WorldCover — Global Land Cover at 10 m (ESA Copernicus) {#worldcover}
+
+**ESA WorldCover** is a global 10 m land cover product produced by ESA under the Copernicus Global Land Service, fusing Sentinel-1 SAR and Sentinel-2 multispectral imagery to achieve global land surface classification at the highest resolution publicly available at planetary scale. Two editions have been released (2020 and 2021), each providing a 11-class annual snapshot of global land cover.
+
+**Agency:** ESA Copernicus / produced by VITO, Brockmann Consult, CS, Gamma Remote Sensing, IIASA, WUR
+**Input sensors:** Sentinel-2 MSI (optical) + Sentinel-1 SAR (C-band)
+**Spatial resolution:** 10 m
+**Coverage:** Global (all land, including Antarctica)
+**Editions:** WorldCover 2020 · WorldCover 2021
+**Land cover classes (11):** Tree cover · Shrubland · Grassland · Cropland · Built-up · Bare/sparse vegetation · Snow & ice · Permanent water bodies · Herbaceous wetland · Mangroves · Moss & lichen
+**Overall accuracy:** ~75% (global); higher in temperate regions, lower in tropical forests and mixed agricultural landscapes
+**Key applications:** Global habitat extent, deforestation frontiers, urban expansion, wetland mapping, food security monitoring, regional land use planning, validation baseline for coarser products
+
+::: {.callout-note}
+ESA WorldCover is freely available through the [ESA WorldCover portal](https://worldcover2021.esa.int), [Copernicus Data Space](https://dataspace.copernicus.eu), and [Google Earth Engine](https://earthengine.google.com) (`ESA/WorldCover/v100` for 2020, `ESA/WorldCover/v200` for 2021).
+:::
+
+---
+
+## ESA CCI Land Cover — Global Land Cover at 100 m (ESA / C3S) {#esacci}
+
+**ESA CCI Land Cover** (and its continuation under the Copernicus Climate Change Service, C3S) is a global annual land cover product spanning 1992 to present. The 300 m archive (1992–2015) is complemented by the **Copernicus Global Land Cover (CGLS-LC100)** product at 100 m, providing annual global land cover maps from 2015 to 2019 with continuous fractional cover layers alongside the discrete classification.
+
+**Agency:** ESA Climate Change Initiative (CCI) / Copernicus Climate Change Service (C3S) / Copernicus Global Land Service (CGLS)
+**Input sensors:** MERIS (300 m archive) · PROBA-V 100 m (CGLS-LC100 2015–2019) · Sentinel-3 (post-2020 continuation)
+**Spatial resolution:**
+- **ESA CCI LC** — 300 m (1992–2020 annual archive)
+- **CGLS-LC100** — 100 m (2015–2019 annual)
+**Coverage:** Global
+**Temporal coverage:** Annual maps 1992–present (300 m); 2015–2019 (100 m)
+**Classification system:** 22 land cover classes (FAO LCCS-compatible)
+**CGLS-LC100 additional layers (continuous fields):**
+- Tree cover fraction · Grass cover fraction · Shrub cover fraction
+- Urban built-up fraction · Permanent water fraction · Bare cover fraction
+**Key applications:** Global long-term land cover change (30-year archive), climate model land surface parameterization, biodiversity and habitat trend analysis, carbon cycle assessments, comparison with finer-resolution products (WorldCover, NLCD)
+
+::: {.callout-tip}
+The **300 m annual archive back to 1992** is ESA CCI LC's unique strength — no other global product provides a comparable continuous multi-decadal land cover time series, making it indispensable for studies of long-term LULC change and its climate feedbacks.
+:::
+
+::: {.callout-note}
+ESA CCI Land Cover (300 m) is freely available from the [ESA CCI LC viewer](https://maps.elie.ucl.ac.be/CCI/viewer/) and [Google Earth Engine](https://earthengine.google.com) (`ESA/CCI/FireCCI/5_1` and `ESA/GLOBCOVER_L4_200901_200912_V2_3`). CGLS-LC100 (100 m) is available from the [Copernicus Global Land Service](https://land.copernicus.eu/global/products/lc) and GEE (`COPERNICUS/Landcover/100m/Proba-V-C3/Global`).
+:::
+
+---
+
+## CMIP6 — Coupled Model Intercomparison Project Phase 6 (WCRP) {#cmip6}
+
+**CMIP6** is the sixth phase of the Coupled Model Intercomparison Project, coordinated by the World Climate Research Programme (WCRP). It provides the most comprehensive and widely used multi-model ensemble of Earth System Model (ESM) simulations for historical climate and future projections, forming the scientific backbone of the IPCC Sixth Assessment Report (AR6). CMIP6 models simulate the fully coupled atmosphere–ocean–land–ice system and output hundreds of variables relevant to ecosystem research, including surface temperature, precipitation, solar radiation, soil moisture, and terrestrial carbon fluxes.
+
+**Coordinating body:** World Climate Research Programme (WCRP) — Coupled Model Intercomparison Project
+**Number of models:** ~100 ESMs from ~50 modeling centers worldwide
+**Simulation types:**
+- **Historical** — 1850–2014, driven by observed forcings (greenhouse gases, aerosols, land use)
+- **ScenarioMIP projections** — 2015–2100 under four Shared Socioeconomic Pathways:
+  - SSP1-2.6 (low emissions, ~+1.5–2°C by 2100)
+  - SSP2-4.5 (intermediate emissions)
+  - SSP3-7.0 (high emissions)
+  - SSP5-8.5 (very high emissions, ~+4–5°C by 2100)
+**Key ecosystem-relevant variables:**
+- `tas` — Near-surface air temperature (2 m)
+- `pr` — Precipitation
+- `npp` — Net Primary Production
+- `gpp` — Gross Primary Production
+- `mrso` — Soil moisture
+- `hurs` — Near-surface relative humidity
+- `rsds` — Surface downwelling shortwave radiation
+**Spatial resolution:** Typically 1°–2° (atmosphere); some high-resolution models at 0.25°–0.5°
+**Temporal resolution:** Monthly outputs (standard); daily available for select variables and models
+
+::: {.callout-tip}
+For ecosystem IAV studies, CMIP6 daily or monthly `tas`, `pr`, and `npp` outputs under SSP126 and SSP585 form the standard multi-model ensemble used to characterize future climate–NPP relationships and extreme event attribution — as employed in Chu et al. (2026, *Environmental Research Letters*, [DOI: 10.1088/1748-9326/ae6dd4](https://doi.org/10.1088/1748-9326/ae6dd4)).
+:::
+
+::: {.callout-note}
+CMIP6 data are freely available through the [Earth System Grid Federation (ESGF)](https://esgf-node.llnl.gov/projects/cmip6/) node network. Select variables are also accessible via [Google Earth Engine](https://earthengine.google.com) and [Copernicus Climate Data Store (CDS)](https://cds.climate.copernicus.eu).
+:::
+
+---
+
+## TRENDY — Trends in Net Land–Atmosphere Carbon Exchange (Multi-Model DGVM Ensemble) {#trendy}
+
+**TRENDY** is a coordinated multi-model benchmarking initiative that runs an ensemble of state-of-the-art Dynamic Global Vegetation Models (DGVMs) under identical forcing conditions, producing standardized outputs of terrestrial carbon, water, and energy fluxes. TRENDY results underpin the annual **Global Carbon Budget** published by the Global Carbon Project, providing the model-based estimate of the global land carbon sink and its interannual variability.
+
+**Coordinating body:** Global Carbon Project / University of Exeter (led by Stephen Sitch and Pierre Friedlingstein)
+**Participating models (selected):** ORCHIDEE · LPJ-GUESS · CLM5 · CABLE-POP · JULES · VISIT · SDGVM · ISAM · YIBs · CLASSIC · DLEM · OCN · JSBACH
+**Number of models:** ~18 DGVMs (varies by annual version)
+**Simulation protocols:**
+| Simulation | CO₂ | Climate | Land Use |
+|---|---|---|---|
+| **S0** | Pre-industrial fixed | Pre-industrial fixed | Pre-industrial fixed (control) |
+| **S1** | Transient | Pre-industrial fixed | Pre-industrial fixed |
+| **S2** | Transient | Transient (observed) | Pre-industrial fixed |
+| **S3** | Transient | Transient (observed) | Transient (observed) |
+
+Comparing S2 vs. S1 isolates the **climate effect**; S3 vs. S2 isolates the **land use effect**; S3 vs. S0 gives the **total change**.
+
+**Climate forcing:** CRU-JRA (bias-corrected ERA-reanalysis + CRU observations), updated annually
+**Key output variables:** GPP · NPP · NEE · Rh (heterotrophic respiration) · Vegetation carbon · Soil carbon · Evapotranspiration · Runoff
+**Spatial resolution:** 0.5° × 0.5° global grid
+**Temporal resolution:** Monthly; some models provide daily
+**Temporal coverage:** 1700 or 1850 to present (updated annually with each Global Carbon Budget release)
+
+::: {.callout-tip}
+TRENDY's S2 simulation protocol — transient CO₂ and observed climate, fixed land use — is the standard reference for isolating the **climate-driven component of terrestrial NPP variability**, making it directly comparable to observation-based remote sensing products (MODIS MOD17, GLASS NPP) and CMIP6 model projections for attribution studies.
+:::
+
+::: {.callout-note}
+TRENDY model outputs are available upon request to the TRENDY coordinators via the [TRENDY project page](https://sites.exeter.ac.uk/trendy/). Annual Global Carbon Budget data (which include TRENDY ensemble summaries) are freely published at [Global Carbon Project](https://www.globalcarbonproject.org/carbonbudget/) and archived on [ICOS Carbon Portal](https://www.icos-cp.eu).
+:::
+
+---
+
+## deadtrees.earth — Global Dead Tree and Forest Disturbance Mapping {#deadtrees}
+
+**deadtrees.earth** is an open-access platform that detects and maps dead and dying trees across the globe using dense Sentinel-2 time series and automated change detection algorithms. By tracking sharp spectral transitions associated with needle/leaf loss, crown browning, and mortality, it provides near-real-time and historical records of forest dieback events — including bark beetle outbreaks, drought-induced mortality, windthrow, and wildfire-related tree death — at 10 m spatial resolution.
+
+**Developed by:** Remote Sensing and Earth Observation research community; platform maintained as a free public service
+**Input data:** Sentinel-2 multispectral time series (10 m, ~5-day revisit)
+**Spatial resolution:** 10 m (native Sentinel-2 resolution)
+**Temporal coverage:** 2017–present (Sentinel-2 archive); updated as new imagery becomes available
+**Coverage:** Global (all land areas with Sentinel-2 coverage)
+**Detection approach:** Per-pixel spectral trajectory analysis tracking changes in NDVI, red-edge bands, and SWIR reflectance to distinguish healthy canopy, stressed canopy, and dead/dying trees
+**Key disturbance types detected:** Bark beetle infestations (e.g., *Ips typographus* in European spruce forests), drought-induced dieback, wind and ice storm damage, wildfire tree mortality, forest harvesting
+**Key applications:** Forest health monitoring, bark beetle early warning, post-disturbance carbon flux estimation, regeneration tracking, forest management prioritization, calibration/validation of coarser disturbance products (Hansen GFC, MODIS burned area)
+
+::: {.callout-tip}
+deadtrees.earth is particularly powerful in Central Europe where bark beetle (*Ips typographus*) outbreaks have killed millions of hectares of Norway spruce since the 2018–2020 drought. Its 10 m Sentinel-2 basis allows detection of individual tree clusters and small-gap mortality invisible to MODIS-scale products.
+:::
+
+::: {.callout-note}
+The deadtrees.earth platform, interactive map, and data downloads are freely accessible at [deadtrees.earth](https://deadtrees.earth).
+:::
