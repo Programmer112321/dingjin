@@ -363,6 +363,10 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">About Me</span></a>
   </li>  
   <li class="nav-item">
+    <a class="nav-link" href="./publications.html"> 
+<span class="menu-text">Publications</span></a>
+  </li>  
+  <li class="nav-item">
     <a class="nav-link" href="./news.html"> 
 <span class="menu-text">News</span></a>
   </li>  
@@ -430,10 +434,44 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p><strong>How to estimate forest AGB across large spatial scales?</strong></p>
+<p><strong>How can we estimate forest above-ground biomass (AGB) accurately — from a single plot to a whole continent — and know how much to trust the estimate?</strong></p>
 <p><img src="photo/AGB_estimation.png" class="img-fluid" style="border-radius: 6px; margin-bottom: 0.75rem;;width:100.0%"></p>
-<p>LiDAR-based modeling of forest above-ground biomass (AGB) using USGS 3DEP and NEON airborne point clouds, integrated with GEDI spaceborne LiDAR footprints and ESA CCI Biomass products for cross-scale validation. Built a large-scale processing pipeline that derives canopy structure metrics (height percentiles, density, rumple index) and predicts plot-level AGB with Random Forest, XGBoost, LightGBM, and stacked ensemble models, evaluated with grouped cross-validation and SHAP-based interpretation.</p>
-<p><strong>Tools:</strong> R (lidR, lasR, terra, sf), Python (scikit-learn, XGBoost, LightGBM, SHAP)</p>
+<section id="why-it-matters" class="level2">
+<h2 class="anchored" data-anchor-id="why-it-matters">Why it matters</h2>
+<p>Forests store most of the carbon held in terrestrial vegetation, and AGB is the quantity that carbon accounting, forest management and climate policy all depend on. Wall-to-wall AGB maps now exist at national and global scales, but their errors are poorly known at the local scales where land managers, tribal nations and counties actually make decisions. My work asks where those errors come from and how multi-scale LiDAR can reduce them.</p>
+</section>
+<section id="current-projects" class="level2">
+<h2 class="anchored" data-anchor-id="current-projects">Current projects</h2>
+<section id="local-scale-bias-in-global-agb-maps" class="level3">
+<h3 class="anchored" data-anchor-id="local-scale-bias-in-global-agb-maps">1 · Local-scale bias in global AGB maps</h3>
+<p>Global biomass products (e.g.&nbsp;ESA CCI Biomass, GEDI L4B) are increasingly used to report local carbon stocks. I compare these products against local reference estimates to identify <strong>what drives their local-scale bias</strong> — and therefore when a global map can, and cannot, stand in for a local inventory. A case study focuses on forests on Tribal Nations’ lands in the U.S.</p>
+</section>
+<section id="airborne-lidar-to-agb-at-neon-sites" class="level3">
+<h3 class="anchored" data-anchor-id="airborne-lidar-to-agb-at-neon-sites">2 · Airborne LiDAR to AGB at NEON sites</h3>
+<p>A reproducible pipeline linking NEON field plots to airborne LiDAR at <strong>11 forest sites across the U.S.</strong>, from raw point clouds to wall-to-wall 20 m AGB maps. The project replicates a published NEON LiDAR–biomass benchmark and extends it with canopy-complexity metrics and USGS 3DEP LiDAR, with a focus on <strong>how well models transfer to sites they were not trained on</strong>.</p>
+<ul>
+<li><strong>Data:</strong> NEON AOP discrete-return LiDAR, NEON vegetation-structure plots, USGS 3DEP</li>
+<li><strong>Approach:</strong> point-cloud normalization (lidR / lasR), height, density and entropy-based complexity metrics, power-law and ensemble ML models, leave-one-site-out validation</li>
+</ul>
+</section>
+<section id="what-controls-the-accuracy-of-lidar-based-biomass-synthesis" class="level3">
+<h3 class="anchored" data-anchor-id="what-controls-the-accuracy-of-lidar-based-biomass-synthesis">3 · What controls the accuracy of LiDAR-based biomass? (synthesis)</h3>
+<p>A systematic review of <strong>121 LiDAR–AGB studies</strong> and a meta-regression of terrestrial laser scanning (TLS) studies, testing whether reconstruction method (quantitative structure models vs.&nbsp;allometry), scanning design and reference data explain the reported accuracy of TLS biomass estimates.</p>
+</section>
+<section id="spaceborne-lidar-validation" class="level3">
+<h3 class="anchored" data-anchor-id="spaceborne-lidar-validation">4 · Spaceborne LiDAR validation</h3>
+<p>Evaluating GEDI canopy height (L2A) and biomass (L4A) footprints against airborne LiDAR in forests and cities. The workflows are written up as open notebooks in the <a href="./blog.html">Blog</a>: <a href="./posts/gedi-l2a/index.html">GEDI L2A at NEON SCBI</a> · <a href="./posts/gedi-l4a/index.html">GEDI L4A at NEON SCBI</a> · <a href="./posts/gedi-urban-nyc/index.html">Urban GEDI in New York City</a> · <a href="./posts/gedi-3dep-compare/index.html">GEDI, 3DEP and OSM heights</a></p>
+</section>
+</section>
+<section id="outputs" class="level2">
+<h2 class="anchored" data-anchor-id="outputs">Outputs</h2>
+<ul>
+<li><strong>Poster</strong> — <em>Understanding the Drivers of Local-Scale Bias in Global Forest Aboveground Biomass Maps.</em> SAF National Convention, Tacoma, WA, Oct 2026.</li>
+<li><strong>Talk</strong> — <em>The factors influencing the accuracy of global forest biomass maps to estimate local carbon storage: a case study of Tribal Nations in the U.S.</em> Natural Resource Conference, Oklahoma City, Apr 2026.</li>
+<li><strong>Poster</strong> — <em>Understanding the Drivers of Local-Scale Bias in Global Forest Aboveground Biomass Maps.</em> AGU Fall Meeting, New Orleans, Dec 2025.</li>
+</ul>
+<p><strong>Status:</strong> manuscripts in preparation.</p>
+<p><strong>Tools:</strong> R (lidR, lasR, terra, sf), Python (scikit-learn, XGBoost, LightGBM, SHAP), Google Earth Engine</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -449,6 +487,7 @@ Note
 </div>
 
 
+</section>
 
 </main> <!-- /main -->
 <canvas id="bg-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none;"></canvas>
@@ -641,7 +680,7 @@ Note
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp("https:\/\/Programmer112321\.github\.io\/dingjin\/");
+        var filterRegex = new RegExp("https:\/\/programmer112321\.github\.io\/dingjin\/");
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }

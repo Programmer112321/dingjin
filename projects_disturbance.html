@@ -363,6 +363,10 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">About Me</span></a>
   </li>  
   <li class="nav-item">
+    <a class="nav-link" href="./publications.html"> 
+<span class="menu-text">Publications</span></a>
+  </li>  
+  <li class="nav-item">
     <a class="nav-link" href="./news.html"> 
 <span class="menu-text">News</span></a>
   </li>  
@@ -430,15 +434,35 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p><strong>How do disturbances regulate ecosystem functioning?</strong></p>
+<p><strong>How do climate extremes and disturbances change the productivity and stability of ecosystems — and what makes some forests more resilient than others?</strong></p>
+<section id="why-it-matters" class="level2">
+<h2 class="anchored" data-anchor-id="why-it-matters">Why it matters</h2>
+<p>Droughts, heatwaves and other extremes are becoming more frequent and intense. Their effects on carbon uptake are not just a matter of lower averages: extremes make productivity more variable from year to year, which makes the land carbon sink harder to predict and forests harder to manage. Knowing which ecosystems resist, recover from, or are destabilized by extremes is key to forecasting the carbon cycle and to targeting management.</p>
+</section>
+<section id="current-projects" class="level2">
+<h2 class="anchored" data-anchor-id="current-projects">Current projects</h2>
+<section id="future-climate-extremes-and-productivity-variability-in-central-asia-published" class="level3">
+<h3 class="anchored" data-anchor-id="future-climate-extremes-and-productivity-variability-in-central-asia-published">1 · Future climate extremes and productivity variability in Central Asia <em>(published)</em></h3>
 <p><img src="photo/climate_extremes_merged_ecosystem.png" class="img-fluid" style="border-radius: 6px; margin-bottom: 0.75rem;;width:100.0%"></p>
-<p>Climate extremes are projected to become more frequent and intense in the future, posing potentially severe yet poorly understood consequences for ecosystem functioning and carbon cycling.</p>
-<p><strong>Publication:</strong> Chu, D., Zhang, L., Wu, H., He, H., &amp; Ren, X. (2026). Future climate extremes enhance interannual variability of net primary production in Central Asia. <em>Environmental Research Letters.</em> <a href="https://doi.org/10.1088/1748-9326/ae6dd4" class="uri">https://doi.org/10.1088/1748-9326/ae6dd4</a></p>
-<hr>
-<p><strong>How do disturbances drive forest loss and its succession?</strong></p>
+<p>Using CMIP6 climate projections, this study shows that intensifying climate extremes — droughts, heatwaves and anomalously wet periods — will <strong>amplify the year-to-year swings in net primary production (NPP)</strong> across Central Asia’s arid and semi-arid ecosystems, making carbon uptake increasingly unpredictable under future warming.</p>
+<blockquote class="blockquote">
+<p>Chu, D., Zhang, L., Wu, H., He, H., &amp; Ren, X. (2026). Future climate extremes enhance interannual variability of net primary production in Central Asia. <em>Environmental Research Letters.</em> <a href="https://doi.org/10.1088/1748-9326/ae6dd4">doi:10.1088/1748-9326/ae6dd4</a></p>
+</blockquote>
+<p>A companion study, led by Han Wu, extends the analysis to the terrestrial carbon sink across China:</p>
+<blockquote class="blockquote">
+<p>Wu, H., Zhang, L., He, H., Ren, X., Zhang, M., Chu, D., &amp; Zheng, Y. (2025). Enhanced interannual variability of the terrestrial carbon sink in China under high emissions. <em>Environmental Research Letters.</em></p>
+</blockquote>
+</section>
+<section id="forest-biomass-stability-under-drought-across-the-u.s." class="level3">
+<h3 class="anchored" data-anchor-id="forest-biomass-stability-under-drought-across-the-u.s.">2 · Forest biomass stability under drought across the U.S.</h3>
 <p><img src="photo/tree_mortality.jpg" class="img-fluid" style="border-radius: 6px; margin-bottom: 0.75rem;;width:100.0%"></p>
-<p>Quantifying forest loss trends and drivers across large spatial extents using time-series satellite imagery. The workflow integrates Hansen Global Forest Change data with climate and topographic covariates to attribute disturbance to fire, harvest, and insect outbreak.</p>
-<p><strong>Tools:</strong> R, Python, GEE</p>
+<p>Which forests hold their biomass through drought? Using repeated forest inventory across the conterminous U.S., I identify drought events from climatic water deficit and quantify each forest’s <strong>resistance, recovery and resilience</strong> in above-ground biomass, then ask how climate, soil, stand structure, structural diversity and plant functional traits shape those responses.</p>
+<ul>
+<li><strong>Data:</strong> USFS FIA plot network (aggregated to hexagons), seasonal climatic water deficit and vapor pressure deficit, soil and topography layers, TRY plant traits, tree-diversity and structural-diversity products</li>
+<li><strong>Approach:</strong> event-based stability metrics, interpretable machine learning with permutation-based significance testing</li>
+</ul>
+<p><strong>Status:</strong> manuscript in preparation.</p>
+<p><strong>Tools:</strong> R, Python (scikit-learn, XGBoost, SHAP), Google Earth Engine, CMIP6 / TRENDY model output</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -454,6 +478,8 @@ Note
 </div>
 
 
+</section>
+</section>
 
 </main> <!-- /main -->
 <canvas id="bg-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none;"></canvas>
@@ -646,7 +672,7 @@ Note
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp("https:\/\/Programmer112321\.github\.io\/dingjin\/");
+        var filterRegex = new RegExp("https:\/\/programmer112321\.github\.io\/dingjin\/");
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }

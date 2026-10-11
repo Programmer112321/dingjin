@@ -363,6 +363,10 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">About Me</span></a>
   </li>  
   <li class="nav-item">
+    <a class="nav-link" href="./publications.html"> 
+<span class="menu-text">Publications</span></a>
+  </li>  
+  <li class="nav-item">
     <a class="nav-link" href="./news.html"> 
 <span class="menu-text">News</span></a>
   </li>  
@@ -430,10 +434,43 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p><strong>How does the urban green space regulate the temperature?</strong></p>
+<p><strong>How much do urban forests and green spaces cool cities, what controls that cooling, and who benefits from it?</strong></p>
 <p><img src="photo/urban_green_space_cooling_effect.png" class="img-fluid" style="border-radius: 6px; margin-bottom: 0.75rem;;width:100.0%"></p>
-<p>Quantifying how the structure and composition of urban green spaces moderate land surface temperature across cities. Integrates USGS 3DEP airborne LiDAR-derived canopy metrics (height, cover, vertical complexity) with land cover and satellite-derived LST to model cooling magnitude as a function of canopy structure, patch geometry, and surrounding impervious context.</p>
-<p><strong>Tools:</strong> R (lidR, terra, sf, lme4), Python (xarray, rasterio, scikit-learn)</p>
+<section id="why-it-matters" class="level2">
+<h2 class="anchored" data-anchor-id="why-it-matters">Why it matters</h2>
+<p>Extreme heat is the deadliest weather hazard in the U.S., and cities amplify it. Planting and protecting trees is one of the most widely promoted heat-adaptation strategies, but the cooling a park or urban forest delivers varies enormously from place to place. Planners need to know <em>which</em> green spaces cool most, <em>why</em>, and whether that cooling is holding up as climate and canopies change.</p>
+</section>
+<section id="current-projects" class="level2">
+<h2 class="anchored" data-anchor-id="current-projects">Current projects</h2>
+<section id="patterns-and-drivers-of-urban-forest-cooling-across-u.s.-cities" class="level3">
+<h3 class="anchored" data-anchor-id="patterns-and-drivers-of-urban-forest-cooling-across-u.s.-cities">1 · Patterns and drivers of urban forest cooling across U.S. cities</h3>
+<p>A national analysis of the cooling effect of urban forests across <strong>hundreds of U.S. urbanized areas</strong>. For each forest patch, I measure the land surface temperature (LST) contrast between the forest and its surroundings from a decade of Landsat thermal imagery, track how that cooling changes through time, and model it as a function of:</p>
+<ul>
+<li><strong>Vegetation structure</strong> — canopy cover, canopy height, greenness, tree diversity</li>
+<li><strong>Climate</strong> — summer temperature, precipitation, evaporative demand</li>
+<li><strong>Urban morphology</strong> — building density, height and floor-area ratio around each forest</li>
+<li><strong>Terrain and soil</strong></li>
+</ul>
+<p><strong>Data:</strong> Landsat 8/9 LST and NDVI, NLCD tree canopy cover, LCMS land cover and disturbance, global canopy height, building footprints, gridded climate.</p>
+<p><strong>Approach:</strong> quality-controlled cooling profiles in distance rings around each forest, Theil–Sen and mixed-effects trend estimation, interpretable machine learning (SHAP, partial dependence).</p>
+</section>
+<section id="heat-air-conditioning-access-and-equity" class="level3">
+<h3 class="anchored" data-anchor-id="heat-air-conditioning-access-and-equity">2 · Heat, air-conditioning access and equity</h3>
+<p>Surface heat matters most for people who cannot escape it indoors. Combining tract-level air-conditioning prevalence with satellite heat and canopy data across U.S. cities, this project asks where heat exposure and low cooling access overlap — and whether the communities in those places are served by green space.</p>
+</section>
+<section id="canopy-structure-from-airborne-lidar" class="level3">
+<h3 class="anchored" data-anchor-id="canopy-structure-from-airborne-lidar">3 · Canopy structure from airborne LiDAR</h3>
+<p>Using USGS 3DEP airborne LiDAR to characterize the 3-D structure of urban canopies (height, vertical complexity, gaps) and buildings, so cooling can be linked to structure rather than to 2-D cover alone. See the <a href="./posts/lidar-metrics/index.html">LiDAR metrics</a> and <a href="./posts/gedi-urban-nyc/index.html">urban GEDI</a> posts for the processing workflow.</p>
+</section>
+</section>
+<section id="outputs" class="level2">
+<h2 class="anchored" data-anchor-id="outputs">Outputs</h2>
+<ul>
+<li><strong>Talk (30 min)</strong> — <em>Patterns and Drivers of Urban Forest Cooling Across U.S. Cities.</em> SAF National Convention, Tacoma, WA, Oct 2026.</li>
+<li><strong>Proposal</strong> — NASA FINESST fellowship application on multi-scale LiDAR and urban cooling (2026).</li>
+</ul>
+<p><strong>Status:</strong> manuscripts in preparation.</p>
+<p><strong>Tools:</strong> R (lidR, terra, sf, lme4), Python (xarray, rasterio, scikit-learn, XGBoost, SHAP), Google Earth Engine</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -449,6 +486,7 @@ Note
 </div>
 
 
+</section>
 
 </main> <!-- /main -->
 <canvas id="bg-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none;"></canvas>
@@ -641,7 +679,7 @@ Note
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp("https:\/\/Programmer112321\.github\.io\/dingjin\/");
+        var filterRegex = new RegExp("https:\/\/programmer112321\.github\.io\/dingjin\/");
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }
