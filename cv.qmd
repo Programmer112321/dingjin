@@ -71,6 +71,28 @@ Forests and mountains I have walked through — from old-growth rain forest in t
 ![Sunset over the prairie, Wichita Mountains, Oklahoma (2025)](photo/gallery/wichita_sunset.jpg){style="border-radius: 6px; width: 100%;"}
 :::
 
+### Fieldwork in the Qilian Mountains, Qinghai (2022)
+
+For my M.Sc. I spent the summer of 2022 surveying forests at 2,300–3,000 m in the eastern Qilian Mountains, Qinghai, China — measuring stand structure and collecting tree cores to reconstruct forest growth.
+
+::: {layout-ncol=2}
+![Spruce forest above a mountain meadow](photo/gallery/qilian_meadow_forest.jpg){style="border-radius: 6px; width: 100%;"}
+
+![A forested valley in the eastern Qilian Mountains](photo/gallery/qilian_valley.jpg){style="border-radius: 6px; width: 100%;"}
+
+![Spruce forest and grassland on steep mountain slopes](photo/gallery/qilian_spruce_slopes.jpg){style="border-radius: 6px; width: 100%;"}
+
+![Spruce stands along the valley floor](photo/gallery/qilian_spruce_valley.jpg){style="border-radius: 6px; width: 100%;"}
+
+![Coring a tree with an increment borer](photo/gallery/qilian_coring.jpg){style="border-radius: 6px; width: 100%;"}
+
+![A fresh tree core for ring-width analysis](photo/gallery/qilian_tree_core.jpg){style="border-radius: 6px; width: 100%;"}
+
+![A double rainbow over the field camp](photo/gallery/qilian_rainbow_camp.jpg){style="border-radius: 6px; width: 100%;"}
+
+![A 22° halo around the sun above the forest](photo/gallery/qilian_sun_halo.jpg){style="border-radius: 6px; width: 100%;"}
+:::
+
 ---
 
 # Open Science
