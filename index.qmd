@@ -1,7 +1,7 @@
 ---
 title: "Dingjin Chu 初鼎晋"
 description: "PhD Student in Land Surface Ecology & Geospatial Science at Oklahoma State University, researching forest AGB estimation, urban green space cooling, and ecosystem responses to disturbances."
-image: photo/personal_profile.JPG
+image: photo/about/personal_profile.JPG
 include-in-header:
   - text: |
       <script type="application/ld+json">
@@ -11,7 +11,7 @@ include-in-header:
         "name": "Dingjin Chu",
         "alternateName": "初鼎晋",
         "url": "https://programmer112321.github.io/dingjin/",
-        "image": "https://programmer112321.github.io/dingjin/photo/personal_profile.JPG",
+        "image": "https://programmer112321.github.io/dingjin/photo/about/personal_profile.JPG",
         "jobTitle": "PhD Student",
         "description": "PhD Student in Land Surface Ecology and Geospatial Science, researching forest above-ground biomass estimation, urban green space cooling effects, and ecosystem responses to climate disturbances.",
         "affiliation": {
@@ -42,7 +42,7 @@ include-in-header:
       </script>
 about:
   template: jolla
-  image: photo/personal_profile.JPG
+  image: photo/about/personal_profile.JPG
   links:
     - icon: github
       text: GitHub
@@ -88,19 +88,19 @@ To answer them, I combine field inventories (FIA, NEON) with airborne, spaceborn
 
 ::: {.grid}
 ::: {.g-col-12 .g-col-md-4}
-[![](photo/AGB_estimation.png){style="border-radius:8px; width:100%; aspect-ratio:4/3; object-fit:cover;"}](projects_agb.qmd)
+[![](photo/research/AGB_estimation.png){style="border-radius:8px; width:100%; aspect-ratio:4/3; object-fit:cover;"}](projects_agb.qmd)
 
 **[Forest Above-Ground Biomass](projects_agb.qmd)**<br>
 Multi-scale LiDAR and the local accuracy of biomass maps.
 :::
 ::: {.g-col-12 .g-col-md-4}
-[![](photo/climate_extremes_merged_ecosystem.png){style="border-radius:8px; width:100%; aspect-ratio:4/3; object-fit:cover;"}](projects_disturbance.qmd)
+[![](photo/research/climate_extremes_merged_ecosystem.png){style="border-radius:8px; width:100%; aspect-ratio:4/3; object-fit:cover;"}](projects_disturbance.qmd)
 
 **[Response to Disturbances](projects_disturbance.qmd)**<br>
 Climate extremes, productivity variability and forest stability.
 :::
 ::: {.g-col-12 .g-col-md-4}
-[![](photo/urban_green_space_cooling_effect.png){style="border-radius:8px; width:100%; aspect-ratio:4/3; object-fit:cover;"}](projects_urban.qmd)
+[![](photo/research/urban_green_space_cooling_effect.png){style="border-radius:8px; width:100%; aspect-ratio:4/3; object-fit:cover;"}](projects_urban.qmd)
 
 **[Urban Green Space Cooling](projects_urban.qmd)**<br>
 How canopy, climate and buildings shape urban cooling.
@@ -109,7 +109,7 @@ How canopy, climate and buildings shape urban cooling.
 
 ---
 
-![*Image generated from [Your Name in Landsat](https://science.nasa.gov/specials/your-name-in-landsat/) — NASA.*](photo/Bottom_photo_created_by_yourname_landsat.png){width="100%"}
+![*Image generated from [Your Name in Landsat](https://science.nasa.gov/specials/your-name-in-landsat/) — NASA.*](photo/research/Bottom_photo_created_by_yourname_landsat.png){width="100%"}
 
 ---
 

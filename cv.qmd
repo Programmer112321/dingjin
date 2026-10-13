@@ -40,13 +40,13 @@ Hiking, swimming, music, and movie.
 ## Photos
 
 ::: {layout-ncol=2}
-![](photo/Personal/FACE.jpg){style="border-radius: 6px; width: 100%;"}
+![](photo/about/FACE.jpg){style="border-radius: 6px; width: 100%;"}
 
-![](photo/Personal/IMG_6266.JPG){style="border-radius: 6px; width: 100%;"}
+![](photo/about/IMG_6266.JPG){style="border-radius: 6px; width: 100%;"}
 
-![](photo/Personal/IMG_8220.jpg){style="border-radius: 6px; width: 100%;"}
+![](photo/about/IMG_8220.jpg){style="border-radius: 6px; width: 100%;"}
 
-![](photo/Personal/IMG_8628.jpg){style="border-radius: 6px; width: 100%;"}
+![](photo/about/IMG_8628.jpg){style="border-radius: 6px; width: 100%;"}
 :::
 
 ## Field & Outdoors

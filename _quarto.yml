@@ -4,13 +4,13 @@ project:
 website:
   title: "Dingjin Chu"
   site-url: https://programmer112321.github.io/dingjin/
-  favicon: "photo/favicon_satellite.svg"
+  favicon: "photo/icons/favicon_satellite.svg"
   description: "PhD Student in Land Surface Ecology & Geospatial Science at Oklahoma State University. Research on forest biomass estimation, urban green space cooling effects, and ecosystem responses to climate disturbances."
   open-graph:
-    image: https://programmer112321.github.io/dingjin/photo/personal_profile.JPG
+    image: https://programmer112321.github.io/dingjin/photo/about/personal_profile.JPG
     description: "PhD Student in Land Surface Ecology & Geospatial Science at Oklahoma State University. Research on forest biomass, urban green space, and ecosystem disturbances."
   twitter-card:
-    image: https://programmer112321.github.io/dingjin/photo/personal_profile.JPG
+    image: https://programmer112321.github.io/dingjin/photo/about/personal_profile.JPG
     card-style: summary_large_image
     description: "PhD Student in Land Surface Ecology & Geospatial Science at Oklahoma State University."
   navbar:
@@ -75,10 +75,10 @@ website:
       - icon: linkedin
         href: https://www.linkedin.com/in/dingjin-chu-892ba7352/
         aria-label: LinkedIn
-      - text: "<img src='photo/scholar_logo.svg' alt='Google Scholar' style='height:20px; vertical-align:middle; margin-top:-2px;'>"
+      - text: "<img src='photo/icons/scholar_logo.svg' alt='Google Scholar' style='height:20px; vertical-align:middle; margin-top:-2px;'>"
         href: https://scholar.google.com/citations?user=XzIFKvMAAAAJ&hl=en
         aria-label: Google Scholar
-      - text: "<img src='photo/zenodo_logo.svg' alt='Zenodo' style='height:20px; vertical-align:middle; margin-top:-2px;'>"
+      - text: "<img src='photo/icons/zenodo_logo.svg' alt='Zenodo' style='height:20px; vertical-align:middle; margin-top:-2px;'>"
         href: "https://zenodo.org/search?q=metadata.creators.person_or_org.name%3A%22Chu%2C%20Dingjin%22&l=list&p=1&s=10&sort=bestmatch"
         aria-label: Zenodo
   page-footer:

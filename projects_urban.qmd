@@ -4,13 +4,13 @@ title: "Cooling Effect of Urban Green Space"
 
 **How much do urban forests and green spaces cool cities, what controls that cooling, and who benefits from it?**
 
-![](photo/urban_green_space_cooling_effect.png){width="100%" style="border-radius: 6px; margin-bottom: 0.75rem;"}
+![](photo/research/urban_green_space_cooling_effect.png){width="100%" style="border-radius: 6px; margin-bottom: 0.75rem;"}
 
 ## Why it matters
 
 Extreme heat is the deadliest weather hazard in the U.S., and cities amplify it. Planting and protecting trees is one of the most widely promoted heat-adaptation strategies, but the cooling a park or urban forest delivers varies enormously from place to place. Planners need to know *which* green spaces cool most, *why*, and whether that cooling is holding up as climate and canopies change.
 
-![*Why built-up areas run hot: roofs, pavement and concrete absorb incoming sunlight, reflect little of it (low albedo), lose little water to evaporation, and release the stored heat back into the street.*](photo/urban_heat_diagram.jpg){width="100%" style="border-radius: 6px;"}
+![*Why built-up areas run hot: roofs, pavement and concrete absorb incoming sunlight, reflect little of it (low albedo), lose little water to evaporation, and release the stored heat back into the street.*](photo/research/urban_heat_diagram.jpg){width="100%" style="border-radius: 6px;"}
 
 ## Current projects
 

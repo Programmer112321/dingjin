@@ -4,7 +4,7 @@ title: "Forest Above-Ground Biomass Estimation"
 
 **How can we estimate forest above-ground biomass (AGB) accurately — from a single plot to a whole continent — and know how much to trust the estimate?**
 
-![](photo/AGB_estimation.png){width="100%" style="border-radius: 6px; margin-bottom: 0.75rem;"}
+![](photo/research/AGB_estimation.png){width="100%" style="border-radius: 6px; margin-bottom: 0.75rem;"}
 
 ## Why it matters
 

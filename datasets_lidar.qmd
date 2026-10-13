@@ -30,7 +30,7 @@ The datasets shown here are airborne LiDAR point clouds from two open-access pro
 **Area:** ~2.04 km² · **Points:** 2.21 million · **Density:** ~1.08 pts/m²
 **Elevation range:** −10 m to +385 m (ground to building rooftops)
 
-![Annual 3DEP collection progress by fiscal year — showing the steady expansion of high-resolution lidar coverage across the contiguous United States (USGS).](photo/FY25_3DEP_ByYear_Resized.gif){width="100%" style="border-radius:6px; margin-bottom:0.75rem;"}
+![Annual 3DEP collection progress by fiscal year — showing the steady expansion of high-resolution lidar coverage across the contiguous United States (USGS).](photo/research/FY25_3DEP_ByYear_Resized.gif){width="100%" style="border-radius:6px; margin-bottom:0.75rem;"}
 
 This tile covers a section of Manhattan adjacent to Central Park. The map below shows the exact footprint of the dataset on a satellite basemap.
 
@@ -92,7 +92,7 @@ Satellite-borne LiDAR instruments providing global coverage of surface elevation
 
 ### GEDI
 
-![*GEDI (Global Ecosystem Dynamics Investigation) — NASA LiDAR instrument aboard the ISS for measuring forest structure and biomass.*](photo/GEDI.png){width="100%" style="border-radius: 6px; margin: 1rem 0;"}
+![*GEDI (Global Ecosystem Dynamics Investigation) — NASA LiDAR instrument aboard the ISS for measuring forest structure and biomass.*](photo/research/GEDI.png){width="100%" style="border-radius: 6px; margin: 1rem 0;"}
 
 GEDI is a full-waveform LiDAR instrument mounted on the International Space Station. It provides high-resolution measurements of forest vertical structure, canopy height, and above-ground biomass at global scale.
 

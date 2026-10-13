@@ -12,7 +12,7 @@ Droughts, heatwaves and other extremes are becoming more frequent and intense. T
 
 ### 1 · Future climate extremes and productivity variability in Central Asia *(published)*
 
-![](photo/climate_extremes_merged_ecosystem.png){width="100%" style="border-radius: 6px; margin-bottom: 0.75rem;"}
+![](photo/research/climate_extremes_merged_ecosystem.png){width="100%" style="border-radius: 6px; margin-bottom: 0.75rem;"}
 
 Using CMIP6 climate projections, this study shows that intensifying climate extremes — droughts, heatwaves and anomalously wet periods — will **amplify the year-to-year swings in net primary production (NPP)** across Central Asia's arid and semi-arid ecosystems, making carbon uptake increasingly unpredictable under future warming.
 
@@ -24,7 +24,7 @@ A companion study, led by Han Wu, extends the analysis to the terrestrial carbon
 
 ### 2 · Forest biomass stability under drought across the U.S.
 
-![](photo/tree_mortality.jpg){width="100%" style="border-radius: 6px; margin-bottom: 0.75rem;"}
+![](photo/research/tree_mortality.jpg){width="100%" style="border-radius: 6px; margin-bottom: 0.75rem;"}
 
 Which forests hold their biomass through drought? Using repeated forest inventory across the conterminous U.S., I identify drought events from climatic water deficit and quantify each forest's **resistance, recovery and resilience** in above-ground biomass, then ask how climate, soil, stand structure, structural diversity and plant functional traits shape those responses.
 

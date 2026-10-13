@@ -13,3 +13,6 @@
 *.laz
 *.las
 posts/*/data/
+
+# Personal photo library, private documents and unused images: never commit
+Photoes/
