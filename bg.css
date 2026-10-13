@@ -1,6 +1,6 @@
 /* ── Full-page background image (About Me only) ─────────── */
 body {
-  background-image: url('photo/bakcgournd.jpg');
+  background-image: url('photo/about/bakcgournd.jpg');
   background-size: cover;
   background-attachment: fixed;
   background-position: center center;
