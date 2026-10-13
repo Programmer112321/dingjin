@@ -60,7 +60,7 @@ Forests and mountains I have walked through — from old-growth rain forest in t
 
 ![Spruce forest in a Tian Shan valley, Kyrgyzstan (2023)](photo/gallery/tianshan_valley.jpg){style="border-radius: 6px; width: 100%;"}
 
-![Tian Shan spruce below alpine ridges, Kyrgyzstan (2023)](photo/gallery/tianshan_spruce.jpg){style="border-radius: 6px; width: 100%;"}
+![Glacier at the head of a spruce-lined valley, Tian Shan, Kyrgyzstan (2023)](photo/gallery/tianshan_glacier_valley.jpg){style="border-radius: 6px; width: 100%;"}
 
 ![Granite overlook, Wichita Mountains, Oklahoma (2025)](photo/gallery/wichita_overlook.jpg){style="border-radius: 6px; width: 100%;"}
 
