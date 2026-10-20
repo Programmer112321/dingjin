@@ -9,7 +9,7 @@ description: "Peer-reviewed publications and conference presentations by Dingjin
 
 ## Preprints
 
-1. **Chu, D.**, Yang, H., Constanza, J. K., Yang, J., Murray, B., Mosely, J., & Zhai, L. (2026). Local-scale bias in global products of forest aboveground biomass related to structural diversity, stand density, and forest age. *SSRN preprint.* [doi:10.2139/ssrn.7287457](https://doi.org/10.2139/ssrn.7287457)
+1. **Chu, D.**, Yang, H., Costanza, J. K., Yang, J., Murray, B., Mosely, J., & Zhai, L. (2026). Local-scale bias in global products of forest aboveground biomass related to structural diversity, stand density, and forest age. *SSRN preprint.* [doi:10.2139/ssrn.7287457](https://doi.org/10.2139/ssrn.7287457)
 
 ## Peer-reviewed publications
 

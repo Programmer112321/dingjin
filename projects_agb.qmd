@@ -37,7 +37,7 @@ Evaluating GEDI canopy height (L2A) and biomass (L4A) footprints against airborn
 
 ## Outputs
 
-- **Preprint** — Chu, D., Yang, H., Constanza, J. K., Yang, J., Murray, B., Mosely, J., & Zhai, L. (2026). *Local-scale bias in global products of forest aboveground biomass related to structural diversity, stand density, and forest age.* SSRN. [doi:10.2139/ssrn.7287457](https://doi.org/10.2139/ssrn.7287457)
+- **Preprint** — Chu, D., Yang, H., Costanza, J. K., Yang, J., Murray, B., Mosely, J., & Zhai, L. (2026). *Local-scale bias in global products of forest aboveground biomass related to structural diversity, stand density, and forest age.* SSRN. [doi:10.2139/ssrn.7287457](https://doi.org/10.2139/ssrn.7287457)
 - **Poster** — *Understanding the Drivers of Local-Scale Bias in Global Forest Aboveground Biomass Maps.* SAF National Convention, Tacoma, WA, Oct 2026.
 - **Talk** — *The factors influencing the accuracy of global forest biomass maps to estimate local carbon storage: a case study of Tribal Nations in the U.S.* Natural Resource Conference, Oklahoma City, Apr 2026.
 - **Poster** — *Understanding the Drivers of Local-Scale Bias in Global Forest Aboveground Biomass Maps.* AGU Fall Meeting, New Orleans, Dec 2025.
