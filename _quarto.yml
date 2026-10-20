@@ -21,7 +21,7 @@ website:
           - text: Introduction
             href: projects_intro.qmd
           - text: Forest Above-Ground Biomass Estimation
-            href: projects_agb.qmd
+            href: projects_forest_agb.qmd
           - text: Ecosystem Response to Disturbances
             href: projects_disturbance.qmd
           - text: Cooling Effect of Urban Green Space

@@ -36,5 +36,5 @@ Which forests hold their biomass through drought? Using repeated forest inventor
 **Tools:** R, Python (scikit-learn, XGBoost, SHAP), Google Earth Engine, CMIP6 / TRENDY model output
 
 ::: {.callout-note}
-Return to [Forest AGB Estimation](projects_agb.qmd) or continue to [Cooling Effect of Urban Green Space](projects_urban.qmd).
+Return to [Forest AGB Estimation](projects_forest_agb.qmd) or continue to [Cooling Effect of Urban Green Space](projects_urban.qmd).
 :::

@@ -88,9 +88,9 @@ To answer them, I combine field inventories (FIA, NEON) with airborne, spaceborn
 
 ::: {.grid}
 ::: {.g-col-12 .g-col-md-4}
-[![](photo/research/AGB_estimation.png){style="border-radius:8px; width:100%; aspect-ratio:4/3; object-fit:cover;"}](projects_agb.qmd)
+[![](photo/research/AGB_estimation.png){style="border-radius:8px; width:100%; aspect-ratio:4/3; object-fit:cover;"}](projects_forest_agb.qmd)
 
-**[Forest Above-Ground Biomass](projects_agb.qmd)**<br>
+**[Forest Above-Ground Biomass](projects_forest_agb.qmd)**<br>
 Multi-scale LiDAR and the local accuracy of biomass maps.
 :::
 ::: {.g-col-12 .g-col-md-4}

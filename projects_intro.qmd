@@ -12,7 +12,7 @@ Integrate field investigations, remote sensing, and modeling to reveal cross-sca
 
 | Topic | Core question |
 |---|---|
-| [**Forest Above-Ground Biomass Estimation**](projects_agb.qmd) | How to estimate forest AGB across large spatial scales? |
+| [**Forest Above-Ground Biomass Estimation**](projects_forest_agb.qmd) | How to estimate forest AGB across large spatial scales? |
 | [**Ecosystem Response to Disturbances**](projects_disturbance.qmd) | How do disturbances regulate ecosystem functioning and drive forest loss? |
 | [**Cooling Effect of Urban Green Space**](projects_urban.qmd) | How does urban green space regulate temperature? |
 

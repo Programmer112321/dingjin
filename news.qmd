@@ -27,7 +27,7 @@ format:
 <div class="text-muted mt-4">Apr 2026</div>
 <h5><strong>Talk at the Natural Resource Conference, Oklahoma City, USA</strong></h5>
 <p>Dingjin gave a talk on <em>The factors influencing the accuracy of global forest biomass maps to estimate local carbon storage: a case study of Tribal Nations in the U.S.</em></p>
-<a href="projects_agb.qmd" class="btn btn-outline-primary">About this research</a>
+<a href="projects_forest_agb.qmd" class="btn btn-outline-primary">About this research</a>
 
 # 2025
 
