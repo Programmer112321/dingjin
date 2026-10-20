@@ -7,6 +7,10 @@ description: "Peer-reviewed publications and conference presentations by Dingjin
 [ResearchGate](https://www.researchgate.net/profile/Dingjin-Chu/publications?sorting=recentlyAdded){.btn .btn-outline-secondary target="_blank"}
 [Download CV (PDF)](doc/DingjinChu_CV.pdf){.btn .btn-primary}
 
+## Preprints
+
+1. **Chu, D.**, Yang, H., Constanza, J. K., Yang, J., Murray, B., Mosely, J., & Zhai, L. (2026). Local-scale bias in global products of forest aboveground biomass related to structural diversity, stand density, and forest age. *SSRN preprint.* [doi:10.2139/ssrn.7287457](https://doi.org/10.2139/ssrn.7287457)
+
 ## Peer-reviewed publications
 
 1. **Chu, D.**, Zhang, L., Wu, H., He, H., & Ren, X. (2026). Future climate extremes enhance interannual variability of net primary production in Central Asia. *Environmental Research Letters.* [doi:10.1088/1748-9326/ae6dd4](https://doi.org/10.1088/1748-9326/ae6dd4)
