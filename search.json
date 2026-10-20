@@ -1194,7 +1194,7 @@
     "href": "projects_agb.html#outputs",
     "title": "Forest Above-Ground Biomass Estimation",
     "section": "Outputs",
-    "text": "Outputs\n\nPreprint — Chu, D., Yang, H., Constanza, J. K., Yang, J., Murray, B., Mosely, J., & Zhai, L. (2026). Local-scale bias in global products of forest aboveground biomass related to structural diversity, stand density, and forest age. SSRN. doi:10.2139/ssrn.7287457\nPoster — Understanding the Drivers of Local-Scale Bias in Global Forest Aboveground Biomass Maps. SAF National Convention, Tacoma, WA, Oct 2026.\nTalk — The factors influencing the accuracy of global forest biomass maps to estimate local carbon storage: a case study of Tribal Nations in the U.S. Natural Resource Conference, Oklahoma City, Apr 2026.\nPoster — Understanding the Drivers of Local-Scale Bias in Global Forest Aboveground Biomass Maps. AGU Fall Meeting, New Orleans, Dec 2025.\n\nStatus: project 1 is available as a preprint; other manuscripts are in preparation.\nTools: R (lidR, lasR, terra, sf), Python (scikit-learn, XGBoost, LightGBM, SHAP), Google Earth Engine\n\n\n\n\n\n\nNote\n\n\n\nReturn to Research Introduction or continue to Ecosystem Response to Disturbances."
+    "text": "Outputs\n\nPreprint — Chu, D., Yang, H., Costanza, J. K., Yang, J., Murray, B., Mosely, J., & Zhai, L. (2026). Local-scale bias in global products of forest aboveground biomass related to structural diversity, stand density, and forest age. SSRN. doi:10.2139/ssrn.7287457\nPoster — Understanding the Drivers of Local-Scale Bias in Global Forest Aboveground Biomass Maps. SAF National Convention, Tacoma, WA, Oct 2026.\nTalk — The factors influencing the accuracy of global forest biomass maps to estimate local carbon storage: a case study of Tribal Nations in the U.S. Natural Resource Conference, Oklahoma City, Apr 2026.\nPoster — Understanding the Drivers of Local-Scale Bias in Global Forest Aboveground Biomass Maps. AGU Fall Meeting, New Orleans, Dec 2025.\n\nStatus: project 1 is available as a preprint; other manuscripts are in preparation.\nTools: R (lidR, lasR, terra, sf), Python (scikit-learn, XGBoost, LightGBM, SHAP), Google Earth Engine\n\n\n\n\n\n\nNote\n\n\n\nReturn to Research Introduction or continue to Ecosystem Response to Disturbances."
   },
   {
     "objectID": "projects_intro.html",
@@ -1236,7 +1236,7 @@
     "href": "publications.html#preprints",
     "title": "Publications & Presentations",
     "section": "Preprints",
-    "text": "Preprints\n\nChu, D., Yang, H., Constanza, J. K., Yang, J., Murray, B., Mosely, J., & Zhai, L. (2026). Local-scale bias in global products of forest aboveground biomass related to structural diversity, stand density, and forest age. SSRN preprint. doi:10.2139/ssrn.7287457"
+    "text": "Preprints\n\nChu, D., Yang, H., Costanza, J. K., Yang, J., Murray, B., Mosely, J., & Zhai, L. (2026). Local-scale bias in global products of forest aboveground biomass related to structural diversity, stand density, and forest age. SSRN preprint. doi:10.2139/ssrn.7287457"
   },
   {
     "objectID": "publications.html#peer-reviewed-publications",
