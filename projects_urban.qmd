@@ -4,7 +4,7 @@ title: "Cooling Effect of Urban Green Space"
 
 **How much do urban forests and green spaces cool cities, what controls that cooling, and who benefits from it?**
 
-![](photo/research/urban_green_space_cooling_effect.png){width="100%" style="border-radius: 6px; margin-bottom: 0.75rem;"}
+![](photo/research/urban_cooling_buffer_effect.jpg){width="100%" style="border-radius: 6px; margin-bottom: 0.75rem;"}
 
 ## Why it matters
 

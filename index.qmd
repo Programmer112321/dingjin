@@ -100,7 +100,7 @@ Multi-scale LiDAR and the local accuracy of biomass maps.
 Climate extremes, productivity variability and forest stability.
 :::
 ::: {.g-col-12 .g-col-md-4}
-[![](photo/research/urban_green_space_cooling_effect.png){style="border-radius:8px; width:100%; aspect-ratio:4/3; object-fit:cover;"}](projects_urban.qmd)
+[![](photo/research/urban_cooling_buffer_effect.jpg){style="border-radius:8px; width:100%; aspect-ratio:4/3; object-fit:cover;"}](projects_urban.qmd)
 
 **[Urban Green Space Cooling](projects_urban.qmd)**<br>
 How canopy, climate and buildings shape urban cooling.
