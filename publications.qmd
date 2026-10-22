@@ -1,6 +1,6 @@
 ---
-title: "Publications & Presentations"
-description: "Peer-reviewed publications and conference presentations by Dingjin Chu."
+title: "Publications"
+description: "Preprints and peer-reviewed publications by Dingjin Chu."
 ---
 
 [Google Scholar](https://scholar.google.com/citations?user=XzIFKvMAAAAJ&hl=en){.btn .btn-outline-secondary target="_blank"}
@@ -20,13 +20,3 @@ description: "Peer-reviewed publications and conference presentations by Dingjin
 3. **Chu, D.**, He, K., Lin, S., Zuo, Y., & Chen, X. (2022). Comparison of forest and shrublands in potentially afforested areas based on remote sensing and field surveys. *Acta Ecologica Sinica*, 42(18), 7362–7371. [doi:10.5846/stxb202203210685](https://doi.org/10.5846/stxb202203210685) *(in Chinese)*
 
 4. Chen, X., Li, Y., Zuo, Y., Lin, S., **Chu, D.**, & He, K. (2022). Effects of stand characteristics on herbaceous diversity. *Acta Botanica Boreali-Occidentalia Sinica*, 42(08), 1396–1407. [doi:10.7606/j.issn.1000-4025.2022.08.1396](https://doi.org/10.7606/j.issn.1000-4025.2022.08.1396) *(in Chinese)*
-
-## Conference presentations
-
-| Date | Type | Title | Meeting |
-|---|---|---|---|
-| Oct 2026 | Talk | Patterns and Drivers of Urban Forest Cooling Across U.S. Cities | SAF National Convention, Tacoma, WA |
-| Oct 2026 | Poster | Understanding the Drivers of Local-Scale Bias in Global Forest Aboveground Biomass Maps | SAF National Convention, Tacoma, WA |
-| Apr 2026 | Talk | The factors influencing the accuracy of global forest biomass maps to estimate local carbon storage: a case study of Tribal Nations in the U.S. | Natural Resource Conference, Oklahoma City, OK |
-| Dec 2025 | Poster | Understanding the Drivers of Local-Scale Bias in Global Forest Aboveground Biomass Maps | AGU Fall Meeting, New Orleans, LA |
-| Aug 2023 | Poster | Impacts of future climate extremes on interannual variability of terrestrial ecosystem productivity in Central Asia based on CMIP6 | Actual Issues of Environmental Research for Sustainable Development in Arid Zones, Issyk-Kul, Kyrgyzstan |

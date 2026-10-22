@@ -10,7 +10,7 @@ I am a Ph.D. student in Quantitative Ecology in the Department of Natural Resour
 Before coming to OSU, I was a research assistant at the Institute of Geographic Sciences and Natural Resources Research, Chinese Academy of Sciences (2023–2025), where I worked on global forest disturbance mapping, process-based ecosystem models, and the effects of climate extremes on vegetation productivity in drylands. My M.Sc. at Beijing Forestry University combined forest field surveys, tree rings and remote sensing to assess forest functions in the Qilian Mountains.
 
 [Download CV (PDF)](doc/DingjinChu_CV.pdf){.btn .btn-primary}
-[Publications & Presentations](publications.qmd){.btn .btn-outline-secondary}
+[Publications](publications.qmd){.btn .btn-outline-secondary}
 
 ## Education
 
