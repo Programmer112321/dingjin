@@ -680,3 +680,22 @@ h2.hp-h2 {
   text-align: center;
   margin-top: 0.4rem;
 }
+
+/* ── Larger hero globe on wide screens: column runs to the window edge ── */
+.hp-hero {
+  overflow-x: clip;
+}
+
+@media (min-width: 992px) {
+  .hp-hero-grid {
+    grid-template-columns: 5fr 7fr;
+  }
+
+  .hp-hero-grid > div:last-child {
+    margin-right: calc(-1 * (max(0px, (100vw - var(--hp-max)) / 2) + 28px));
+  }
+
+  .hp-hero .hp-globe-box {
+    max-height: 760px;
+  }
+}
