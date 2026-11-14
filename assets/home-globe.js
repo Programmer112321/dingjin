@@ -123,7 +123,7 @@
     controls.autoRotateSpeed = 0.4;
     controls.enableZoom = false;
 
-    globe.pointOfView({ lat: 28, lng: 85, altitude: 2.2 }, 0);   /* start over the Himalaya */
+    globe.pointOfView({ lat: 28, lng: 85, altitude: 1.6 }, 0);   /* start over the Himalaya */
 
     function fit() { globe.width(el.clientWidth).height(el.clientHeight); }
     fit();
