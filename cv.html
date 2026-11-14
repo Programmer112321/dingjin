@@ -584,6 +584,8 @@ ul.task-list li input[type="checkbox"] {
 <script>
 (function () {
   var canvas = document.getElementById('bg-canvas');
+  /* the homepage has its own globe animation: no particle background there */
+  if (document.querySelector('.hp-home')) { canvas.remove(); return; }
   var ctx = canvas.getContext('2d');
   var particles = [];
   var N = 90;

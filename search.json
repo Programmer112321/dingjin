@@ -805,34 +805,6 @@
     "text": "NAIP — National Agriculture Imagery Program (USDA)\nNAIP (National Agriculture Imagery Program) is a high-resolution aerial imagery program operated by the USDA Farm Service Agency (FSA). It acquires leaf-on orthorectified imagery across the contiguous United States (CONUS) during agricultural growing seasons, making it one of the highest-resolution freely available datasets for land surface analysis in the US.\nAgency: USDA Farm Service Agency (FSA) Spatial resolution: 1 m (standard) · 0.6 m (select states and years) Temporal resolution: State-level acquisition cycles, typically every 2–3 years per state Spectral bands: Red, Green, Blue (RGB) · Near-Infrared (NIR) added since 2007; some products include a 5th band (Red Edge, select years) Coverage: Contiguous United States (CONUS); acquired during peak growing season (leaf-on conditions) Format: Cloud Optimized GeoTIFF (COG); also available as tiled web services Key applications: Land cover and land use mapping, crop type identification, urban tree canopy assessment, riparian vegetation monitoring, change detection at local scale, training data for machine learning models\n\n\n\n\n\n\nTip\n\n\n\nBecause NAIP is acquired leaf-on and at ~1 m resolution, it is widely used as high-resolution ground truth or training data for coarser satellite products (Landsat, Sentinel-2). NDVI derived from NAIP’s NIR band can resolve individual tree crowns.\n\n\n\n\n\n\n\n\nNote\n\n\n\nNAIP imagery is freely available through USGS EarthExplorer, USDA Box, and Google Earth Engine (USDA/NAIP/DOQQ)."
   },
   {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Dingjin Chu 初鼎晋",
-    "section": "",
-    "text": "PhD Student · Land Surface Ecology & Geospatial Science\nDepartment of Natural Resource Ecology & Management · Oklahoma State University"
-  },
-  {
-    "objectID": "index.html#hello-this-is-dingjin.",
-    "href": "index.html#hello-this-is-dingjin.",
-    "title": "Dingjin Chu 初鼎晋",
-    "section": "👋 Hello, this is Dingjin.",
-    "text": "👋 Hello, this is Dingjin.\nExplore important research questions using robust datasets and rigorous methods under well-defined assumptions.\n\nI study how forests store carbon, how they respond to climate extremes, and how much they cool our cities. My work asks questions such as: Can a global biomass map be trusted to report the carbon in a local forest? Which forests hold their biomass through drought? Why do some urban forests cool their surroundings far more than others? Read more in the Research section.\nTo answer them, I combine field inventories (FIA, NEON) with airborne, spaceborne and terrestrial LiDAR and multi-decadal satellite records — see Datasets — and analyze them with statistical models, interpretable machine learning and process-based models — see Methods.\nLatest: I presented a talk on urban forest cooling and a poster on biomass-map bias at the SAF National Convention (Oct 2026), and my paper on climate extremes and productivity variability in Central Asia is out in Environmental Research Letters."
-  },
-  {
-    "objectID": "index.html#research-areas",
-    "href": "index.html#research-areas",
-    "title": "Dingjin Chu 初鼎晋",
-    "section": "Research Areas",
-    "text": "Research Areas\n\n\n\nForest Above-Ground Biomass Multi-scale LiDAR and the local accuracy of biomass maps.\n\n\n\nResponse to Disturbances Climate extremes, productivity variability and forest stability.\n\n\n\nUrban Green Space Cooling How canopy, climate and buildings shape urban cooling.\n\n\n\n\n\n\nImage generated from Your Name in Landsat — NASA."
-  },
-  {
-    "objectID": "index.html#contact-me",
-    "href": "index.html#contact-me",
-    "title": "Dingjin Chu 初鼎晋",
-    "section": "Contact Me",
-    "text": "Contact Me\n\n  \n    Feel free to get in touch for any inquiries or opportunities. I am open to collaborations, scientific projects, and job opportunities where I can contribute my expertise in remote sensing, LiDAR, and environmental data science.\n    dingjinchu@gmail.com\n    Agricultural Hall, Department of Natural Resource Ecology & Management, Oklahoma State University, Stillwater, OK\n    \n      \n      \n      \n    \n  \n  \n    \n      \n        Full Name *\n        \n      \n      \n        Email *\n        \n      \n      \n        Affiliation *\n        \n      \n      \n        Position *\n        \n      \n      \n        Message *\n        \n      \n      Submit"
-  },
-  {
     "objectID": "methods_causal.html",
     "href": "methods_causal.html",
     "title": "Causal Inference",
