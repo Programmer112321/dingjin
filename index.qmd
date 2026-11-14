@@ -44,6 +44,8 @@ page-layout: custom
 title-block-style: none
 resources:
   - assets/home-globe.js
+  - assets/gistemp-decades.json
+  - assets/treeline.svg
 ---
 
 ```{=html}
@@ -52,6 +54,7 @@ resources:
 
 <!-- ── Hero ─────────────────────────────────────────────── -->
 <section class="hp-hero">
+  <div class="hp-treeline" aria-hidden="true"></div>
   <div class="hp-wrap hp-hero-grid">
     <div>
       <div class="hp-kicker">Natural Resource Ecology &amp; Management · Oklahoma State University</div>
@@ -201,5 +204,5 @@ function submitContactHome(e) {
   document.querySelectorAll('.hp-reveal').forEach(function (el) { io.observe(el); });
 })();
 </script>
-<script src="assets/home-globe.js?v=202611141627" defer></script>
+<script src="assets/home-globe.js?v=202611141721" defer></script>
 ```
