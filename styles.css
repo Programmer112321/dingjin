@@ -334,7 +334,8 @@ h2.hp-h2 {
 
 .hp-globe-box:active { cursor: grabbing; }
 
-#hp-globe {
+#hp-globe,
+#data-globe {
   position: absolute;
   inset: 0;
 }
@@ -665,4 +666,17 @@ h2.hp-h2 {
 
 .hp-veg-legend {
   margin-top: 6px;
+}
+
+/* ── Datasets page globe ───────────────────────────────────── */
+.mg-figure {
+  max-width: 560px;
+  margin: 1.5rem auto 0.5rem;
+}
+
+.mg-caption {
+  font-size: 0.88rem;
+  color: var(--dc-muted);
+  text-align: center;
+  margin-top: 0.4rem;
 }
