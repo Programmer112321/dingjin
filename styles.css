@@ -699,3 +699,72 @@ h2.hp-h2 {
     max-height: 760px;
   }
 }
+
+/* ── Homepage globe: temperature overlay (decade + slim scale) ── */
+.hp-temp {
+  position: absolute;
+  left: 6%;
+  bottom: 6%;
+  width: 220px;
+  pointer-events: none;
+  font-size: 0.78rem;
+  color: var(--dc-muted);
+}
+
+.hp-temp-dec {
+  font-family: var(--dc-serif);
+  font-size: 1.9rem;
+  line-height: 1.1;
+  color: var(--dc-ink);
+  margin-bottom: 6px;
+}
+
+.hp-temp-bar {
+  height: 8px;
+  border-radius: 4px;
+}
+
+.hp-temp-ticks {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2px;
+}
+
+.hp-temp-src {
+  margin-top: 4px;
+  font-size: 0.72rem;
+}
+
+/* ── Homepage hero: natural treeline along the bottom ── */
+.hp-hero {
+  position: relative;
+  padding-bottom: 150px;
+}
+
+.hp-treeline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 170px;
+  background: url("assets/treeline.svg") repeat-x left bottom / auto 170px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.hp-hero .hp-wrap {
+  position: relative;
+  z-index: 1;
+}
+
+body.quarto-dark .hp-treeline {
+  opacity: 0.45;
+  filter: brightness(0.8);
+}
+
+@media (max-width: 640px) {
+  .hp-hero { padding-bottom: 110px; }
+  .hp-treeline { height: 120px; background-size: auto 120px; }
+  .hp-temp { width: 170px; }
+  .hp-temp-dec { font-size: 1.4rem; }
+}
