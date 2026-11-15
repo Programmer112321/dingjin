@@ -122,7 +122,7 @@
 
     var controls = globe.controls();
     controls.autoRotate = !reduce;
-    controls.autoRotateSpeed = 0.4;
+    controls.autoRotateSpeed = 3.2;
     controls.enableZoom = false;
 
     globe.pointOfView({ lat: 28, lng: 85, altitude: 1.6 }, 0);   /* start over the Himalaya */
@@ -210,7 +210,7 @@
 
       if (reduce) { paint(last, 0); return; }
 
-      var HOLD = 1600, FADE = 1300, END_HOLD = 3500;
+      var HOLD = 533, FADE = 433, END_HOLD = 1200;
       var k = 0, phase = "hold", t0 = performance.now(), lastPaint = 0;
       paint(0, 0);
       function tick(now) {
@@ -221,7 +221,7 @@
           }
           if (phase === "fade") {
             var f = Math.min(1, dt / FADE);
-            if (now - lastPaint > 80 || f === 1) {
+            if (now - lastPaint > 60 || f === 1) {
               lastPaint = now;
               if (k === last) paint(0, 0);   /* loop back to the 1950s */
               else paint(k, f);
