@@ -16,7 +16,7 @@ Modern ecological and environmental research requires observations spanning mult
   <p class="mg-caption">Data streams scanning the Earth: spaceborne <a href="datasets_lidar.html">LiDAR</a> (GEDI, ICESat-2), <a href="datasets_optical.html">optical imaging</a> (Landsat 9) and <a href="datasets_radar.html">radar</a> (Sentinel-1), over the 81 <a href="datasets_field.html">NEON field sites</a> in orange. Hover a satellite or site for its name; drag to turn the globe.</p>
 </div>
 <script src="assets/neon-sites.js?v=20261114"></script>
-<script src="assets/data-globe.js?v=20261114" defer></script>
+<script src="assets/data-globe.js?v=202611151311" defer></script>
 ```
 
 ---

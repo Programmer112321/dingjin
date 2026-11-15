@@ -131,7 +131,18 @@
     fit();
     window.addEventListener("resize", fit);
 
-    el.addEventListener("pointerdown", function () { controls.autoRotate = false; });
+    /* pause rotation while the visitor holds or drags the globe; resume 2.5 s after release */
+    var resumeTimer = null;
+    el.addEventListener("pointerdown", function () {
+      controls.autoRotate = false;
+      clearTimeout(resumeTimer);
+    });
+    ["pointerup", "pointercancel", "pointerleave"].forEach(function (ev) {
+      el.addEventListener(ev, function () {
+        clearTimeout(resumeTimer);
+        if (!reduce) resumeTimer = setTimeout(function () { controls.autoRotate = true; }, 2500);
+      });
+    });
     el.__globe = globe;   /* handle for debugging in the browser console */
   }
 
